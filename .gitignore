@@ -1,25 +1,41 @@
-# CakePHP 3
+#################################
+# Sistema / Editor
+#################################
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
 
-/vendor/*
-/config/app.php
+#################################
+# Entorno / secretos
+#################################
+.env
+.env.*
+config/db.php
 
-/tmp/cache/models/*
-!/tmp/cache/models/empty
-/tmp/cache/persistent/*
-!/tmp/cache/persistent/empty
-/tmp/cache/views/*
-!/tmp/cache/views/empty
-/tmp/sessions/*
-!/tmp/sessions/empty
-/tmp/tests/*
-!/tmp/tests/empty
+#################################
+# PHP / Composer
+#################################
+/vendor/
+composer.lock
 
-/logs/*
-!/logs/empty
+#################################
+# Docker
+#################################
+docker/db_data/
+*.pid
 
-# CakePHP 2
+#################################
+# Subidas de usuarios
+#################################
+uploads/
+public/uploads/
+src/public/uploads/
 
-/app/tmp/*
-/app/Config/core.php
-/app/Config/database.php
-/vendors/*
+#################################
+# Logs / temporales
+#################################
+*.log
+/tmp/
+cache/
+

@@ -1,9 +1,13 @@
 <?php
+declare(strict_types=1);
 
 class HomeController
 {
-    public function index()
+    // GET /
+    public function index(): void
     {
-        echo 'HOME';
+        // Lo típico: o enseñas landing o rediriges a /mascotas
+        header('Location: /mascotas');
+        exit;
     }
 }

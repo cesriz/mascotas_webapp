@@ -1,107 +1,126 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../Models/MascotaRepository.php';
+require_once __DIR__ . '/../Models/Mascota.php';
 
 class MascotaController
 {
-    private MascotaFiltro $mascotaFiltro;
-
-    public function __construct()
-    {
-        // Creamos el filtro (el que sabe conseguir mascotas)
-        $this->mascotaFiltro = new MascotaFiltro();
-    }
-
-    /**
-     * GET /mascotas
-     * Esto muestra la LISTA de mascotas.
-     */
+    // GET /mascotas?estado=perdida
     public function index(): void
     {
-        // 1) Leemos el filtro que puede venir por la URL:
-        //    /mascotas?estado=perdida  o  /mascotas?estado=encontrada
-        $estado = $_GET['estado'] ?? 'perdida'; // si no viene, perdidas por defecto
+        // Para poner por estado por defecto "perdida"
+        $estado = $_GET['estado'] ?? 'perdida';
 
-        // 2) Pedimos al repositorio la lista de mascotas de ese estado
-        //    Esto te devuelve un array de objetos Mascota
-        $mascotas = $this->mascotaFiltro->obtenerTodas($estado);
+        // Validación de que se ha introducido estado válido, sino se pone por defecto "perdida"
+        if (!in_array($estado, ['perdida','encontrada'], true)) {
+            $estado = 'perdida';
+        }
 
-        // 3) Cargamos la vista que pinta el listado
-        //    La vista usará la variable $mascotas
+        $mascota = new Mascota();
+        $mascotas = $mascota->obtenerTodas($estado);
+
         require __DIR__ . '/../Views/mascotas/index.php';
     }
 
-    /**
-     * GET /mascotas/{id}
-     * Esto muestra el DETALLE de una mascota.
-     */
+    // GET /mascotas/{id}
     public function show(int $id): void
     {
-        // 1) Pedimos la mascota concreta
-        $mascota = $this->repo->obtenerPorId($id);
+        $mascota = new Mascota();
 
-        // 2) Si no existe -> mensaje simple
-        if ($mascota === null) {
+        if (!$mascota->cargarPorId($id)) {
             http_response_code(404);
             echo 'Mascota no encontrada';
             return;
         }
 
-        // 3) Cargamos la vista del detalle
         require __DIR__ . '/../Views/mascotas/show.php';
     }
 
-    /**
-     * GET /mascotas/crear
-     * Mostrar el formulario de publicar mascota
-     */
+    // GET /mascotas/crear
     public function create(): void
     {
+        $errores = [];
         require __DIR__ . '/../Views/mascotas/create.php';
     }
 
-    /**
-     * POST /mascotas
-     * Guardar la nueva mascota que viene del formulario
-     */
+    // POST /mascotas
     public function store(): void
     {
-        // 1) Recogemos datos del formulario
-        $nombre = trim($_POST['nombre'] ?? '');
-        $tipo = trim($_POST['tipo'] ?? '');
-        $ciudad = trim($_POST['ciudad'] ?? '');
-        $descripcion = trim($_POST['descripcion'] ?? '');
+        $m = new Mascota();
 
-        // 2) Creamos un objeto Mascota (id provisional 0 porque la BD luego dará el real)
-        $mascota = new Mascota(
-            id: 0,
-            nombre: $nombre,
-            tipo: $tipo,
-            estado: 'perdida',
-            ciudad: $ciudad,
-            descripcion: $descripcion
-        );
+        $m->nombre = trim($_POST['nombre'] ?? '');
+        $m->localizacion_perdida = trim($_POST['localizacion_perdida'] ?? '');
+        $m->telefono_contacto = trim($_POST['telefono_contacto'] ?? '');
+        $m->email_contacto = trim($_POST['email_contacto'] ?? '');
+        $m->fecha_desaparicion = trim($_POST['fecha_desaparicion'] ?? '');
+        $m->estado = 'perdida';
 
-        // 3) Mandamos al repositorio guardarla
-        $this->repo->crear($mascota);
 
-        // 4) Redirigimos al listado
-        header('Location: /mascotas');
-        exit;
-    }
+        $peso = trim($_POST['peso_kg'] ?? '');
+        $m->peso_kg = ($peso !== '' && is_numeric($peso)) ? (float)$peso : null;
 
-    /**
-     * POST /mascotas/{id}/estado
-     * Cambiar estado (perdida/encontrada/cerrada)
-     */
-    public function actualizarEstado(int $id): void
-    {
-        $estado = $_POST['estado'] ?? 'perdida';
-        $this->repo->actualizarEstado($id, $estado);
+        // Foto simple
+        $m->foto_path = $this->guardarFoto($_FILES['foto'] ?? null);
+
+        // Validación 
+        $errores = [];
+        if ($m->nombre === '') $errores[] = 'Falta el nombre';
+        if ($m->localizacion_perdida === '') $errores[] = 'Falta la localización';
+        if ($m->telefono_contacto === '') $errores[] = 'Falta el teléfono';
+        if ($m->email_contacto === '') $errores[] = 'Falta el email';
+        if ($m->fecha_desaparicion === '') $errores[] = 'Falta la fecha';
+
+        if (!empty($errores)) {
+            require __DIR__ . '/../Views/mascotas/create.php';
+            return;
+        }
+
+        $id = $m->insertar();
 
         header('Location: /mascotas/' . $id);
         exit;
     }
-}
 
+    // POST /mascotas/{id}/estado
+    public function actualizarEstado(int $id): void
+    {
+        $estado = $_POST['estado'] ?? 'perdida';
+
+
+        // Validación de que se ha introducido estado válido, sino se pone por defecto "perdida"
+        if (!in_array($estado, ['perdida','encontrada'], true)) {
+            $estado = 'perdida';
+        }
+
+        $m = new Mascota();
+        $m->cambiarEstado($id, $estado);
+
+        header('Location: /mascotas/' . $id);
+        exit;
+    }
+
+    // Para manejar fotos asociadas a la mascota
+
+    private function guardarFoto(?array $file): ?string // Parámetro de entrada será $_FILES['foto'] y devuelve una ruta donde se guardó la foto en el proyecto
+    {
+        if ($file === null || $file['error'] !== UPLOAD_ERR_OK) { // Si dió error devuelve null
+            return null;
+        }
+
+        // Ruta donde se guardarán las fotos
+        $ruta = __DIR__ . '/../../public/uploads/mascotas';
+
+        // Si la carpeta no existe creála en esa ubicación
+        if (!is_dir($ruta)) {
+            mkdir($ruta, 0775, true);
+        }
+
+
+        // Obtenemos la extensión del archivo ("bretón.jpg")
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION); // Obtenemos la extensión del archivo ("bretón.jpg" -> jpg)
+        $nombre = uniqid('m_', true) . '.' . $extension; // Crea un nombre único para el archivo para evitar sobreescribir archivos
+        move_uploaded_file($file['tmp_name'], $ruta . '/' . $nombre); // Muevela foto u archivo desde carpeta temporal del formulario a carpeta uploads de nuestro proyecto
+
+        return '/uploads/mascotas/' . $nombre;
+    }
+}

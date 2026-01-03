@@ -5,6 +5,8 @@ require_once __DIR__ . '/../Models/Mascota.php';
 
 class MascotaController
 {
+
+
     // GET /mascotas?estado=perdida
     public function index(): void
     {
@@ -20,7 +22,11 @@ class MascotaController
         $mascotas = $mascota->obtenerTodas($estado);
 
         require __DIR__ . '/../Views/mascotas/index.php';
+
     }
+
+
+
 
     // GET /mascotas/{id}
     public function show(int $id): void
@@ -36,12 +42,18 @@ class MascotaController
         require __DIR__ . '/../Views/mascotas/show.php';
     }
 
+
+
+
     // GET /mascotas/crear
     public function create(): void
     {
         $errores = [];
         require __DIR__ . '/../Views/mascotas/create.php';
     }
+
+
+
 
     // POST /mascotas
     public function store(): void
@@ -81,6 +93,9 @@ class MascotaController
         exit;
     }
 
+
+
+
     // POST /mascotas/{id}/estado
     public function actualizarEstado(int $id): void
     {
@@ -98,6 +113,9 @@ class MascotaController
         header('Location: /mascotas/' . $id);
         exit;
     }
+
+
+    
 
     // Para manejar fotos asociadas a la mascota
 

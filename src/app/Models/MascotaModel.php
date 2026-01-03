@@ -49,25 +49,22 @@ class Mascota
      * Cargar mascota por ID 
      */
     public function cargarPorId(int $id): bool
-    {
-        $sql = "SELECT * FROM mascotas WHERE id = :id LIMIT 1";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $id]);
+{
+    $stmt = $this->db->prepare(
+        "SELECT * FROM mascotas WHERE id = :id"
+    );
+    $stmt->execute(['id' => $id]);
 
-        $row = $stmt->fetch();
-        if (!$row) {
-            return false;
-        }
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) return false;
 
-        // Volcamos datos al objeto
-        foreach ($row as $campo => $valor) {
-            if (property_exists($this, $campo)) {
-                $this->$campo = $valor;
-            }
-        }
-
-        return true;
+    foreach ($row as $campo => $valor) {
+        $this->$campo = $valor;
     }
+
+    return true;
+}
+
 
     /**
      * Insertar nueva mascota

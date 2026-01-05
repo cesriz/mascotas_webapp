@@ -6,22 +6,6 @@ require_once __DIR__ . '/../Models/Mascota.php';
 
 class AvistamientoController
 {
-    // GET /mascotas/{id}/avistamientos
-    public function index(int $mascotaId): void
-    {
-        $mascota = new Mascota();
-        if (!$mascota->cargarPorId($mascotaId)) {
-            http_response_code(404);
-            echo 'Mascota no encontrada';
-            return;
-        }
-
-        $avistamiento = new Avistamiento();
-        $avistamientos = $avistamiento->obtenerPorMascota($mascotaId);
-
-        require __DIR__ . '/../Views/avistamientos/index.php';
-    }
-
     // GET /mascotas/{id}/avistamientos/crear
     public function create(int $mascotaId): void
     {
@@ -33,7 +17,7 @@ class AvistamientoController
         }
 
         $errores = [];
-        require __DIR__ . '/../Views/avistamientos/create.php';
+        require __DIR__ . '/../../resources/views/avistamientos/create.php';
     }
 
     // POST /mascotas/{id}/avistamientos
@@ -52,7 +36,6 @@ class AvistamientoController
         $avistamiento->localizacion = trim($_POST['localizacion'] ?? '');
         $avistamiento->fecha_avistamiento = trim($_POST['fecha_avistamiento'] ?? '');
         $avistamiento->descripcion = trim($_POST['descripcion'] ?? '');
-        if ($avistamiento->descripcion === '') $avistamiento->descripcion = null;
 
         $avistamiento->telefono_contacto = trim($_POST['telefono_contacto'] ?? '');
         $avistamiento->email_contacto = trim($_POST['email_contacto'] ?? '');
@@ -67,13 +50,16 @@ class AvistamientoController
         if ($avistamiento->email_contacto === '') $errores[] = 'Falta el email';
 
         if (!empty($errores)) {
-            require __DIR__ . '/../Views/avistamientos/create.php';
+            // OJO: si hay errores, volvemos a enseñar el formulario
+            // y necesitamos $mascotaId para el action del form
+            require __DIR__ . '/../../resources/views/avistamientos/create.php';
             return;
         }
 
-        $a->insertar();
+        
+        $avistamiento->insertar();
 
-        // Vuelves al detalle de la mascota (o al listado de avistamientos)
+        // Volvemos al detalle de la mascota
         header('Location: /mascotas/' . $mascotaId);
         exit;
     }
@@ -84,7 +70,7 @@ class AvistamientoController
             return null;
         }
 
-        $ruta = __DIR__ . '/../../public/uploads/avistamientos';
+        $ruta = __DIR__ . '/../../../public/uploads/avistamientos';
 
         if (!is_dir($ruta)) {
             mkdir($ruta, 0775, true);
@@ -98,4 +84,3 @@ class AvistamientoController
         return '/uploads/avistamientos/' . $nombre;
     }
 }
-

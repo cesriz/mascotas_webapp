@@ -11,7 +11,7 @@ Thumbs.db
 #################################
 .env
 .env.*
-config/db.php
+src/config/database.php
 
 #################################
 # PHP / Composer
@@ -20,17 +20,15 @@ config/db.php
 composer.lock
 
 #################################
-# Docker
+# Docker / Base de datos
 #################################
-docker/db_data/
+mysql_data/
 *.pid
 
 #################################
 # Subidas de usuarios
 #################################
-uploads/
 public/uploads/
-src/public/uploads/
 
 #################################
 # Logs / temporales
@@ -38,4 +36,3 @@ src/public/uploads/
 *.log
 /tmp/
 cache/
-

@@ -49,7 +49,8 @@ return [
     ['GET',  '/mascotas/{id}/avistamientos', 'AvistamientoController@index'],
 
     // Registrar un avistamiento
-    ['POST', '/mascotas/{id}/avistamientos', 'AvistamientoController@store'],
+    ['GET',  '/mascotas/{id}/avistamientos/crear',   'AvistamientoController@create'],
+    ['POST', '/mascotas/{id}/avistamientos',         'AvistamientoController@store'],
 
 
     // =========================

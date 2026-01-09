@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mascotas_app
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./mysql_data:/var/lib/mysql"
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.1-apache
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+
+  php-app:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    environment:
+      XDEBUG_MOD: debug
+      XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=9003 start_with_request=yes"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Montamos TODO el proyecto para que exista /public dentro del contenedor
+      - ./:/var/www/html
+      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    depends_on:
+      - db
+      - phpmyadmin
+    ports:
+      - "3000:80"
+    command: >
+      bash -lc "
+      a2enmod rewrite &&
+      sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf &&
+      sed -ri 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf || true &&
+      apache2-foreground
+      "

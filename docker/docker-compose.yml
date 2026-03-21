@@ -28,12 +28,15 @@ services:
       PMA_USER: root
       PMA_PASSWORD: root
     ports:
-      - "8080:80"
+      - "8081:80"
 
   backend-app:
     build:
+      # Usamos la raíz del proyecto como contexto
       context: ..
-      dockerfile: ./php/Dockerfile
+
+      # El Dockerfile está dentro de la carpeta Docker
+      dockerfile: Docker/Dockerfile
     container_name: mascotas_backend_app
     restart: unless-stopped
     depends_on:
@@ -45,14 +48,10 @@ services:
       - ../src:/var/www/project
 
       # Configuración opcional de Xdebug
-      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      # Déjalo solo si existe Docker/xdebug.ini
+      - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     ports:
       - "3000:80"
-
-      # Ejecuta al iniciar el contenedor:
-      # 1. Activa mod_rewrite de Apache (necesario para rutas tipo /api/...)
-      # 2. Cambia la ruta por defecto (/var/www/html) para que Apache sirva backend/public
-      # 3. Arranca Apache en primer plano (necesario para que el contenedor no se cierre)
     command: >
       bash -lc "
       a2enmod rewrite &&
@@ -60,22 +59,27 @@ services:
       sed -ri 's!/var/www/!/var/www/project/backend/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf || true &&
       apache2-foreground
       "
+    # Ejecuta al iniciar el contenedor:
+    # 1. Activa mod_rewrite de Apache
+    # 2. Cambia la ruta pública para que Apache sirva backend/public
+    # 3. Arranca Apache en primer plano para que el contenedor no se cierre
 
-  frontend-app:
-    image: node:20
-    container_name: mascotas_frontend_app
-    restart: unless-stopped
-    working_dir: /app
-    depends_on:
-      - backend-app
-    volumes:
+    # Descomentar cuando implemente frontend
+
+  #frontend-app:
+    #image: node:20
+    #container_name: mascotas_frontend_app
+    #restart: unless-stopped
+    #working_dir: /app
+    #depends_on:
+      #- backend-app
+    #volumes:
       # Aquí vive el frontend separado
-      - ../src/frontend:/app
-    ports:
-      - "4200:4200"
-
-      # Ejecuta al iniciar el contenedor:
-      # 1. Instala dependencias del proyecto (npm install)
-      # 2. Arranca el servidor de desarrollo del frontend
-      # 3. Usa --host 0.0.0.0 para que sea accesible desde el navegador fuera del contenedor
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+      #- ../src/frontend:/app
+    #ports:
+      #- "4200:4200"
+    #command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    # Ejecuta al iniciar el contenedor:
+    # 1. Instala dependencias del proyecto (npm install)
+    # 2. Arranca el servidor de desarrollo del frontend
+    # 3. Usa --host 0.0.0.0 para que sea accesible desde el navegador fuera del contenedor

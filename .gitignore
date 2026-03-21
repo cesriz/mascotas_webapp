@@ -12,7 +12,7 @@ Thumbs.db
 .env
 .env.*
 
-# Configuración sensible de base de datos
+# Configuración sensible de base de datos, para no exponer credenciales
 src/backend/app/Config/database.php
 
 #################################

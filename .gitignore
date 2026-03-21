@@ -11,13 +11,20 @@ Thumbs.db
 #################################
 .env
 .env.*
-src/config/database.php
+
+# Configuración sensible de base de datos
+src/backend/app/Config/database.php
 
 #################################
 # PHP / Composer
 #################################
-/vendor/
+vendor/
 composer.lock
+
+#################################
+# Node / Frontend
+#################################
+node_modules/
 
 #################################
 # Docker / Base de datos
@@ -28,7 +35,7 @@ mysql_data/
 #################################
 # Subidas de usuarios
 #################################
-public/uploads/
+src/backend/public/uploads/
 
 #################################
 # Logs / temporales

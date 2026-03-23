@@ -1,17 +1,25 @@
 services:
   db:
     image: mysql:8.0
+    container_name: mascotas_db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mascotas_app
+      MYSQL_DATABASE: mascotas_webapp
     ports:
       - "3306:3306"
     volumes:
-      - "./mysql_data:/var/lib/mysql"
+      # Persistencia de datos de MySQL
+      - ../mysql_data:/var/lib/mysql
+
+      # Scripts SQL iniciales
+      # Todo .sql que haya en DB/ se ejecutará la primera vez
+      # que se cree la base de datos
+      - ../DB:/docker-entrypoint-initdb.d
 
   phpmyadmin:
     image: phpmyadmin:5.2.1-apache
+    container_name: mascotas_phpmyadmin
     restart: unless-stopped
     depends_on:
       - db
@@ -20,30 +28,58 @@ services:
       PMA_USER: root
       PMA_PASSWORD: root
     ports:
-      - "8080:80"
+      - "8081:80"
 
-  php-app:
+  backend-app:
     build:
-      context: ./php
-      dockerfile: Dockerfile
-    environment:
-      XDEBUG_MOD: debug
-      XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=9003 start_with_request=yes"
+      # Usamos la raíz del proyecto como contexto
+      context: ..
+
+      # El Dockerfile está dentro de la carpeta Docker
+      dockerfile: Docker/Dockerfile
+    container_name: mascotas_backend_app
+    restart: unless-stopped
+    depends_on:
+      - db
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      # Montamos TODO el proyecto para que exista /public dentro del contenedor
-      - ./:/var/www/html
-      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-    depends_on:
-      - db
-      - phpmyadmin
+      # Montamos todo src para que el proyecto completo esté accesible
+      - ../src:/var/www/project
+
+      # Configuración opcional de Xdebug
+      # Déjalo solo si existe Docker/xdebug.ini
+      - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     ports:
       - "3000:80"
     command: >
       bash -lc "
       a2enmod rewrite &&
-      sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf &&
-      sed -ri 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf || true &&
+      sed -ri 's!/var/www/html!/var/www/project/backend/public!g' /etc/apache2/sites-available/*.conf &&
+      sed -ri 's!/var/www/!/var/www/project/backend/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf || true &&
       apache2-foreground
       "
+    # Ejecuta al iniciar el contenedor:
+    # 1. Activa mod_rewrite de Apache
+    # 2. Cambia la ruta pública para que Apache sirva backend/public
+    # 3. Arranca Apache en primer plano para que el contenedor no se cierre
+
+    # Descomentar cuando implemente frontend
+
+  #frontend-app:
+    #image: node:20
+    #container_name: mascotas_frontend_app
+    #restart: unless-stopped
+    #working_dir: /app
+    #depends_on:
+      #- backend-app
+    #volumes:
+      # Aquí vive el frontend separado
+      #- ../src/frontend:/app
+    #ports:
+      #- "4200:4200"
+    #command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    # Ejecuta al iniciar el contenedor:
+    # 1. Instala dependencias del proyecto (npm install)
+    # 2. Arranca el servidor de desarrollo del frontend
+    # 3. Usa --host 0.0.0.0 para que sea accesible desde el navegador fuera del contenedor

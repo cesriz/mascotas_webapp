@@ -226,3 +226,51 @@ CREATE TABLE IF NOT EXISTS fotos_avistamientos (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+-- =========================================
+-- INDICES
+-- =========================================
+CREATE INDEX idx_password_resets_usuario_id 
+ON password_resets(usuario_id);
+
+CREATE INDEX idx_anuncio_usuario_id 
+ON anuncio_mascotas(usuario_id);
+
+CREATE INDEX idx_anuncio_raza_id 
+ON anuncio_mascotas(raza_id);
+
+CREATE INDEX idx_anuncio_ubicacion_perdida_id 
+ON anuncio_mascotas(ubicaciones_perdida_id);
+
+CREATE INDEX idx_anuncio_estado 
+ON anuncio_mascotas(estado);
+
+CREATE INDEX idx_avistamientos_mascota_id 
+ON avistamientos(mascota_id);
+
+CREATE INDEX idx_avistamientos_ubicacion_id 
+ON avistamientos(ubicaciones_avistamientos_id);
+
+CREATE INDEX idx_avistamientos_usuario_id 
+ON avistamientos(usuario_id);
+
+CREATE INDEX idx_avistamientos_fecha_hora 
+ON avistamientos(fecha_hora);
+
+CREATE INDEX idx_fotos_anuncios_mascota_orden 
+ON fotos_anuncios(mascota_id, orden);
+
+CREATE INDEX idx_fotos_avistamientos_avistamiento_orden
+ON fotos_avistamientos(avistamiento_id, orden);
+
+CREATE INDEX idx_mascotas_colores_color_id 
+ON mascotas_colores(color_id);
+
+CREATE INDEX idx_ubicaciones_codigo_postal 
+ON ubicaciones(codigo_postal);
+
+CREATE INDEX idx_ubicaciones_municipio
+ON ubicaciones(municipio);
+
+CREATE INDEX idx_ubicaciones_provincia
+ON ubicaciones(provincia);

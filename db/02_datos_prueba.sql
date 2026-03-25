@@ -194,7 +194,7 @@ INSERT INTO anuncio_mascotas (
 (
     3,
     'Misu',
-    2,
+    8,
     'HEMBRA',
     FALSE,
     'PEQUENO',

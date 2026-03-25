@@ -71,7 +71,7 @@ INSERT INTO usuarios (
     '111222333',
     'Murcia',
     'ADMIN',
-    '$2y$10$abcdefghijklmnopqrstuvABCDEFGHIJKLMN1234567890abcd',
+    'admin123',
     TRUE,
     TRUE
 ),
@@ -82,7 +82,7 @@ INSERT INTO usuarios (
     '600222333',
     'Murcia',
     'USUARIO',
-    '$2y$10$bbbbbbbbbbbbbbbbbbbbbbBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'laura123',
     TRUE,
     TRUE
 ),
@@ -93,7 +93,7 @@ INSERT INTO usuarios (
     '600333444',
     'Molina de Segura',
     'USUARIO',
-    '$2y$10$ccccccccccccccccccccccCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    'carlos123',
     FALSE,
     TRUE
 );

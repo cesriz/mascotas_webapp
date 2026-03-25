@@ -3,7 +3,7 @@
 -- Proyecto mascotas_webapp
 -- =====================================
 
-USE proyecto_animales;
+USE mascotas_webapp;
 
 -- =========================================
 -- ESPECIES

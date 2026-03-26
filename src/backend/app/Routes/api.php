@@ -4,6 +4,7 @@ return [
     ['GET', '/api/mascotas', 'MascotaController@index'],
     ['GET', '/api/mascotas/{id}', 'MascotaController@show'],
     ['POST', '/api/mascotas', 'MascotaController@store'],
+    ['PUT', '/api/mascotas/{id}', 'MascotaController@update'],
 
     ['GET', '/api/mascotas/{id}/avistamientos', 'AvistamientoController@index'],
     ['POST', '/api/mascotas/{id}/avistamientos', 'AvistamientoController@store'],

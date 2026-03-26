@@ -65,4 +65,34 @@ class UbicacionModel extends BaseModel
     {
         return $this->findById('ubicaciones', $id);
     }
+
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "
+        UPDATE ubicaciones
+        SET
+            latitud = :latitud,
+            longitud = :longitud,
+            direccion_formateada = :direccion_formateada,
+            municipio = :municipio,
+            provincia = :provincia,
+            codigo_postal = :codigo_postal,
+            pais = :pais,
+            descripcion = :descripcion
+        WHERE id = :id
+    ";
+
+        return $this->executeQuery($sql, [
+            'id' => $id,
+            'latitud' => $data['latitud'],
+            'longitud' => $data['longitud'],
+            'direccion_formateada' => $data['direccion_formateada'],
+            'municipio' => $data['municipio'],
+            'provincia' => $data['provincia'],
+            'codigo_postal' => $data['codigo_postal'],
+            'pais' => $data['pais'],
+            'descripcion' => $data['descripcion'],
+        ]);
+    }
 }

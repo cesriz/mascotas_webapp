@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
@@ -193,6 +194,43 @@ class MascotaModel extends BaseModel
             'estado' => $data['estado'],
             'recompensa' => $data['recompensa'],
             'ubicaciones_perdida_id' => $data['ubicaciones_perdida_id'],
+        ]);
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "
+        UPDATE anuncio_mascotas
+        SET
+            nombre = :nombre,
+            razas_id = :razas_id,
+            sexo = :sexo,
+            tamano = :tamano,
+            peso = :peso,
+            fecha_nacimiento = :fecha_nacimiento,
+            descripcion = :descripcion,
+            fecha_perdida = :fecha_perdida,
+            fecha_encontrada = :fecha_encontrada,
+            fecha_recuperada = :fecha_recuperada,
+            estado = :estado,
+            recompensa = :recompensa
+        WHERE id = :id
+    ";
+
+        return $this->executeQuery($sql, [
+            'id' => $id,
+            'nombre' => $data['nombre'],
+            'razas_id' => $data['razas_id'],
+            'sexo' => $data['sexo'],
+            'tamano' => $data['tamano'],
+            'peso' => $data['peso'],
+            'fecha_nacimiento' => $data['fecha_nacimiento'],
+            'descripcion' => $data['descripcion'],
+            'fecha_perdida' => $data['fecha_perdida'],
+            'fecha_encontrada' => $data['fecha_encontrada'],
+            'fecha_recuperada' => $data['fecha_recuperada'],
+            'estado' => $data['estado'],
+            'recompensa' => $data['recompensa'],
         ]);
     }
 }

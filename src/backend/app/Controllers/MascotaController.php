@@ -10,23 +10,19 @@ require_once __DIR__ . '/../Models/MascotaColorModel.php';
 require_once __DIR__ . '/../Validators/MascotaValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
+require_once __DIR__ . '/../Services/MascotaService.php';
 
 class MascotaController
 {
     private MascotaModel $mascotaModel;
-    private UbicacionModel $ubicacionModel;
     private MascotaColorModel $mascotaColorModel;
+    private MascotaService $mascotaService;
 
     public function __construct()
     {
-        // Modelo principal
         $this->mascotaModel = new MascotaModel();
-
-        // Modelo de ubicaciones
-        $this->ubicacionModel = new UbicacionModel();
-
-        // Modelo relación mascota-color
         $this->mascotaColorModel = new MascotaColorModel();
+        $this->mascotaService = new MascotaService();
     }
 
     /*
@@ -120,60 +116,62 @@ class MascotaController
         $data = $result['data'];
 
         try {
-            // Iniciar transacción
-            // Como todos los modelos comparten la misma conexión PDO,
-            // la transacción afectará también a ubicación y colores
-            $this->mascotaModel->beginTransaction();
-
-            // Crear ubicación primero
-            $ubicacionId = $this->ubicacionModel->create($data['ubicacion']);
-
-            // Crear mascota después
-            $newId = $this->mascotaModel->create([
-                'usuario_id' => $data['usuario_id'],
-                'nombre' => $data['nombre'],
-                'razas_id' => $data['razas_id'],
-                'sexo' => $data['sexo'],
-                'tamano' => $data['tamano'],
-                'peso' => $data['peso'],
-                'fecha_nacimiento' => $data['fecha_nacimiento'],
-                'descripcion' => $data['descripcion'],
-                'fecha_perdida' => $data['fecha_perdida'],
-                'fecha_encontrada' => $data['fecha_encontrada'],
-                'fecha_recuperada' => $data['fecha_recuperada'],
-                'estado' => $data['estado'],
-                'recompensa' => $data['recompensa'],
-                'ubicaciones_perdida_id' => $ubicacionId,
-            ]);
-
-            // Guardar relación con colores
-            $this->mascotaColorModel->syncColors($newId, $data['colores']);
-
-            // Si todo ha ido bien, confirmar cambios
-            $this->mascotaModel->commit();
+            $created = $this->mascotaService->create($data);
 
             // Respuesta final
             Response::json([
                 'success' => true,
                 'message' => 'Mascota creada correctamente',
-                'data' => [
-                    'id' => $newId,
-                    'ubicacion_id' => $ubicacionId,
-                    'colores' => $data['colores']
-                ]
+                'data' => $created
             ], 201);
         } catch (Throwable $e) {
-            // Si algo falla, deshacer todo lo que se haya hecho
-            $this->mascotaModel->rollBack();
-
             // Respuesta de error genérica
-            // Más adelante, en desarrollo, podrías devolver también $e->getMessage()
             Response::json([
                 'success' => false,
                 'message' => 'Error al crear la mascota'
             ], 500);
 
             return;
+        }
+    }
+
+
+    public function update(int $id): void
+    {
+        $mascota = $this->mascotaModel->getById($id);
+
+        if ($mascota === null) {
+            Response::json([
+                'success' => false,
+                'message' => 'Mascota no encontrada'
+            ], 404);
+            return;
+        }
+
+        $input = Request::json();
+        $result = MascotaValidator::validateStore($input);
+
+        if (!empty($result['errors'])) {
+            Response::json([
+                'success' => false,
+                'errors' => $result['errors']
+            ], 422);
+            return;
+        }
+
+        try {
+            $updated = $this->mascotaService->update($id, $result['data']);
+
+            Response::json([
+                'success' => true,
+                'message' => 'Mascota actualizada correctamente',
+                'data' => $updated
+            ]);
+        } catch (Throwable $e) {
+            Response::json([
+                'success' => false,
+                'message' => 'Error al actualizar la mascota'
+            ], 500);
         }
     }
 }

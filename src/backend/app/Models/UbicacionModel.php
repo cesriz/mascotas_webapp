@@ -7,20 +7,9 @@ class UbicacionModel extends BaseModel
 {
     /*
      * Inserta una nueva ubicación y devuelve su id
-     * 
-     * Espera un array con:
-     * - latitud
-     * - longitud
-     * - direccion_formateada (opcional)
-     * - municipio
-     * - provincia
-     * - codigo_postal (opcional)
-     * - pais (opcional, default España)
-     * - descripcion (opcional)
      */
     public function create(array $data): int
     {
-        
         $sql = "
             INSERT INTO ubicaciones (
                 latitud,
@@ -43,7 +32,6 @@ class UbicacionModel extends BaseModel
             )
         ";
 
-        // Ejecuta y devuelve el id generado
         return $this->insertAndGetId($sql, [
             'latitud' => $data['latitud'],
             'longitud' => $data['longitud'],
@@ -56,32 +44,28 @@ class UbicacionModel extends BaseModel
         ]);
     }
 
-    /*
-     * Devuelve una ubicación por id
-     * 
-     * Aprovechamos el método genérico del BaseModel
-     */
+    // Devuelve una ubicación concreta por id.
     public function getById(int $id): ?array
     {
         return $this->findById('ubicaciones', $id);
     }
 
-
+    // Actualiza una ubicación existente.
     public function update(int $id, array $data): bool
     {
         $sql = "
-        UPDATE ubicaciones
-        SET
-            latitud = :latitud,
-            longitud = :longitud,
-            direccion_formateada = :direccion_formateada,
-            municipio = :municipio,
-            provincia = :provincia,
-            codigo_postal = :codigo_postal,
-            pais = :pais,
-            descripcion = :descripcion
-        WHERE id = :id
-    ";
+            UPDATE ubicaciones
+            SET
+                latitud = :latitud,
+                longitud = :longitud,
+                direccion_formateada = :direccion_formateada,
+                municipio = :municipio,
+                provincia = :provincia,
+                codigo_postal = :codigo_postal,
+                pais = :pais,
+                descripcion = :descripcion
+            WHERE id = :id
+        ";
 
         return $this->executeQuery($sql, [
             'id' => $id,
@@ -94,5 +78,11 @@ class UbicacionModel extends BaseModel
             'pais' => $data['pais'],
             'descripcion' => $data['descripcion'],
         ]);
+    }
+
+    // Borra una ubicación por id.
+    public function deletePublicById(int $id): bool
+    {
+        return $this->deleteById('ubicaciones', $id);
     }
 }

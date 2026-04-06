@@ -1,0 +1,13 @@
+{
+  "name": "cesar/mascotas-webapp-backend",
+  "description": "Backend PHP del proyecto Mascotas WebApp",
+  "type": "project",
+  "require": {
+    "firebase/php-jwt": "^7.0"
+  },
+  "autoload": {
+    "classmap": [
+      "app/"
+    ]
+  }
+}

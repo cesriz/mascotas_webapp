@@ -1,10 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
+// Carga librerías instaladas con Composer.
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Carga el router.
 require_once __DIR__ . '/../app/Core/Router.php';
 
-$routes = require __DIR__ . '/../app/Routes/api.php';
+// Carga las rutas.
+$routes = require_once __DIR__ . '/../app/Routes/api.php';
 
+// Ejecuta el router.
 $router = new Router($routes);
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 

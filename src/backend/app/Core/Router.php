@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 class Router
@@ -14,14 +15,19 @@ class Router
     // Decide qué controlador ejecutar según método + URL
     public function dispatch(string $method, string $uri): void
     {
-        // Quita query params (?estado=...)
+        // Quita query params
         $path = parse_url($uri, PHP_URL_PATH) ?? '/';
 
         // Recorre todas las rutas
-        foreach ($this->routes as [$routeMethod, $routePath, $handler]) {
+        foreach ($this->routes as $route) {
+            // Permite rutas con 3 elementos o con 4 si llevan opciones.
+            $routeMethod = $route[0];
+            $routePath = $route[1];
+            $handler = $route[2];
+            $options = $route[3] ?? [];
 
-            // Comprueba método HTTP (GET, POST...)
-            if ($routeMethod !== $method) {
+            // Comprueba método HTTP
+            if (strtoupper($routeMethod) !== strtoupper($method)) {
                 continue;
             }
 
@@ -29,6 +35,36 @@ class Router
             $params = $this->match($routePath, $path);
             if ($params === null) {
                 continue;
+            }
+
+            // Si la ruta es privada, ejecuta el middleware antes del controlador.
+            if (!empty($options['auth'])) {
+                $middlewareFile = __DIR__ . '/../Middelware/AuthMiddleware.php';
+
+                if (!is_file($middlewareFile)) {
+                    http_response_code(500);
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'AuthMiddleware no encontrado'
+                    ]);
+                    return;
+                }
+
+                require_once $middlewareFile;
+
+                if (!class_exists('AuthMiddleware')) {
+                    http_response_code(500);
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Clase AuthMiddleware no encontrada'
+                    ]);
+                    return;
+                }
+
+                $middleware = new AuthMiddleware();
+                $middleware->handle();
             }
 
             // Separa "Controlador@accion"
@@ -40,6 +76,7 @@ class Router
             // Comprueba que existe el archivo
             if (!is_file($controllerFile)) {
                 http_response_code(500);
+                header('Content-Type: application/json; charset=utf-8');
                 echo json_encode([
                     'success' => false,
                     'message' => "Controlador $controllerName no encontrado"
@@ -53,6 +90,7 @@ class Router
             // Comprueba que la clase existe
             if (!class_exists($controllerName)) {
                 http_response_code(500);
+                header('Content-Type: application/json; charset=utf-8');
                 echo json_encode([
                     'success' => false,
                     'message' => "Clase $controllerName no encontrada"
@@ -66,6 +104,7 @@ class Router
             // Comprueba que existe el método
             if (!method_exists($controller, $action)) {
                 http_response_code(404);
+                header('Content-Type: application/json; charset=utf-8');
                 echo json_encode([
                     'success' => false,
                     'message' => "Acción $action no encontrada"
@@ -73,13 +112,14 @@ class Router
                 return;
             }
 
-            // Ejecuta el método con parámetros (ej: id)
+            // Ejecuta el método con parámetros
             $controller->$action(...$params);
             return;
         }
 
-        // Si no hay coincidencia → 404
+        // Si no hay coincidencia
         http_response_code(404);
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'success' => false,
             'message' => 'Ruta no encontrada'
@@ -89,13 +129,14 @@ class Router
     // Comprueba si una ruta coincide y extrae parámetros
     private function match(string $routePath, string $actualPath): ?array
     {
-        // Convierte {id} en número
-        $pattern = preg_replace('#\{id\}#', '(\d+)', $routePath);
+        // Convierte cualquier placeholder tipo {id}, {contactoId}, {avistamientoId}
+        // en un patrón numérico
+        $pattern = preg_replace('#\{[a-zA-Z_][a-zA-Z0-9_]*\}#', '(\d+)', $routePath);
 
         // Ajusta inicio y fin
         $pattern = '#^' . $pattern . '$#';
 
-        // Si no coincide → null
+        // Si no coincide
         if (!preg_match($pattern, $actualPath, $matches)) {
             return null;
         }
@@ -107,5 +148,3 @@ class Router
         return array_map('intval', $matches);
     }
 }
-
-

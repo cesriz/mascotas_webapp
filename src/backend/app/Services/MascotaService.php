@@ -1,5 +1,6 @@
 <?php
 
+// IMPLEMENTAR EL SERVICE MÁS ADELANTE CUANDO YA NO VAYA A HABER MUCHOS CAMBIOS
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/MascotaModel.php';
@@ -24,15 +25,14 @@ class MascotaService
         try {
             $this->mascotaModel->beginTransaction();
 
-            // 1. Crear ubicación
             $ubicacionId = $this->ubicacionModel->create($data['ubicacion']);
 
-            // 2. Crear mascota
             $mascotaId = $this->mascotaModel->create([
                 'usuario_id' => $data['usuario_id'],
                 'nombre' => $data['nombre'],
-                'razas_id' => $data['razas_id'],
+                'raza_id' => $data['raza_id'],
                 'sexo' => $data['sexo'],
+                'tiene_chip' => $data['tiene_chip'],
                 'tamano' => $data['tamano'],
                 'peso' => $data['peso'],
                 'fecha_nacimiento' => $data['fecha_nacimiento'],
@@ -45,7 +45,6 @@ class MascotaService
                 'ubicaciones_perdida_id' => $ubicacionId,
             ]);
 
-            // 3. Guardar colores
             $this->mascotaColorModel->syncColors($mascotaId, $data['colores']);
 
             $this->mascotaModel->commit();
@@ -61,7 +60,6 @@ class MascotaService
         }
     }
 
-
     public function update(int $id, array $data): array
     {
         $mascota = $this->mascotaModel->getById($id);
@@ -73,12 +71,14 @@ class MascotaService
         try {
             $this->mascotaModel->beginTransaction();
 
-            $this->ubicacionModel->update((int) $mascota['ubicacion_id'], $data['ubicacion']);
+            $this->ubicacionModel->update((int)$mascota['ubicacion_id'], $data['ubicacion']);
 
             $this->mascotaModel->update($id, [
+                'usuario_id' => $data['usuario_id'],
                 'nombre' => $data['nombre'],
-                'razas_id' => $data['razas_id'],
+                'raza_id' => $data['raza_id'],
                 'sexo' => $data['sexo'],
+                'tiene_chip' => $data['tiene_chip'],
                 'tamano' => $data['tamano'],
                 'peso' => $data['peso'],
                 'fecha_nacimiento' => $data['fecha_nacimiento'],
@@ -96,7 +96,7 @@ class MascotaService
 
             return [
                 'id' => $id,
-                'ubicacion_id' => (int) $mascota['ubicacion_id'],
+                'ubicacion_id' => (int)$mascota['ubicacion_id'],
                 'colores' => $data['colores']
             ];
         } catch (Throwable $e) {

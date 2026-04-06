@@ -1,20 +1,169 @@
 <?php
+
 declare(strict_types=1);
 
 class MascotaValidator
 {
-    // Valida y normaliza los datos del alta
+    // Valida y normaliza los filtros del listado.
+    public static function validateIndexFilters(array $data): array
+    {
+        $errors = [];
+
+        $estadosValidos = ['PERDIDA', 'ENCONTRADA', 'RECUPERADA'];
+        $sexosValidos = ['MACHO', 'HEMBRA', 'DESCONOCIDO'];
+        $tamanosValidos = ['PEQUENO', 'MEDIANO', 'GRANDE', 'DESCONOCIDO'];
+        $ordenesValidos = ['recientes', 'antiguos', 'nombre_asc', 'nombre_desc'];
+
+        $estado = isset($data['estado']) && $data['estado'] !== ''
+            ? trim((string) $data['estado'])
+            : null;
+
+        $especieId = isset($data['especie_id']) && $data['especie_id'] !== ''
+            ? (int) $data['especie_id']
+            : null;
+
+        $razaId = isset($data['raza_id']) && $data['raza_id'] !== ''
+            ? (int) $data['raza_id']
+            : null;
+
+        $sexo = isset($data['sexo']) && $data['sexo'] !== ''
+            ? trim((string) $data['sexo'])
+            : null;
+
+        $tamano = isset($data['tamano']) && $data['tamano'] !== ''
+            ? trim((string) $data['tamano'])
+            : null;
+
+        $municipio = isset($data['municipio']) && $data['municipio'] !== ''
+            ? trim((string) $data['municipio'])
+            : null;
+
+        $provincia = isset($data['provincia']) && $data['provincia'] !== ''
+            ? trim((string) $data['provincia'])
+            : null;
+
+        $qUbicacion = isset($data['q_ubicacion']) && $data['q_ubicacion'] !== ''
+            ? trim((string) $data['q_ubicacion'])
+            : null;
+
+        $fechaDesde = isset($data['fecha_desde']) && $data['fecha_desde'] !== ''
+            ? trim((string) $data['fecha_desde'])
+            : null;
+
+        $fechaHasta = isset($data['fecha_hasta']) && $data['fecha_hasta'] !== ''
+            ? trim((string) $data['fecha_hasta'])
+            : null;
+
+        $tieneChip = self::normalizeNullableBool($data['tiene_chip'] ?? null);
+        $conFotos = self::normalizeNullableBool($data['con_fotos'] ?? null);
+
+        $orden = isset($data['orden']) && $data['orden'] !== ''
+            ? trim((string) $data['orden'])
+            : 'recientes';
+
+        $page = isset($data['page']) && $data['page'] !== ''
+            ? (int) $data['page']
+            : 1;
+
+        $limit = isset($data['limit']) && $data['limit'] !== ''
+            ? (int) $data['limit']
+            : 12;
+
+        $colorIds = self::normalizeColorIds($data['color_ids'] ?? null);
+
+        if ($estado !== null && !in_array($estado, $estadosValidos, true)) {
+            $errors[] = 'estado no válido';
+        }
+
+        if ($sexo !== null && !in_array($sexo, $sexosValidos, true)) {
+            $errors[] = 'sexo no válido';
+        }
+
+        if ($tamano !== null && !in_array($tamano, $tamanosValidos, true)) {
+            $errors[] = 'tamano no válido';
+        }
+
+        if ($especieId !== null && $especieId <= 0) {
+            $errors[] = 'especie_id no válido';
+        }
+
+        if ($razaId !== null && $razaId <= 0) {
+            $errors[] = 'raza_id no válido';
+        }
+
+        if ($fechaDesde !== null && !self::isValidDate($fechaDesde)) {
+            $errors[] = 'fecha_desde no tiene un formato válido';
+        }
+
+        if ($fechaHasta !== null && !self::isValidDate($fechaHasta)) {
+            $errors[] = 'fecha_hasta no tiene un formato válido';
+        }
+
+        if ($fechaDesde !== null && $fechaHasta !== null && $fechaDesde > $fechaHasta) {
+            $errors[] = 'fecha_desde no puede ser mayor que fecha_hasta';
+        }
+
+        if (!in_array($orden, $ordenesValidos, true)) {
+            $errors[] = 'orden no válido';
+        }
+
+        if ($page <= 0) {
+            $errors[] = 'page debe ser mayor que 0';
+        }
+
+        if ($limit <= 0) {
+            $errors[] = 'limit debe ser mayor que 0';
+        }
+
+        if ($limit > 50) {
+            $limit = 50;
+        }
+
+        if (!empty($errors)) {
+            return [
+                'errors' => $errors,
+                'data' => []
+            ];
+        }
+
+        return [
+            'errors' => [],
+            'data' => [
+                'estado' => $estado,
+                'especie_id' => $especieId,
+                'raza_id' => $razaId,
+                'sexo' => $sexo,
+                'tamano' => $tamano,
+                'municipio' => $municipio,
+                'provincia' => $provincia,
+                'q_ubicacion' => $qUbicacion,
+                'fecha_desde' => $fechaDesde,
+                'fecha_hasta' => $fechaHasta,
+                'color_ids' => $colorIds,
+                'tiene_chip' => $tieneChip,
+                'con_fotos' => $conFotos,
+                'orden' => $orden,
+                'page' => $page,
+                'limit' => $limit
+            ]
+        ];
+    }
+
+    // Valida los datos al crear una mascota.
     public static function validateStore(array $data): array
     {
         $errors = [];
 
-        // Campos obligatorios base
+        if (isset($data['colores']) && !is_array($data['colores'])) {
+            $data['colores'] = [$data['colores']];
+        }
+
         if (empty($data['nombre'])) {
             $errors[] = 'nombre es obligatorio';
         }
 
-        if (empty($data['razas_id'])) {
-            $errors[] = 'razas_id es obligatorio';
+        if (empty($data['raza_id'])) {
+            $errors[] = 'raza_id es obligatorio';
         }
 
         if (empty($data['sexo'])) {
@@ -33,26 +182,16 @@ class MascotaValidator
             $errors[] = 'estado es obligatorio';
         }
 
-        // Colores obligatorios como array
         if (empty($data['colores']) || !is_array($data['colores'])) {
             $errors[] = 'colores es obligatorio y debe ser un array';
         } else {
-            // Quitar vacíos
             $colores = array_filter(
                 $data['colores'],
                 fn($color) => $color !== null && $color !== ''
             );
 
-            // Convertir a enteros
             $colores = array_map('intval', $colores);
-
-            // Quitar ids no válidos (0 o negativos)
-            $colores = array_filter(
-                $colores,
-                fn($color) => $color > 0
-            );
-
-            // Quitar duplicados y reindexar
+            $colores = array_filter($colores, fn($color) => $color > 0);
             $colores = array_values(array_unique($colores));
 
             if (count($colores) < 1) {
@@ -64,49 +203,55 @@ class MascotaValidator
             }
         }
 
-        // Estados permitidos
-        $estadosValidos = ['perdido', 'encontrado', 'recuperado'];
+        $estadosValidos = ['PERDIDA', 'ENCONTRADA', 'RECUPERADA'];
+        $sexosValidos = ['MACHO', 'HEMBRA', 'DESCONOCIDO'];
+        $tamanosValidos = ['PEQUENO', 'MEDIANO', 'GRANDE', 'DESCONOCIDO'];
 
         if (!empty($data['estado']) && !in_array($data['estado'], $estadosValidos, true)) {
             $errors[] = 'estado no válido';
         }
 
-        // Fechas según estado
+        if (!empty($data['sexo']) && !in_array($data['sexo'], $sexosValidos, true)) {
+            $errors[] = 'sexo no válido';
+        }
+
+        if (!empty($data['tamano']) && !in_array($data['tamano'], $tamanosValidos, true)) {
+            $errors[] = 'tamano no válido';
+        }
+
         $fechaPerdida = null;
         $fechaEncontrada = null;
         $fechaRecuperada = null;
 
-        if (($data['estado'] ?? null) === 'perdido') {
+        if (($data['estado'] ?? null) === 'PERDIDA') {
             if (empty($data['fecha_perdida'])) {
-                $errors[] = 'fecha_perdida es obligatoria si el estado es perdido';
+                $errors[] = 'fecha_perdida es obligatoria si el estado es PERDIDA';
             } else {
                 $fechaPerdida = $data['fecha_perdida'];
             }
         }
 
-        if (($data['estado'] ?? null) === 'encontrado') {
+        if (($data['estado'] ?? null) === 'ENCONTRADA') {
             if (empty($data['fecha_encontrada'])) {
-                $errors[] = 'fecha_encontrada es obligatoria si el estado es encontrado';
+                $errors[] = 'fecha_encontrada es obligatoria si el estado es ENCONTRADA';
             } else {
                 $fechaEncontrada = $data['fecha_encontrada'];
             }
         }
 
-        if (($data['estado'] ?? null) === 'recuperado') {
+        if (($data['estado'] ?? null) === 'RECUPERADA') {
             if (empty($data['fecha_recuperada'])) {
-                $errors[] = 'fecha_recuperada es obligatoria si el estado es recuperado';
+                $errors[] = 'fecha_recuperada es obligatoria si el estado es RECUPERADA';
             } else {
                 $fechaRecuperada = $data['fecha_recuperada'];
             }
         }
 
-        // Validar ubicación
         if (empty($data['ubicacion']) || !is_array($data['ubicacion'])) {
             $errors[] = 'ubicacion es obligatoria';
         } else {
             $ubicacion = $data['ubicacion'];
 
-            // Coordenadas obligatorias (base real del sistema)
             if (!isset($ubicacion['latitud']) || $ubicacion['latitud'] === '') {
                 $errors[] = 'ubicacion.latitud es obligatoria';
             } elseif (!is_numeric($ubicacion['latitud'])) {
@@ -119,7 +264,6 @@ class MascotaValidator
                 $errors[] = 'ubicacion.longitud debe ser numérica';
             }
 
-            // Datos administrativos obligatorios
             if (empty($ubicacion['municipio'])) {
                 $errors[] = 'ubicacion.municipio es obligatorio';
             }
@@ -129,7 +273,6 @@ class MascotaValidator
             }
         }
 
-        // Si hay errores, devolverlos
         if (!empty($errors)) {
             return [
                 'errors' => $errors,
@@ -137,29 +280,29 @@ class MascotaValidator
             ];
         }
 
-        // Normalizar colores
         $colores = array_filter(
             $data['colores'],
             fn($color) => $color !== null && $color !== ''
         );
 
         $colores = array_map('intval', $colores);
-
-        $colores = array_filter(
-            $colores,
-            fn($color) => $color > 0
-        );
-
+        $colores = array_filter($colores, fn($color) => $color > 0);
         $colores = array_values(array_unique($colores));
 
-        // Datos limpios
         return [
             'errors' => [],
             'data' => [
-                'usuario_id' => null,
+                'usuario_id' => isset($data['usuario_id']) && (int) $data['usuario_id'] > 0
+                    ? (int) $data['usuario_id']
+                    : null,
                 'nombre' => trim((string) $data['nombre']),
-                'razas_id' => (int) $data['razas_id'],
+                'raza_id' => (int) $data['raza_id'],
                 'sexo' => trim((string) $data['sexo']),
+                'tiene_chip' => in_array(
+                    (string) ($data['tiene_chip'] ?? ''),
+                    ['1', 'true', 'on', 'si', 'SI'],
+                    true
+                ) ? 1 : 0,
                 'tamano' => trim((string) $data['tamano']),
                 'peso' => isset($data['peso']) && $data['peso'] !== ''
                     ? (float) $data['peso']
@@ -174,8 +317,6 @@ class MascotaValidator
                     ? (float) $data['recompensa']
                     : null,
                 'colores' => $colores,
-
-                // Ubicación adaptada a la nueva estructura
                 'ubicacion' => [
                     'latitud' => (float) $data['ubicacion']['latitud'],
                     'longitud' => (float) $data['ubicacion']['longitud'],
@@ -196,5 +337,58 @@ class MascotaValidator
                 ]
             ]
         ];
+    }
+
+    // Reutiliza la validación de crear para actualizar.
+    public static function validateUpdate(array $data): array
+    {
+        return self::validateStore($data);
+    }
+
+    // Convierte color_ids a array de enteros.
+    private static function normalizeColorIds(mixed $value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+
+        if (!is_array($value)) {
+            $value = explode(',', (string) $value);
+        }
+
+        $value = array_map('trim', $value);
+        $value = array_filter($value, fn($item) => $item !== '');
+        $value = array_map('intval', $value);
+        $value = array_filter($value, fn($item) => $item > 0);
+
+        return array_values(array_unique($value));
+    }
+
+    // Convierte varios formatos a 1, 0 o null.
+    private static function normalizeNullableBool(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $value = mb_strtolower(trim((string) $value));
+
+        if (in_array($value, ['1', 'true', 'si', 'sí', 'on'], true)) {
+            return 1;
+        }
+
+        if (in_array($value, ['0', 'false', 'no', 'off'], true)) {
+            return 0;
+        }
+
+        return null;
+    }
+
+    // Comprueba si una fecha tiene formato Y-m-d.
+    private static function isValidDate(string $date): bool
+    {
+        $parsed = DateTime::createFromFormat('Y-m-d', $date);
+
+        return $parsed !== false && $parsed->format('Y-m-d') === $date;
     }
 }

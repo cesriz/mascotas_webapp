@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Reenvía el header Authorization para que PHP pueda leerlo
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

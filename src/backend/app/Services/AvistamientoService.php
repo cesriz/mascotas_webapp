@@ -20,19 +20,16 @@ class AvistamientoService
         try {
             $this->avistamientoModel->beginTransaction();
 
-            // 1. Crear ubicación del avistamiento
             $ubicacionId = $this->ubicacionModel->create($data['ubicacion']);
 
-            // 2. Crear avistamiento
             $avistamientoId = $this->avistamientoModel->create([
-                'anuncio_mascotas_id' => $mascotaId,
-                'usuarios_id' => $data['usuarios_id'],
+                'mascota_id' => $mascotaId,
+                'usuario_id' => $data['usuario_id'],
                 'ubicaciones_avistamientos_id' => $ubicacionId,
                 'telefono' => $data['telefono'],
-                'email' => $data['email'],
+                'correo' => $data['correo'],
                 'descripcion' => $data['descripcion'],
-                'fecha_avistamiento' => $data['fecha_avistamiento'],
-                'hora_avistamiento' => $data['hora_avistamiento'],
+                'fecha_hora' => $data['fecha_hora'],
             ]);
 
             $this->avistamientoModel->commit();

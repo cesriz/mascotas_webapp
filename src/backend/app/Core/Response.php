@@ -16,15 +16,15 @@ class Response
 
 
 /**
-En vez de poner en cada controlador:
+*En vez de poner en cada controlador:
 
-    header('Content-Type: application/json');
-    echo json_encode($resultado);
-    exit;
+    *header('Content-Type: application/json');
+    *echo json_encode($resultado);
+    *exit;
 
-pones:
+*pones:
 
-    Response::json($resultado, 200);
+    *Response::json($resultado, 200);
 
-Mucho más limpio.
+*Mucho más limpio.
  */

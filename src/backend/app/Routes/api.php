@@ -1,21 +1,72 @@
 <?php
 
 return [
-    ['GET', '/api/mascotas', 'MascotaController@index'],
-    ['GET', '/api/mascotas/{id}', 'MascotaController@show'],
-    ['POST', '/api/mascotas', 'MascotaController@store'],
-    ['PUT', '/api/mascotas/{id}', 'MascotaController@update'],
 
+    // =========================
+    // Autenticación
+    // =========================
+    ['POST', '/api/auth/login', 'AuthController@login'],
+    ['GET', '/api/auth/me', 'AuthController@me', ['auth' => true]],
+    ['POST', '/api/auth/logout', 'AuthController@logout', ['auth' => true]],
+
+    // =========================
+    // Zona privada del usuario autenticado
+    // =========================
+    ['GET', '/api/me/perfil', 'MeController@perfil', ['auth' => true]],
+    ['PUT', '/api/me/perfil', 'MeController@updatePerfil', ['auth' => true]],
+    ['PATCH', '/api/me/password', 'MeController@cambiarPassword', ['auth' => true]],
+    ['DELETE', '/api/me/cuenta', 'MeController@eliminarCuenta', ['auth' => true]],
+
+    ['GET', '/api/me/mascotas', 'MeController@mascotas', ['auth' => true]],
+    ['GET', '/api/me/avistamientos', 'MeController@avistamientos', ['auth' => true]],
+    ['GET', '/api/me/notificaciones', 'MeController@notificaciones', ['auth' => true]],
+
+    ['PATCH', '/api/me/notificaciones/contactos/{id}/leer', 'MeController@marcarContactoLeido', ['auth' => true]],
+    ['PATCH', '/api/me/notificaciones/avistamientos/{id}/leer', 'MeController@marcarAvistamientoLeido', ['auth' => true]],
+
+    // =========================
+    // Mascotas públicas
+    // =========================
+    ['GET', '/api/mascotas', 'MascotaController@index'],
+    ['GET', '/api/mascotas/recientes', 'MascotaController@recientes'],
+    ['GET', '/api/mascotas/{id}', 'MascotaController@show'],
+
+    // =========================
+    // Mascotas privadas
+    // =========================
+    ['POST', '/api/mascotas', 'MascotaController@store', ['auth' => true]],
+    ['PUT', '/api/mascotas/{id}', 'MascotaController@update', ['auth' => true]],
+    ['POST', '/api/mascotas/{id}/fotos', 'MascotaController@uploadFotos', ['auth' => true]],
+    ['DELETE', '/api/mascotas/{id}', 'MascotaController@destroy', ['auth' => true]],
+    ['PATCH', '/api/mascotas/{id}/recuperar', 'MascotaController@marcarRecuperada', ['auth' => true]],
+
+    // =========================
+    // Avistamientos
+    // =========================
     ['GET', '/api/mascotas/{id}/avistamientos', 'AvistamientoController@index'],
     ['POST', '/api/mascotas/{id}/avistamientos', 'AvistamientoController@store'],
 
+    // =========================
+    // Contacto sobre un anuncio
+    // =========================
+    ['POST', '/api/mascotas/{id}/contactos', 'ContactoController@store'],
+
+    // =========================
+    // Catálogos
+    // =========================
+    ['GET', '/api/colores', 'ColorController@index'],
+    ['GET', '/api/colores/{id}', 'ColorController@show'],
     ['GET', '/api/especies', 'EspecieController@index'],
     ['GET', '/api/razas', 'RazaController@index'],
 
-     // Catálogo de colores
-    ['GET', '/api/colores', 'ColorController@index'],
-    ['GET', '/api/colores/{id}', 'ColorController@show'],
+    // =========================
+    // Usuarios
+    // =========================
+    ['GET', '/api/usuarios', 'UsuarioController@index'],
+    ['GET', '/api/usuarios/{id}', 'UsuarioController@show'],
+    ['POST', '/api/usuarios', 'UsuarioController@store'],
 ];
+    
 
 // Aquí se define qué URL llama a qué controlador y qué método.
 

@@ -71,7 +71,7 @@ INSERT INTO usuarios (
     '111222333',
     'Murcia',
     'ADMIN',
-    'admin123',
+    '$2y$12$GMtO8xB7J0QQ2k0for48h.6R4129BvQL6sqXxi1oqwZBBs3ta5kqi',
     TRUE,
     TRUE
 ),
@@ -82,7 +82,7 @@ INSERT INTO usuarios (
     '600222333',
     'Murcia',
     'USUARIO',
-    'laura123',
+    '$2y$12$PNsXbjGCi2mID1at7EbedO0hAXaAjBL59na.ili33u.F1nNkyCQKS',
     TRUE,
     TRUE
 ),
@@ -93,7 +93,7 @@ INSERT INTO usuarios (
     '600333444',
     'Molina de Segura',
     'USUARIO',
-    'carlos123',
+    '$2y$12$.Cy134CMtz/0FAljE47nuOwywC5O27KkC1KNE07yQlLMxVH2VSTo2',
     FALSE,
     TRUE
 );

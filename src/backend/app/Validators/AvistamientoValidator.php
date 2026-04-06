@@ -3,33 +3,29 @@ declare(strict_types=1);
 
 class AvistamientoValidator
 {
-    // Valida y normaliza los datos del alta de un avistamiento
     public static function validateStore(array $data): array
     {
         $errors = [];
 
-        // Teléfono obligatorio
+        // Si quieres, teléfono puede seguir siendo obligatorio siempre.
         if (empty($data['telefono'])) {
             $errors[] = 'telefono es obligatorio';
         }
 
-        // Fecha obligatoria
-        if (empty($data['fecha_avistamiento'])) {
-            $errors[] = 'fecha_avistamiento es obligatoria';
+        // Correo opcional, pero si viene tiene que ser válido.
+        if (!empty($data['correo']) && !filter_var($data['correo'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'correo no válido';
         }
 
-        // Hora obligatoria
-        if (empty($data['hora_avistamiento'])) {
-            $errors[] = 'hora_avistamiento es obligatoria';
+        if (empty($data['fecha_hora'])) {
+            $errors[] = 'fecha_hora es obligatoria';
         }
 
-        // Ubicación obligatoria
         if (empty($data['ubicacion']) || !is_array($data['ubicacion'])) {
             $errors[] = 'ubicacion es obligatoria';
         } else {
             $ubicacion = $data['ubicacion'];
 
-            // Coordenadas obligatorias
             if (!isset($ubicacion['latitud']) || $ubicacion['latitud'] === '') {
                 $errors[] = 'ubicacion.latitud es obligatoria';
             } elseif (!is_numeric($ubicacion['latitud'])) {
@@ -42,7 +38,6 @@ class AvistamientoValidator
                 $errors[] = 'ubicacion.longitud debe ser numérica';
             }
 
-            // Datos administrativos obligatorios
             if (empty($ubicacion['municipio'])) {
                 $errors[] = 'ubicacion.municipio es obligatorio';
             }
@@ -52,7 +47,6 @@ class AvistamientoValidator
             }
         }
 
-        // Si hay errores, devolverlos
         if (!empty($errors)) {
             return [
                 'errors' => $errors,
@@ -60,26 +54,23 @@ class AvistamientoValidator
             ];
         }
 
-        // Datos limpios
         return [
             'errors' => [],
             'data' => [
-                // Más adelante vendrá del usuario autenticado si existe
-                'usuarios_id' => $data['usuarios_id'] ?? null,
+                /*
+                 * usuario_id puede venir del usuario autenticado o ser null
+                 * si el avistamiento es público.
+                 */
+                'usuario_id' => $data['usuario_id'] ?? null,
 
                 'telefono' => trim((string) $data['telefono']),
-
-                'email' => isset($data['email']) && $data['email'] !== ''
-                    ? trim((string) $data['email'])
+                'correo' => isset($data['correo']) && $data['correo'] !== ''
+                    ? trim((string) $data['correo'])
                     : null,
-
                 'descripcion' => isset($data['descripcion']) && $data['descripcion'] !== ''
                     ? trim((string) $data['descripcion'])
                     : null,
-
-                'fecha_avistamiento' => $data['fecha_avistamiento'],
-                'hora_avistamiento' => $data['hora_avistamiento'],
-
+                'fecha_hora' => $data['fecha_hora'],
                 'ubicacion' => [
                     'latitud' => (float) $data['ubicacion']['latitud'],
                     'longitud' => (float) $data['ubicacion']['longitud'],

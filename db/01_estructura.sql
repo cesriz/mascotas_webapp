@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     rol ENUM('USUARIO', 'ADMIN') NOT NULL DEFAULT 'USUARIO',
     password_hash VARCHAR(255) NOT NULL,
+    token TEXT NULL,
     email_verificado BOOLEAN NOT NULL DEFAULT FALSE,
     activo BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
-
 
 -- =========================================
 -- TABLA: PASSWORD_RESETS
@@ -44,7 +44,6 @@ CREATE TABLE IF NOT EXISTS password_resets (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-
 -- =========================================
 -- TABLA: ESPECIES
 -- =========================================
@@ -52,7 +51,6 @@ CREATE TABLE IF NOT EXISTS especies (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
-
 
 -- =========================================
 -- TABLA: RAZAS
@@ -71,7 +69,6 @@ CREATE TABLE IF NOT EXISTS razas (
     CONSTRAINT uq_raza_nombre UNIQUE (nombre)
 ) ENGINE=InnoDB;
 
-
 -- =========================================
 -- TABLA: COLORES
 -- =========================================
@@ -79,7 +76,6 @@ CREATE TABLE IF NOT EXISTS colores (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
-
 
 -- =========================================
 -- TABLA: UBICACIONES
@@ -96,7 +92,6 @@ CREATE TABLE IF NOT EXISTS ubicaciones (
     longitud DECIMAL(10,7) NULL
 ) ENGINE=InnoDB;
 
-
 -- =========================================
 -- TABLA: ANUNCIO_MASCOTAS
 -- =========================================
@@ -112,7 +107,7 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
     descripcion TEXT NOT NULL,
     fecha_nacimiento DATE NULL,
     fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fecha_perdida DATE NOT NULL,
+    fecha_perdida DATE NULL,
     fecha_encontrada DATE NULL,
     fecha_recuperada DATE NULL,
     estado ENUM('PERDIDA', 'ENCONTRADA', 'RECUPERADA') NOT NULL DEFAULT 'PERDIDA',
@@ -138,7 +133,6 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-
 -- =========================================
 -- TABLA: MASCOTAS_COLORES
 -- =========================================
@@ -161,9 +155,9 @@ CREATE TABLE IF NOT EXISTS mascotas_colores (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-
 -- =========================================
 -- TABLA: AVISTAMIENTOS
+-- Incluye control de leído para el propietario
 -- =========================================
 CREATE TABLE IF NOT EXISTS avistamientos (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -174,6 +168,8 @@ CREATE TABLE IF NOT EXISTS avistamientos (
     telefono VARCHAR(20) NULL,
     correo VARCHAR(150) NULL,
     usuario_id INT UNSIGNED NULL,
+    leido_propietario BOOLEAN NOT NULL DEFAULT FALSE,
+    fecha_leido_propietario DATETIME NULL,
 
     CONSTRAINT fk_avistamiento_mascota
         FOREIGN KEY (mascota_id)
@@ -194,6 +190,41 @@ CREATE TABLE IF NOT EXISTS avistamientos (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+-- =========================================
+-- TABLA: MENSAJES_CONTACTO
+-- Guarda los mensajes enviados desde el botón contactar
+-- =========================================
+CREATE TABLE IF NOT EXISTS mensajes_contacto (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    mascota_id INT UNSIGNED NOT NULL,
+    usuario_destinatario_id INT UNSIGNED NOT NULL,
+    usuario_remitente_id INT UNSIGNED NULL,
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) NOT NULL,
+    telefono VARCHAR(20) NULL,
+    mensaje TEXT NOT NULL,
+    leido_destinatario BOOLEAN NOT NULL DEFAULT FALSE,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_leido DATETIME NULL,
+
+    CONSTRAINT fk_mensajes_contacto_mascota
+        FOREIGN KEY (mascota_id)
+        REFERENCES anuncio_mascotas(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_mensajes_contacto_usuario_destinatario
+        FOREIGN KEY (usuario_destinatario_id)
+        REFERENCES usuarios(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_mensajes_contacto_usuario_remitente
+        FOREIGN KEY (usuario_remitente_id)
+        REFERENCES usuarios(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
 -- =========================================
 -- TABLA: FOTOS_ANUNCIOS
@@ -202,6 +233,7 @@ CREATE TABLE IF NOT EXISTS fotos_anuncios (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     mascota_id INT UNSIGNED NOT NULL,
     url VARCHAR(500) NOT NULL,
+    public_id VARCHAR(255) NULL,
     fecha_subida DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     es_principal BOOLEAN NOT NULL DEFAULT FALSE,
     orden INT UNSIGNED NOT NULL DEFAULT 0,
@@ -213,7 +245,6 @@ CREATE TABLE IF NOT EXISTS fotos_anuncios (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-
 -- =========================================
 -- TABLA: FOTOS_AVISTAMIENTOS
 -- =========================================
@@ -221,6 +252,7 @@ CREATE TABLE IF NOT EXISTS fotos_avistamientos (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     avistamiento_id INT UNSIGNED NOT NULL,
     url VARCHAR(500) NOT NULL,
+    public_id VARCHAR(255) NULL,
     fecha_subida DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     es_principal BOOLEAN NOT NULL DEFAULT FALSE,
     orden INT UNSIGNED NOT NULL DEFAULT 0,
@@ -235,43 +267,46 @@ CREATE TABLE IF NOT EXISTS fotos_avistamientos (
 -- =========================================
 -- INDICES
 -- =========================================
-CREATE INDEX idx_password_resets_usuario_id 
+CREATE INDEX idx_password_resets_usuario_id
 ON password_resets(usuario_id);
 
-CREATE INDEX idx_anuncio_usuario_id 
+CREATE INDEX idx_anuncio_usuario_id
 ON anuncio_mascotas(usuario_id);
 
-CREATE INDEX idx_anuncio_raza_id 
+CREATE INDEX idx_anuncio_raza_id
 ON anuncio_mascotas(raza_id);
 
-CREATE INDEX idx_anuncio_ubicacion_perdida_id 
+CREATE INDEX idx_anuncio_ubicacion_perdida_id
 ON anuncio_mascotas(ubicaciones_perdida_id);
 
-CREATE INDEX idx_anuncio_estado 
+CREATE INDEX idx_anuncio_estado
 ON anuncio_mascotas(estado);
 
-CREATE INDEX idx_avistamientos_mascota_id 
+CREATE INDEX idx_avistamientos_mascota_id
 ON avistamientos(mascota_id);
 
-CREATE INDEX idx_avistamientos_ubicacion_id 
+CREATE INDEX idx_avistamientos_ubicacion_id
 ON avistamientos(ubicaciones_avistamientos_id);
 
-CREATE INDEX idx_avistamientos_usuario_id 
+CREATE INDEX idx_avistamientos_usuario_id
 ON avistamientos(usuario_id);
 
-CREATE INDEX idx_avistamientos_fecha_hora 
+CREATE INDEX idx_avistamientos_fecha_hora
 ON avistamientos(fecha_hora);
 
-CREATE INDEX idx_fotos_anuncios_mascota_orden 
+CREATE INDEX idx_avistamientos_leido_propietario
+ON avistamientos(leido_propietario);
+
+CREATE INDEX idx_fotos_anuncios_mascota_orden
 ON fotos_anuncios(mascota_id, orden);
 
 CREATE INDEX idx_fotos_avistamientos_avistamiento_orden
 ON fotos_avistamientos(avistamiento_id, orden);
 
-CREATE INDEX idx_mascotas_colores_color_id 
+CREATE INDEX idx_mascotas_colores_color_id
 ON mascotas_colores(color_id);
 
-CREATE INDEX idx_ubicaciones_codigo_postal 
+CREATE INDEX idx_ubicaciones_codigo_postal
 ON ubicaciones(codigo_postal);
 
 CREATE INDEX idx_ubicaciones_municipio
@@ -279,3 +314,15 @@ ON ubicaciones(municipio);
 
 CREATE INDEX idx_ubicaciones_provincia
 ON ubicaciones(provincia);
+
+CREATE INDEX idx_mensajes_contacto_usuario_destinatario
+ON mensajes_contacto(usuario_destinatario_id);
+
+CREATE INDEX idx_mensajes_contacto_mascota
+ON mensajes_contacto(mascota_id);
+
+CREATE INDEX idx_mensajes_contacto_leido_destinatario
+ON mensajes_contacto(leido_destinatario);
+
+CREATE INDEX idx_mensajes_contacto_fecha_creacion
+ON mensajes_contacto(fecha_creacion);

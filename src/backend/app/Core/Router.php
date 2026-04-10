@@ -37,7 +37,7 @@ class Router
                 continue;
             }
 
-            // Si la ruta es privada, ejecuta el middleware antes del controlador.
+            // Si la ruta es privada, ejecuta el middleware auth antes del controlador
             if (!empty($options['auth'])) {
                 $middlewareFile = __DIR__ . '/../Middelware/AuthMiddleware.php';
 
@@ -65,6 +65,36 @@ class Router
 
                 $middleware = new AuthMiddleware();
                 $middleware->handle();
+            }
+
+            // Si la ruta requiere admin, ejecuta el middleware admin
+            if (!empty($options['admin'])) {
+                $adminMiddlewareFile = __DIR__ . '/../Middelware/AdminMiddleware.php';
+
+                if (!is_file($adminMiddlewareFile)) {
+                    http_response_code(500);
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'AdminMiddleware no encontrado'
+                    ]);
+                    return;
+                }
+
+                require_once $adminMiddlewareFile;
+
+                if (!class_exists('AdminMiddleware')) {
+                    http_response_code(500);
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Clase AdminMiddleware no encontrada'
+                    ]);
+                    return;
+                }
+
+                $adminMiddleware = new AdminMiddleware();
+                $adminMiddleware->handle();
             }
 
             // Separa "Controlador@accion"

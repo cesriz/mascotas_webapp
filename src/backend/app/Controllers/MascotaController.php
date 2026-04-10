@@ -123,6 +123,21 @@ class MascotaController
             return;
         }
 
+        $usuario = Request::user();
+
+        if (($mascota['estado_publicacion'] ?? 'PUBLICADO') === 'OCULTO') {
+            $esDueno = $usuario !== null && (int) $usuario['id'] === (int) $mascota['usuario_id'];
+            $esAdmin = $usuario !== null && ($usuario['rol'] ?? null) === 'ADMIN';
+
+            if (!$esDueno && !$esAdmin) {
+                Response::json([
+                    'success' => false,
+                    'message' => 'Anuncio no disponible'
+                ], 403);
+                return;
+            }
+        }
+
         $mascota['colores'] = $this->mascotaColorModel->getByMascotaId($id);
         $mascota['fotos'] = $this->fotoModel->getByMascotaId($id);
         $mascota['dueno'] = !empty($mascota['usuario_id'])

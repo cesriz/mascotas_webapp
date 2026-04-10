@@ -96,7 +96,7 @@ class MascotaModel extends BaseModel
             INNER JOIN ubicaciones u ON am.ubicaciones_perdida_id = u.id
         ";
 
-        $where = "WHERE 1 = 1";
+        $where = "WHERE 1 = 1 AND am.estado_publicacion = 'PUBLICADO'";
         $params = [];
 
         if (!empty($filters['estado'])) {
@@ -294,7 +294,7 @@ class MascotaModel extends BaseModel
             INNER JOIN razas r ON am.raza_id = r.id
             INNER JOIN especies e ON r.especies_id = e.id
             INNER JOIN ubicaciones u ON am.ubicaciones_perdida_id = u.id
-            WHERE am.estado IN ('PERDIDA', 'ENCONTRADA')
+            WHERE am.estado IN ('PERDIDA', 'ENCONTRADA') AND am.estado_publicacion = 'PUBLICADO'
             ORDER BY am.fecha_registro DESC, am.id DESC
             LIMIT {$limit}
         ";
@@ -443,6 +443,7 @@ class MascotaModel extends BaseModel
                 am.peso,
                 am.descripcion,
                 am.estado,
+                am.estado_publicacion,
                 am.fecha_registro,
                 am.fecha_perdida,
                 am.fecha_encontrada,
@@ -578,7 +579,7 @@ class MascotaModel extends BaseModel
         return $this->deleteById('anuncio_mascotas', $id);
     }
 
-        // Comprueba si una mascota pertenece a un usuario.
+    // Comprueba si una mascota pertenece a un usuario.
     public function belongsToUsuario(int $mascotaId, int $usuarioId): bool
     {
         $sql = "
@@ -595,5 +596,39 @@ class MascotaModel extends BaseModel
         ]);
 
         return $result !== null;
+    }
+
+
+    // Cambia el estado de publicación de una mascota.
+    public function updateEstadoPublicacion(int $id, string $estadoPublicacion): bool
+    {
+        $sql = "
+        UPDATE anuncio_mascotas
+        SET estado_publicacion = :estado_publicacion
+        WHERE id = :id
+    ";
+
+        return $this->executeQuery($sql, [
+            'id' => $id,
+            'estado_publicacion' => $estadoPublicacion
+        ]);
+    }
+
+    // Devuelve el listado de moderación para admin.
+    public function getAdminModeracionList(): array
+    {
+        $sql = "
+        SELECT
+            am.id,
+            am.nombre AS mascota,
+            CONCAT(u.nombre, ' ', COALESCE(u.apellidos, '')) AS usuario,
+            am.fecha_registro AS fecha,
+            am.estado_publicacion AS estado
+        FROM anuncio_mascotas am
+        INNER JOIN usuarios u ON u.id = am.usuario_id
+        ORDER BY am.fecha_registro DESC, am.id DESC
+    ";
+
+        return $this->fetchAll($sql);
     }
 }

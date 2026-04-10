@@ -111,8 +111,10 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
     fecha_encontrada DATE NULL,
     fecha_recuperada DATE NULL,
     estado ENUM('PERDIDA', 'ENCONTRADA', 'RECUPERADA') NOT NULL DEFAULT 'PERDIDA',
+    estado_publicacion ENUM('PUBLICADO','OCULTO') NOT NULL DEFAULT 'PUBLICADO',
     recompensa DECIMAL(10,2) NULL,
     ubicaciones_perdida_id INT UNSIGNED NOT NULL,
+    
 
     CONSTRAINT fk_anuncio_usuario
         FOREIGN KEY (usuario_id)
@@ -263,6 +265,92 @@ CREATE TABLE IF NOT EXISTS fotos_avistamientos (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+-- =========================================
+-- TABLA: REPORTES_ANUNCIOS
+-- =========================================
+
+
+CREATE TABLE IF NOT EXISTS reportes_anuncios (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    mascota_id INT UNSIGNED NOT NULL,
+    usuario_reportante_id INT UNSIGNED NULL,
+    usuario_propietario_id INT UNSIGNED NOT NULL,
+
+    asunto VARCHAR(150) NOT NULL,
+    motivo VARCHAR(100) NOT NULL,
+    mensaje TEXT NOT NULL,
+
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) NOT NULL,
+    telefono VARCHAR(20) NULL,
+
+    estado ENUM('PENDIENTE', 'REVISADO', 'DESCARTADO') NOT NULL DEFAULT 'PENDIENTE',
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_revision DATETIME NULL,
+    revisado_por INT UNSIGNED NULL,
+    notas_admin TEXT NULL,
+
+    CONSTRAINT fk_reportes_anuncios_mascota
+        FOREIGN KEY (mascota_id)
+        REFERENCES anuncio_mascotas(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_reportes_anuncios_usuario_reportante
+        FOREIGN KEY (usuario_reportante_id)
+        REFERENCES usuarios(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_reportes_anuncios_usuario_propietario
+        FOREIGN KEY (usuario_propietario_id)
+        REFERENCES usuarios(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_reportes_anuncios_revisado_por
+        FOREIGN KEY (revisado_por)
+        REFERENCES usuarios(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- =========================================
+-- TABLA: MENSAJES SOPORTE
+-- =========================================
+
+CREATE TABLE IF NOT EXISTS mensajes_soporte (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT UNSIGNED NULL,
+
+    asunto VARCHAR(150) NOT NULL,
+    categoria VARCHAR(100) NOT NULL DEFAULT 'GENERAL',
+    mensaje TEXT NOT NULL,
+
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) NOT NULL,
+    telefono VARCHAR(20) NULL,
+
+    estado ENUM('ABIERTO', 'CERRADO') NOT NULL DEFAULT 'ABIERTO',
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_cierre DATETIME NULL,
+    cerrado_por INT UNSIGNED NULL,
+    notas_admin TEXT NULL,
+
+    CONSTRAINT fk_mensajes_soporte_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_mensajes_soporte_cerrado_por
+        FOREIGN KEY (cerrado_por)
+        REFERENCES usuarios(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+);
 
 -- =========================================
 -- INDICES

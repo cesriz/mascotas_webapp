@@ -8,6 +8,7 @@ require_once __DIR__ . '/../Models/AvistamientoModel.php';
 require_once __DIR__ . '/../Models/ContactoModel.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
+require_once __DIR__ . '/../Validators/UsuarioValidator.php';
 
 class UsuarioController
 {
@@ -230,16 +231,23 @@ class UsuarioController
     {
         $input = Request::json();
 
-        if (empty($input['nombre']) || empty($input['correo']) || empty($input['password'])) {
+        // Seguridad: aunque venga rol en el body, se fuerza siempre a USUARIO
+        $input['rol'] = 'USUARIO';
+
+        $result = UsuarioValidator::validateStore($input);
+
+        if (!empty($result['errors'])) {
             Response::json([
                 'success' => false,
-                'message' => 'nombre, correo y password son obligatorios'
+                'errors' => $result['errors']
             ], 422);
             return;
         }
 
+        $data = $result['data'];
+
         try {
-            $newId = $this->usuarioModel->create($input);
+            $newId = $this->usuarioModel->create($data);
 
             Response::json([
                 'success' => true,

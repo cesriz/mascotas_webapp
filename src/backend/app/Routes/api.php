@@ -52,6 +52,16 @@ return [
     ['POST', '/api/mascotas/{id}/contactos', 'ContactoController@store'],
 
     // =========================
+    // Reportes de anuncios
+    // =========================
+    ['POST', '/api/mascotas/{id}/reportes', 'ReporteController@store'],
+
+    // =========================
+    // Soporte general
+    // =========================
+    ['POST', '/api/soporte', 'SoporteController@store'],
+
+    // =========================
     // Catálogos
     // =========================
     ['GET', '/api/colores', 'ColorController@index'],
@@ -61,10 +71,25 @@ return [
 
     // =========================
     // Usuarios
+    // Solo registro público
     // =========================
-    ['GET', '/api/usuarios', 'UsuarioController@index'],
-    ['GET', '/api/usuarios/{id}', 'UsuarioController@show'],
     ['POST', '/api/usuarios', 'UsuarioController@store'],
+
+    // =========================
+    // Panel admin
+    // =========================
+    ['GET', '/api/admin/anuncios', 'AdminController@anuncios', ['auth' => true, 'admin' => true]],
+    ['PATCH', '/api/admin/anuncios/{id}/estado', 'AdminController@cambiarEstadoAnuncio', ['auth' => true, 'admin' => true]],
+    ['DELETE', '/api/admin/anuncios/{id}', 'AdminController@eliminarAnuncio', ['auth' => true, 'admin' => true]],
+
+    ['GET', '/api/admin/reportes', 'AdminController@reportes', ['auth' => true, 'admin' => true]],
+    ['PATCH', '/api/admin/reportes/{id}/estado', 'AdminController@cambiarEstadoReporte', ['auth' => true, 'admin' => true]],
+
+    ['GET', '/api/admin/soporte', 'AdminController@soporte', ['auth' => true, 'admin' => true]],
+    ['PATCH', '/api/admin/soporte/{id}/estado', 'AdminController@cambiarEstadoSoporte', ['auth' => true, 'admin' => true]],
+
+    ['GET', '/api/admin/usuarios', 'AdminController@usuarios', ['auth' => true, 'admin' => true]],
+    ['PATCH', '/api/admin/usuarios/{id}/estado', 'AdminController@cambiarEstadoUsuario', ['auth' => true, 'admin' => true]],
 ];
     
 

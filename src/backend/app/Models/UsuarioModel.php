@@ -117,6 +117,7 @@ class UsuarioModel extends BaseModel
         return $result !== null;
     }
 
+    
     // Crea un usuario nuevo con contraseña hasheada.
     public function create(array $data): int
     {
@@ -124,30 +125,30 @@ class UsuarioModel extends BaseModel
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = "
-            INSERT INTO usuarios (
-                nombre,
-                apellidos,
-                correo,
-                telefono,
-                direccion,
-                rol,
-                password_hash,
-                token,
-                email_verificado,
-                activo
-            ) VALUES (
-                :nombre,
-                :apellidos,
-                :correo,
-                :telefono,
-                :direccion,
-                :rol,
-                :password_hash,
-                :token,
-                :email_verificado,
-                :activo
-            )
-        ";
+        INSERT INTO usuarios (
+            nombre,
+            apellidos,
+            correo,
+            telefono,
+            direccion,
+            rol,
+            password_hash,
+            token,
+            email_verificado,
+            activo
+        ) VALUES (
+            :nombre,
+            :apellidos,
+            :correo,
+            :telefono,
+            :direccion,
+            :rol,
+            :password_hash,
+            :token,
+            :email_verificado,
+            :activo
+        )
+    ";
 
         return $this->insertAndGetId($sql, [
             'nombre' => $data['nombre'],
@@ -155,7 +156,10 @@ class UsuarioModel extends BaseModel
             'correo' => $data['correo'],
             'telefono' => $data['telefono'] ?? null,
             'direccion' => $data['direccion'] ?? null,
-            'rol' => $data['rol'] ?? 'USUARIO',
+
+            // IMPORTANTE: nunca coger el rol desde el body del usuario
+            'rol' => 'USUARIO',
+
             'password_hash' => $passwordHash,
             'token' => null,
             'email_verificado' => 0,

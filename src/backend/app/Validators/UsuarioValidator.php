@@ -4,6 +4,55 @@ declare(strict_types=1);
 
 class UsuarioValidator
 {
+    // Valida el alta de usuario.
+    public static function validateStore(array $data): array
+    {
+        $errors = [];
+
+        $nombre = isset($data['nombre']) ? trim((string) $data['nombre']) : '';
+        $apellidos = isset($data['apellidos']) ? trim((string) $data['apellidos']) : '';
+        $correo = isset($data['correo']) ? trim((string) $data['correo']) : '';
+        $telefono = isset($data['telefono']) ? trim((string) $data['telefono']) : '';
+        $direccion = isset($data['direccion']) ? trim((string) $data['direccion']) : '';
+        $password = isset($data['password']) ? (string) $data['password'] : '';
+
+        if ($nombre === '') {
+            $errors[] = 'nombre es obligatorio';
+        }
+
+        if ($correo === '') {
+            $errors[] = 'correo es obligatorio';
+        } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'correo no válido';
+        }
+
+        if ($password === '') {
+            $errors[] = 'password es obligatoria';
+        } elseif (strlen($password) < 6) {
+            $errors[] = 'password debe tener al menos 6 caracteres';
+        }
+
+        if (!empty($errors)) {
+            return [
+                'errors' => $errors,
+                'data' => []
+            ];
+        }
+
+        return [
+            'errors' => [],
+            'data' => [
+                'nombre' => $nombre,
+                'apellidos' => $apellidos !== '' ? $apellidos : null,
+                'correo' => $correo,
+                'telefono' => $telefono !== '' ? $telefono : null,
+                'direccion' => $direccion !== '' ? $direccion : null,
+                'password' => $password,
+                'rol' => 'USUARIO'
+            ]
+        ];
+    }
+
     // Valida la edición del perfil.
     public static function validateProfileUpdate(array $data): array
     {

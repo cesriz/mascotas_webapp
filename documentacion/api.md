@@ -2,8 +2,9 @@
 
 ## 1. Qué es este archivo
 
-Documentación sobre como usar api
+Documentación más completa de la API REST del proyecto.
 
+Recoge las rutas activas que aparecen en el backend, cómo se usan desde frontend y qué validaciones o comportamientos importantes conviene tener en cuenta.
 
 ---
 
@@ -36,7 +37,7 @@ Authorization: Bearer TU_TOKEN
 
 ### Qué rutas son privadas
 
-Son privadas las rutas que llevan información del usuario autenticado o que modifican recursos propios.
+Son privadas las rutas que usan el usuario autenticado o que modifican recursos propios.
 
 Ejemplos:
 - `/api/auth/me`
@@ -48,6 +49,16 @@ Ejemplos:
 - marcar mascota como recuperada
 - subir fotos a mascota propia
 
+### Qué rutas son admin
+
+Además de estar autenticadas, requieren rol `ADMIN`.
+
+Ejemplos:
+- `/api/admin/anuncios`
+- `/api/admin/reportes`
+- `/api/admin/soporte`
+- `/api/admin/usuarios`
+
 ### Qué rutas son públicas
 
 Son públicas las que puede usar cualquier persona aunque no tenga sesión iniciada.
@@ -58,6 +69,8 @@ Ejemplos:
 - ver avistamientos de una mascota
 - crear avistamiento
 - enviar mensaje de contacto sobre una mascota
+- reportar un anuncio
+- enviar mensaje de soporte
 - catálogos
 - crear usuario
 - login
@@ -130,7 +143,7 @@ Se usa cuando se envían archivos.
 
 En este proyecto se usa sobre todo en:
 - `POST /api/mascotas/{id}/fotos`
-- `POST /api/mascotas/{id}/avistamientos` si además del texto se mandan fotos
+- `POST /api/mascotas/{id}/avistamientos` cuando además del texto se mandan imágenes
 
 ---
 
@@ -155,6 +168,22 @@ Valores válidos:
 - `GRANDE`
 - `DESCONOCIDO`
 
+### Estado de publicación de anuncios
+Valores válidos:
+- `PUBLICADO`
+- `OCULTO`
+
+### Estados de reportes
+Valores válidos:
+- `PENDIENTE`
+- `REVISADO`
+- `DESCARTADO`
+
+### Estados de soporte
+Valores válidos:
+- `ABIERTO`
+- `CERRADO`
+
 ### Fotos de mascota
 Una mascota se crea primero sin fotos y luego las fotos se suben con otro endpoint.
 
@@ -174,12 +203,29 @@ Un mensaje de contacto sobre una mascota también puede enviarlo:
 Si el usuario está logueado, el backend guarda `usuario_remitente_id`.
 Si no está logueado, ese campo queda a `null`.
 
+### Reportes
+Un reporte sobre un anuncio también puede enviarlo:
+- un usuario logueado
+- una persona pública sin cuenta
+
+Si el usuario está logueado, el backend guarda `usuario_reportante_id`.
+Si no está logueado, ese campo queda a `null`.
+
+### Soporte
+Un mensaje de soporte puede venir:
+- de un usuario autenticado
+- de una persona pública sin cuenta
+
+Si el usuario está autenticado, backend puede rellenar automáticamente nombre, correo o teléfono si no vienen informados.
+
 ### Cambio de contraseña
 Cambiar la contraseña **no cierra la sesión actual automáticamente**.
-Eso hay que tenerlo en cuenta en frontend y también en pruebas.
 
-### Usuarios públicos
-Actualmente existen endpoints públicos de usuarios porque todavía no está cerrada la parte de administración. De momento se documentan tal cual están en el backend.
+### Baja de cuenta
+`DELETE /api/me/cuenta` hace una baja lógica de la cuenta. No es un borrado físico completo. La documentación de frontend debería tratarlo como desactivación.
+
+### Anuncios ocultos
+Si una mascota tiene `estado_publicacion = OCULTO`, su detalle no está disponible para usuarios normales. Solo puede verlo el dueño del anuncio o un admin.
 
 ---
 
@@ -437,7 +483,7 @@ La sesión actual sigue abierta. El token actual sigue siendo válido hasta que 
 
 ### DELETE /api/me/cuenta
 
-Desactiva la cuenta del usuario autenticado y limpia el token.
+Desactiva la cuenta del usuario autenticado.
 
 **Privada:** sí
 
@@ -458,7 +504,7 @@ Esto es una baja lógica, no un borrado físico completo de todos los datos.
 
 **Uso frontend**
 - botón “Eliminar cuenta”
-- después de esto, en frontend conviene limpiar token y enviar al usuario a login o a home
+- después de esto conviene limpiar token en frontend y redirigir fuera del área privada
 
 ---
 
@@ -759,8 +805,25 @@ Devuelve tarjetas recientes para la home.
 GET /api/mascotas/recientes?limit=4
 ```
 
+**Respuesta típica**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "nombre": "Luna",
+      "estado": "PERDIDA",
+      "foto_principal_url": "/uploads/mascotas/luna.jpg"
+    }
+  ]
+}
+```
+
 **Uso frontend**
-- bloque “anuncios recientes” de la home
+- home
+- bloque de anuncios recientes
 
 ---
 
@@ -768,110 +831,52 @@ GET /api/mascotas/recientes?limit=4
 
 Devuelve el detalle completo de una mascota.
 
-**Privada:** no
+**Privada:** no, salvo restricciones por anuncio oculto
 
-**Incluye**
-- datos principales de la mascota
-- ubicación
-- colores
-- fotos de la mascota
-- dueño del anuncio
-- avistamientos asociados
-- fotos de cada avistamiento
-
-**Importante**
-En este proyecto, el detalle público de la mascota sí puede devolver correo y teléfono del dueño porque así se ha decidido para facilitar el contacto también fuera de la app.
-
-**Respuesta típica resumida**
+**Respuesta típica**
 
 ```json
 {
   "success": true,
   "data": {
     "id": 1,
-    "usuario_id": 1,
     "nombre": "Luna",
-    "raza_id": 2,
-    "sexo": "HEMBRA",
-    "tiene_chip": true,
-    "tamano": "MEDIANO",
-    "peso": 12.5,
-    "descripcion": "Se perdió cerca del parque",
     "estado": "PERDIDA",
-    "fecha_registro": "2026-04-01 10:00:00",
-    "fecha_perdida": "2026-04-01",
-    "fecha_encontrada": null,
-    "fecha_recuperada": null,
-    "fecha_nacimiento": "2023-05-10",
-    "recompensa": 100,
-    "raza_nombre": "Labrador",
-    "especie_id": 1,
-    "especie_nombre": "Perro",
-    "ubicacion_id": 5,
-    "direccion_formateada": "Murcia",
-    "municipio": "Murcia",
-    "provincia": "Murcia",
-    "codigo_postal": "30001",
-    "pais": "España",
-    "latitud": 37.99,
-    "longitud": -1.13,
-    "ubicacion_descripcion": "Parque",
+    "descripcion": "Se perdió cerca de casa",
     "colores": [
-      { "id": 1, "nombre": "Negro" }
+      {
+        "id": 1,
+        "nombre": "Negro"
+      }
     ],
     "fotos": [
       {
-        "id": 20,
-        "url": "/uploads/mascotas/luna.jpg",
-        "es_principal": 1,
-        "orden": 0
+        "id": 4,
+        "url": "/uploads/mascotas/luna.jpg"
       }
     ],
     "dueno": {
       "id": 1,
-      "nombre": "Cesar",
-      "apellidos": "Ruiz",
-      "correo": "usuario@correo.com",
-      "telefono": "600000000"
+      "nombre": "Cesar"
     },
-    "avistamientos": [
-      {
-        "id": 8,
-        "mascota_id": 1,
-        "usuario_id": null,
-        "telefono": "622222222",
-        "correo": "persona@correo.com",
-        "descripcion": "La vi cerca de una gasolinera",
-        "fecha_hora": "2026-04-05 18:20:00",
-        "leido_propietario": 0,
-        "fecha_leido_propietario": null,
-        "ubicacion_id": 10,
-        "direccion_formateada": "Murcia",
-        "municipio": "Murcia",
-        "provincia": "Murcia",
-        "codigo_postal": "30001",
-        "pais": "España",
-        "latitud": 37.99,
-        "longitud": -1.13,
-        "ubicacion_descripcion": "Junto al parque",
-        "fotos": []
-      }
-    ]
+    "avistamientos": []
   }
 }
 ```
 
+**Errores comunes**
+- `404` si la mascota no existe
+- `403` si el anuncio está oculto y quien consulta no es dueño ni admin
+
 **Uso frontend**
-- página de detalle
-- mapa
-- ficha completa de la mascota
-- datos de contacto
+- pantalla detalle de mascota
+- ficha ampliada del anuncio
 
 ---
 
 ### POST /api/mascotas
 
-Crea una mascota nueva.
+Crea una mascota nueva del usuario autenticado.
 
 **Privada:** sí
 
@@ -884,13 +889,11 @@ Crea una mascota nueva.
   "sexo": "HEMBRA",
   "tiene_chip": true,
   "tamano": "MEDIANO",
-  "peso": 12.5,
-  "fecha_nacimiento": "2023-05-10",
-  "descripcion": "Se perdió cerca del parque",
-  "fecha_perdida": "2026-03-27",
-  "fecha_encontrada": null,
-  "fecha_recuperada": null,
+  "peso": 18.5,
+  "fecha_nacimiento": "2022-05-01",
+  "descripcion": "Muy sociable",
   "estado": "PERDIDA",
+  "fecha_perdida": "2026-04-01",
   "recompensa": 100,
   "colores": [1, 3],
   "ubicacion": {
@@ -901,29 +904,26 @@ Crea una mascota nueva.
     "provincia": "Murcia",
     "codigo_postal": "30001",
     "pais": "España",
-    "descripcion": "Parque"
+    "descripcion": "Zona del parque"
   }
 }
 ```
 
-**Importante**
-Aunque el frontend mande `usuario_id`, el backend usa siempre el usuario del token.
+**Campos obligatorios**
+- `nombre`
+- `raza_id`
+- `sexo`
+- `tamano`
+- `descripcion`
+- `estado`
+- `colores` como array válido
+- `ubicacion`
 
-**Validaciones importantes**
-- `nombre` obligatorio
-- `raza_id` obligatorio
-- `sexo` obligatorio
-- `tamano` obligatorio
-- `descripcion` obligatoria
-- `estado` obligatorio
-- `colores` obligatorio y debe ser array
-- al menos 1 color válido
-- máximo 5 colores
-- `ubicacion` obligatoria
-- según el estado, la fecha correspondiente también es obligatoria:
-  - si `PERDIDA` → `fecha_perdida`
-  - si `ENCONTRADA` → `fecha_encontrada`
-  - si `RECUPERADA` → `fecha_recuperada`
+**Reglas importantes**
+- si `estado = PERDIDA`, `fecha_perdida` es obligatoria
+- si `estado = ENCONTRADA`, `fecha_encontrada` es obligatoria
+- si `estado = RECUPERADA`, `fecha_recuperada` es obligatoria
+- hay que seleccionar entre 1 y 5 colores válidos
 
 **Éxito**
 
@@ -932,70 +932,110 @@ Aunque el frontend mande `usuario_id`, el backend usa siempre el usuario del tok
   "success": true,
   "message": "Mascota creada correctamente",
   "data": {
-    "id": 12,
-    "ubicacion_id": 18,
-    "colores": [1, 3]
+    "id": 12
   }
 }
 ```
 
+**Errores comunes**
+- `401` si no hay token
+- `422` si faltan campos obligatorios o la validación falla
+
 **Uso frontend**
-- formulario “Publicar mascota”
+- formulario de alta de mascota
+
+---
+
+### PUT /api/mascotas/{id}
+
+Actualiza una mascota del usuario autenticado.
+
+**Privada:** sí
+
+**Body JSON**
+Mismo formato general que en creación.
+
+**Importante**
+Solo puede editarla su dueño.
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Mascota actualizada correctamente",
+  "data": {
+    "id": 12
+  }
+}
+```
+
+**Errores comunes**
+- `401` si no hay token
+- `403` si no pertenece al usuario
+- `404` si no existe
+- `422` si la validación falla
+
+**Uso frontend**
+- edición de anuncio
 
 ---
 
 ### POST /api/mascotas/{id}/fotos
 
-Sube fotos de una mascota ya creada.
+Sube fotos para una mascota ya existente.
 
 **Privada:** sí
 
 **Content-Type**
 `multipart/form-data`
 
-**Campos**
-- `fotos[]` archivos de imagen
+**Campo esperado**
+- `fotos`
 
-**Importante**
-Solo puede subir fotos el propietario de la mascota.
+**Éxito**
 
-**Uso frontend**
-- segundo paso después de crear mascota
-- galería o edición de fotos
+```json
+{
+  "success": true,
+  "message": "Fotos subidas correctamente",
+  "data": [
+    {
+      "id": 20,
+      "url": "/uploads/mascotas/abc123.jpg"
+    }
+  ]
+}
+```
 
----
-
-### PUT /api/mascotas/{id}
-
-Actualiza una mascota propia.
-
-**Privada:** sí
-
-**Body JSON**
-Muy parecido al de creación.
-
-Se recomienda mandar todos los campos editables de la mascota y de la ubicación.
-
-**Importante**
-- solo el propietario puede editar
-- el backend fuerza el `usuario_id` del token
+**Errores comunes**
+- `401` si no hay token
+- `422` si no se envía al menos una imagen en `fotos`
+- `403` si la mascota no pertenece al usuario
 
 **Uso frontend**
-- formulario de edición de mascota
+- paso de subida de fotos posterior a creación
+- galería de edición
 
 ---
 
 ### DELETE /api/mascotas/{id}
 
-Borra una mascota propia.
+Borra una mascota y sus datos relacionados.
 
 **Privada:** sí
 
-**Body**
-No necesita body.
-
 **Importante**
-Solo puede borrar el propietario.
+Solo puede borrarla su dueño.
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Mascota eliminada correctamente"
+}
+```
 
 **Uso frontend**
 - botón eliminar publicación
@@ -1004,18 +1044,35 @@ Solo puede borrar el propietario.
 
 ### PATCH /api/mascotas/{id}/recuperar
 
-Marca una mascota propia como recuperada.
+Marca una mascota como recuperada.
 
 **Privada:** sí
 
 **Body**
 No necesita body.
 
-**Importante**
-Solo puede hacerlo el propietario.
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Mascota marcada como recuperada correctamente",
+  "data": {
+    "id": 12,
+    "estado": "RECUPERADA",
+    "fecha_recuperada": "2026-04-12"
+  }
+}
+```
+
+**Errores comunes**
+- `401` si no hay token
+- `403` si no pertenece al usuario
+- `422` si ya estaba recuperada
 
 **Uso frontend**
-- botón “Marcar como recuperada” en “Mis mascotas” o en el detalle privado
+- cerrar caso
+- mover anuncio a finales felices o histórico
 
 ---
 
@@ -1023,7 +1080,7 @@ Solo puede hacerlo el propietario.
 
 ### GET /api/mascotas/{id}/avistamientos
 
-Devuelve los avistamientos asociados a una mascota.
+Lista los avistamientos de una mascota concreta.
 
 **Privada:** no
 
@@ -1035,59 +1092,47 @@ Devuelve los avistamientos asociados a una mascota.
   "data": [
     {
       "id": 8,
-      "mascota_id": 3,
-      "usuario_id": null,
       "telefono": "622222222",
       "correo": "persona@correo.com",
-      "descripcion": "La vi cerca del parque",
+      "descripcion": "La vi cerca de una gasolinera",
       "fecha_hora": "2026-04-05 18:20:00",
-      "leido_propietario": 0,
-      "fecha_leido_propietario": null,
-      "ubicacion_id": 10,
-      "direccion_formateada": "Murcia",
       "municipio": "Murcia",
       "provincia": "Murcia",
-      "codigo_postal": "30001",
-      "pais": "España",
       "latitud": 37.99,
       "longitud": -1.13,
-      "ubicacion_descripcion": "Junto al parque",
-      "fotos": []
+      "fotos": [
+        {
+          "id": 30,
+          "url": "/uploads/avistamientos/a1.jpg"
+        }
+      ]
     }
   ]
 }
 ```
 
+**Errores comunes**
+- `404` si la mascota no existe
+
 **Uso frontend**
-- listado de avistamientos en el detalle de la mascota
-- mapa de avistamientos
+- detalle de mascota
+- línea temporal de avistamientos
 
 ---
 
 ### POST /api/mascotas/{id}/avistamientos
 
-Crea un avistamiento para una mascota concreta.
+Crea un nuevo avistamiento para una mascota.
 
-**Privada:** no, pero también admite usuario logueado
+**Privada:** no
 
-**Casos posibles**
-- persona pública sin cuenta
-- usuario autenticado con token
-
-**Si hay token**
-- el backend guarda `usuario_id`
-- si faltan teléfono o correo, el backend puede completarlos con los datos del usuario autenticado
-
-**Si no hay token**
-- `usuario_id` queda a `null`
-
-**Body JSON**
+**Puede enviarse como JSON**
 
 ```json
 {
   "telefono": "622222222",
   "correo": "persona@correo.com",
-  "descripcion": "La vi cerca de una gasolinera",
+  "descripcion": "La vi en una rotonda",
   "fecha_hora": "2026-04-05 18:20:00",
   "ubicacion": {
     "latitud": 37.99,
@@ -1097,24 +1142,33 @@ Crea un avistamiento para una mascota concreta.
     "provincia": "Murcia",
     "codigo_postal": "30001",
     "pais": "España",
-    "descripcion": "Junto al parque"
+    "descripcion": "Junto a una gasolinera"
   }
 }
 ```
 
-**Si se quieren subir fotos**
-También puede enviarse como `multipart/form-data` con los campos de texto y además:
-- `fotos[]`
+**O como multipart/form-data**
 
-**Validaciones importantes**
+Campos habituales:
+- `telefono`
+- `correo`
+- `descripcion`
+- `fecha_hora`
+- `latitud`
+- `longitud`
+- `direccion_formateada`
+- `municipio`
+- `provincia`
+- `codigo_postal`
+- `pais`
+- `ubicacion_descripcion`
+- `fotos`
+
+**Reglas importantes**
 - `telefono` obligatorio
-- `correo` opcional, pero si viene debe ser válido
 - `fecha_hora` obligatoria
 - `ubicacion` obligatoria
-- `ubicacion.latitud` obligatoria y numérica
-- `ubicacion.longitud` obligatoria y numérica
-- `ubicacion.municipio` obligatoria
-- `ubicacion.provincia` obligatoria
+- `correo` opcional, pero si viene debe ser válido
 
 **Éxito**
 
@@ -1124,168 +1178,238 @@ También puede enviarse como `multipart/form-data` con los campos de texto y ade
   "message": "Avistamiento creado correctamente",
   "data": {
     "id": 8,
-    "mascota_id": 3,
-    "usuario_id": null,
-    "ubicacion_id": 10
+    "mascota_id": 3
   }
 }
 ```
 
+**Errores comunes**
+- `404` si la mascota no existe
+- `422` si la validación falla
+
 **Uso frontend**
-- formulario “Registrar avistamiento”
-- lo puede usar tanto usuario externo como usuario logueado
+- formulario “He visto esta mascota”
 
 ---
 
-## 8.5 Contacto sobre una mascota
+## 8.5 Contacto sobre anuncios
 
 ### POST /api/mascotas/{id}/contactos
 
-Envía un mensaje de contacto sobre una mascota concreta.
+Envía un mensaje de contacto al usuario que publicó la mascota.
 
-**Privada:** no, pero también admite usuario logueado
-
-**Casos posibles**
-- persona pública sin cuenta
-- usuario autenticado con token
-
-**Si hay token**
-- el backend guarda `usuario_remitente_id`
-- si faltan nombre, correo o teléfono, puede completarlos con datos del perfil
-
-**Si no hay token**
-- `usuario_remitente_id` queda a `null`
+**Privada:** no
 
 **Body JSON**
 
 ```json
 {
-  "nombre": "Ana",
-  "correo": "ana@correo.com",
-  "telefono": "611111111",
-  "mensaje": "Creo que la vi en la zona norte"
+  "nombre": "Juan",
+  "correo": "juan@email.com",
+  "telefono": "600000000",
+  "mensaje": "Creo que la vi por el parque"
 }
 ```
 
-**Validaciones importantes**
-- `nombre` obligatorio
-- `correo` obligatorio y válido
-- `telefono` obligatorio
-- `mensaje` obligatorio
+**Reglas de validación**
+- `nombre` obligatoria
+- `correo` obligatoria y válida
+- `telefono` obligatoria
+- `mensaje` obligatoria
 
 **Éxito**
 
 ```json
 {
   "success": true,
-  "message": "Mensaje de contacto enviado correctamente",
+  "message": "Mensaje enviado correctamente",
   "data": {
-    "id": 10,
-    "mascota_id": 3,
-    "usuario_destinatario_id": 1,
-    "usuario_remitente_id": null
+    "id": 15,
+    "mascota_id": 3
   }
 }
 ```
 
+**Errores comunes**
+- `404` si la mascota no existe
+- `422` si fallan validaciones
+
 **Uso frontend**
-- formulario “Contactar” desde el detalle de una mascota
-- también sirve para mensajes de una persona externa a la aplicación
+- formulario de contacto en el detalle de la mascota
 
 ---
 
-## 8.6 Catálogos
+## 8.6 Reportes de anuncios
 
-### GET /api/colores
+### POST /api/mascotas/{id}/reportes
 
-Devuelve todos los colores.
+Crea un reporte sobre un anuncio.
 
 **Privada:** no
 
-**Respuesta típica**
+**Body JSON**
+
+```json
+{
+  "asunto": "Anuncio sospechoso",
+  "motivo": "fraude",
+  "mensaje": "No parece una publicación real",
+  "nombre": "Ana",
+  "correo": "ana@email.com",
+  "telefono": "611111111"
+}
+```
+
+**Reglas de validación**
+- `asunto` obligatoria
+- `motivo` obligatoria
+- `mensaje` obligatoria
+- `nombre` obligatoria
+- `correo` obligatoria y válida
+- `telefono` opcional
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Reporte enviado correctamente",
+  "data": {
+    "id": 6,
+    "mascota_id": 3
+  }
+}
+```
+
+**Errores comunes**
+- `404` si la mascota no existe
+- `422` si la validación falla
+
+**Uso frontend**
+- botón o modal “Reportar anuncio”
+
+---
+
+## 8.7 Soporte general
+
+### POST /api/soporte
+
+Crea un mensaje de soporte.
+
+**Privada:** no
+
+**Body JSON**
+
+```json
+{
+  "asunto": "Problema con mi cuenta",
+  "categoria": "GENERAL",
+  "mensaje": "No puedo acceder a una sección",
+  "nombre": "Cesar",
+  "correo": "cesar@email.com",
+  "telefono": "600000000"
+}
+```
+
+**Reglas de validación**
+- `asunto` obligatoria
+- `mensaje` obligatoria
+- `nombre` obligatoria
+- `correo` obligatoria y válida
+- `categoria` opcional, por defecto `GENERAL`
+- `telefono` opcional
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Mensaje de soporte enviado correctamente",
+  "data": {
+    "id": 4
+  }
+}
+```
+
+**Errores comunes**
+- `422` si la validación falla
+
+**Uso frontend**
+- formulario de soporte o contacto general
+
+---
+
+## 8.8 Catálogos
+
+### GET /api/colores
+
+Lista todos los colores.
+
+**Privada:** no
+
+**Éxito**
 
 ```json
 {
   "success": true,
   "data": [
-    { "id": 1, "nombre": "Negro" },
-    { "id": 2, "nombre": "Blanco" }
+    {
+      "id": 1,
+      "nombre": "Negro"
+    }
   ]
 }
 ```
 
 **Uso frontend**
-- select múltiple de colores
-- filtros
+- filtros por color
+- selector de colores en formulario de mascota
 
 ---
 
 ### GET /api/colores/{id}
 
-Devuelve un color por id.
+Devuelve un color concreto.
 
 **Privada:** no
+
+**Errores comunes**
+- `404` si el color no existe
 
 ---
 
 ### GET /api/especies
 
-Devuelve todas las especies.
+Lista especies.
 
 **Privada:** no
 
 **Uso frontend**
-- select de especies
+- formularios
+- filtros
 
 ---
 
 ### GET /api/razas
 
-Devuelve razas.
+Lista razas.
 
 **Privada:** no
 
 **Query params**
 - `especie_id` opcional
 
-**Ejemplo**
-
-```txt
-GET /api/razas?especie_id=1
-```
-
 **Uso frontend**
-- select dependiente de razas
+- combo dependiente de razas
+- filtros del tablón
 
 ---
 
-## 8.7 Usuarios
-
-### GET /api/usuarios
-
-Devuelve el listado de usuarios.
-
-**Privada:** no actualmente
-
-**Nota**
-Este endpoint está así ahora mismo porque la parte de administración todavía no está cerrada. Se documenta tal cual existe en backend.
-
----
-
-### GET /api/usuarios/{id}
-
-Devuelve un usuario por id.
-
-**Privada:** no actualmente
-
-**Nota**
-Igual que el endpoint anterior, se deja documentado porque existe en backend aunque más adelante probablemente se revise.
-
----
+## 8.9 Usuarios públicos
 
 ### POST /api/usuarios
 
-Crea un usuario nuevo.
+Registra un nuevo usuario.
 
 **Privada:** no
 
@@ -1295,20 +1419,18 @@ Crea un usuario nuevo.
 {
   "nombre": "Cesar",
   "apellidos": "Ruiz",
-  "correo": "usuario@correo.com",
+  "correo": "cesar@email.com",
   "telefono": "600000000",
   "direccion": "Murcia",
   "password": "123456"
 }
 ```
 
-**Validación actual**
-En controlador solo se exige:
-- `nombre`
-- `correo`
-- `password`
-
-Los demás campos pueden ir vacíos.
+**Reglas importantes**
+- `nombre` obligatoria
+- `correo` obligatoria y válida
+- `password` obligatoria y mínimo 6 caracteres
+- el backend ignora cualquier rol enviado y fuerza siempre `USUARIO`
 
 **Éxito**
 
@@ -1317,102 +1439,274 @@ Los demás campos pueden ir vacíos.
   "success": true,
   "message": "Usuario creado correctamente",
   "data": {
-    "id": 15
+    "id": 9
   }
 }
 ```
 
+**Errores comunes**
+- `422` si la validación falla
+
 **Uso frontend**
-- registro de usuario
+- pantalla de registro
 
 ---
 
-# 9. Ejemplos de flujos reales de frontend
+## 8.10 Panel admin
 
-## Flujo A: login y perfil
+### GET /api/admin/anuncios
 
-1. `POST /api/auth/login`
-2. guardar token
-3. `GET /api/auth/me`
-4. `GET /api/me/perfil`
-5. si se edita el perfil → `PUT /api/me/perfil`
-6. si se cambia contraseña → `PATCH /api/me/password`
-7. si se cierra sesión → `POST /api/auth/logout`
+Devuelve el listado de anuncios para moderación.
 
----
+**Privada:** sí
 
-## Flujo B: publicar una mascota
+**Admin:** sí
 
-1. usuario logueado
-2. `POST /api/mascotas`
-3. guardar el `id` de la mascota creada
-4. `POST /api/mascotas/{id}/fotos`
-5. refrescar con `GET /api/me/mascotas` o `GET /api/mascotas/{id}`
+**Éxito**
 
----
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 3,
+      "nombre": "Luna",
+      "estado": "PERDIDA",
+      "estado_publicacion": "PUBLICADO"
+    }
+  ]
+}
+```
 
-## Flujo C: usuario externo registra un avistamiento
-
-1. abre el detalle con `GET /api/mascotas/{id}`
-2. manda formulario a `POST /api/mascotas/{id}/avistamientos`
-3. no necesita cuenta ni token
-4. el dueño lo verá luego en `GET /api/me/notificaciones`
+**Uso frontend**
+- panel de moderación de anuncios
 
 ---
 
-## Flujo D: usuario externo envía un mensaje de contacto
+### PATCH /api/admin/anuncios/{id}/estado
 
-1. abre el detalle con `GET /api/mascotas/{id}`
-2. manda formulario a `POST /api/mascotas/{id}/contactos`
-3. no necesita cuenta ni token
-4. el dueño lo verá luego en `GET /api/me/notificaciones`
+Cambia el estado de publicación de un anuncio.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Body JSON**
+
+```json
+{
+  "estado_publicacion": "OCULTO"
+}
+```
+
+**Valores válidos**
+- `PUBLICADO`
+- `OCULTO`
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Estado del anuncio actualizado correctamente"
+}
+```
+
+**Errores comunes**
+- `422` si `estado_publicacion` no es válido
+
+**Uso frontend**
+- ocultar o republicar anuncios
 
 ---
 
-## Flujo E: centro de notificaciones
+### DELETE /api/admin/anuncios/{id}
 
-1. usuario logueado llama a `GET /api/me/notificaciones`
-2. pinta resumen, contactos y avistamientos
-3. si abre un contacto → `PATCH /api/me/notificaciones/contactos/{id}/leer`
-4. si abre un avistamiento → `PATCH /api/me/notificaciones/avistamientos/{id}/leer`
+Elimina un anuncio desde administración.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Anuncio eliminado correctamente"
+}
+```
+
+**Uso frontend**
+- acción destructiva en moderación
 
 ---
 
-# 10. Consejos para frontend
+### GET /api/admin/reportes
 
-- Centralizar el token en un solo sitio.
-- Hacer una función común para meter el header `Authorization` en rutas privadas.
-- En formularios, mostrar los errores de `422` tal como llegan en `errors[]`.
-- En las pantallas privadas, si llega `401`, redirigir a login.
-- Después de crear, editar o borrar, refrescar la vista con el GET correspondiente.
-- En avistamientos, si se van a subir fotos, recordar que el envío pasa a `multipart/form-data`.
-- Para filtros, construir la query string solo con los campos que estén informados.
+Devuelve todos los reportes con información relacionada.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Uso frontend**
+- bandeja de reportes
+- tabla de revisión
 
 ---
 
-# 11. Checklist rápida para el compañero de frontend
+### PATCH /api/admin/reportes/{id}/estado
 
-## Sin token
-Puede usar:
+Cambia el estado de un reporte.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Body JSON**
+
+```json
+{
+  "estado": "REVISADO",
+  "notas_admin": "Revisado por administración"
+}
+```
+
+**Valores válidos**
+- `PENDIENTE`
+- `REVISADO`
+- `DESCARTADO`
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Reporte actualizado correctamente"
+}
+```
+
+**Errores comunes**
+- `422` si `estado` no es válido
+
+**Uso frontend**
+- flujo de gestión de reportes
+
+---
+
+### GET /api/admin/soporte
+
+Devuelve todos los mensajes de soporte con sus relaciones.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Uso frontend**
+- panel admin de soporte
+- listado de tickets
+
+---
+
+### PATCH /api/admin/soporte/{id}/estado
+
+Cambia el estado de un mensaje de soporte.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Body JSON**
+
+```json
+{
+  "estado": "CERRADO",
+  "notas_admin": "Incidencia resuelta"
+}
+```
+
+**Valores válidos**
+- `ABIERTO`
+- `CERRADO`
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Mensaje de soporte actualizado correctamente"
+}
+```
+
+**Errores comunes**
+- `422` si `estado` no es válido
+
+**Uso frontend**
+- cerrar incidencias
+- añadir trazabilidad administrativa
+
+---
+
+### GET /api/admin/usuarios
+
+Devuelve el listado de usuarios para gestión administrativa.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Uso frontend**
+- panel de usuarios
+- activar o desactivar cuentas
+
+---
+
+### PATCH /api/admin/usuarios/{id}/estado
+
+Activa o desactiva un usuario.
+
+**Privada:** sí
+
+**Admin:** sí
+
+**Body JSON**
+
+```json
+{
+  "activo": 0
+}
+```
+
+**Valores válidos**
+- `1` = activo
+- `0` = inactivo
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Estado del usuario actualizado correctamente"
+}
+```
+
+**Errores comunes**
+- `422` si `activo` no es 0 o 1
+
+**Uso frontend**
+- bloqueo o reactivación de usuarios
+
+---
+
+## 9. Resumen rápido de endpoints activos
+
+### Autenticación
 - `POST /api/auth/login`
-- `GET /api/mascotas`
-- `GET /api/mascotas/recientes`
-- `GET /api/mascotas/{id}`
-- `GET /api/mascotas/{id}/avistamientos`
-- `POST /api/mascotas/{id}/avistamientos`
-- `POST /api/mascotas/{id}/contactos`
-- `GET /api/colores`
-- `GET /api/colores/{id}`
-- `GET /api/especies`
-- `GET /api/razas`
-- `GET /api/usuarios`
-- `GET /api/usuarios/{id}`
-- `POST /api/usuarios`
-
-## Con token
-Además de lo anterior, puede usar:
 - `GET /api/auth/me`
 - `POST /api/auth/logout`
+
+### Zona privada
 - `GET /api/me/perfil`
 - `PUT /api/me/perfil`
 - `PATCH /api/me/password`
@@ -1422,14 +1716,42 @@ Además de lo anterior, puede usar:
 - `GET /api/me/notificaciones`
 - `PATCH /api/me/notificaciones/contactos/{id}/leer`
 - `PATCH /api/me/notificaciones/avistamientos/{id}/leer`
+
+### Mascotas
+- `GET /api/mascotas`
+- `GET /api/mascotas/recientes`
+- `GET /api/mascotas/{id}`
 - `POST /api/mascotas`
 - `PUT /api/mascotas/{id}`
 - `POST /api/mascotas/{id}/fotos`
 - `DELETE /api/mascotas/{id}`
 - `PATCH /api/mascotas/{id}/recuperar`
 
----
+### Avistamientos
+- `GET /api/mascotas/{id}/avistamientos`
+- `POST /api/mascotas/{id}/avistamientos`
 
-# 12. Última nota
+### Contacto, reportes y soporte
+- `POST /api/mascotas/{id}/contactos`
+- `POST /api/mascotas/{id}/reportes`
+- `POST /api/soporte`
 
-Si en el futuro cambia algo del backend, este archivo hay que actualizarlo a la vez. La documentación útil no es la más bonita, sino la que coincide de verdad con el código actual.
+### Catálogos
+- `GET /api/colores`
+- `GET /api/colores/{id}`
+- `GET /api/especies`
+- `GET /api/razas`
+
+### Usuarios públicos
+- `POST /api/usuarios`
+
+### Admin
+- `GET /api/admin/anuncios`
+- `PATCH /api/admin/anuncios/{id}/estado`
+- `DELETE /api/admin/anuncios/{id}`
+- `GET /api/admin/reportes`
+- `PATCH /api/admin/reportes/{id}/estado`
+- `GET /api/admin/soporte`
+- `PATCH /api/admin/soporte/{id}/estado`
+- `GET /api/admin/usuarios`
+- `PATCH /api/admin/usuarios/{id}/estado`

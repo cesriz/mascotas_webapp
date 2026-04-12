@@ -6,6 +6,7 @@ use Throwable;
 
 require_once __DIR__ . '/../Models/ContactoModel.php';
 require_once __DIR__ . '/../Models/MascotaModel.php';
+require_once __DIR__ . '/../Services/AuthService.php';
 require_once __DIR__ . '/../Validators/ContactoValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
@@ -14,17 +15,29 @@ class ContactoController
 {
     private ContactoModel $contactoModel;
     private MascotaModel $mascotaModel;
+    private AuthService $authService;
 
     public function __construct()
     {
         $this->contactoModel = new ContactoModel();
         $this->mascotaModel = new MascotaModel();
+        $this->authService = new AuthService();
+    }
+
+    /**
+     * Intenta obtener el usuario autenticado actual sin obligar a que exista.
+     *
+     * Si no hay token o no es válido, devuelve null.
+     */
+    private function getOptionalUser(): ?array
+    {
+        return $this->authService->validateCurrentToken();
     }
 
     // Guarda un mensaje de contacto asociado a una mascota.
     public function store(int $mascotaId): void
     {
-        $usuario = Request::user(); // puede ser null si viene público
+        $usuario = $this->getOptionalUser(); // puede ser null si viene público
 
         $mascota = $this->mascotaModel->getById($mascotaId);
 
@@ -80,7 +93,7 @@ class ContactoController
             $newId = $this->contactoModel->create([
                 'mascota_id' => $mascotaId,
                 'usuario_destinatario_id' => (int) $mascota['usuario_id'],
-                'usuario_remitente_id' => $data['usuario_remitente_id'], // puede ser int o null
+                'usuario_remitente_id' => $data['usuario_remitente_id'],
                 'nombre' => $data['nombre'],
                 'correo' => $data['correo'],
                 'telefono' => $data['telefono'],

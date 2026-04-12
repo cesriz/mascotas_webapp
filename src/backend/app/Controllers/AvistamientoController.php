@@ -1,32 +1,53 @@
 <?php
+
 declare(strict_types=1);
 
 use Throwable;
 
 require_once __DIR__ . '/../Models/AvistamientoModel.php';
 require_once __DIR__ . '/../Models/MascotaModel.php';
-require_once __DIR__ . '/../Models/UbicacionModel.php';
 require_once __DIR__ . '/../Models/FotoModel.php';
+require_once __DIR__ . '/../Services/AvistamientoService.php';
 require_once __DIR__ . '/../Validators/AvistamientoValidator.php';
-require_once __DIR__ . '/../Helpers/FileHelper.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
+require_once __DIR__ . '/../Services/AuthService.php';
 
+/**
+ * Controlador de avistamientos.
+ *
+ * Mantiene en controlador:
+ * - comprobaciones simples
+ * - lectura de input
+ * - validación
+ * - respuesta HTTP
+ *
+ * Deja en service:
+ * - creación compleja con ubicación y fotos
+ */
 class AvistamientoController
 {
     private AvistamientoModel $avistamientoModel;
     private MascotaModel $mascotaModel;
-    private UbicacionModel $ubicacionModel;
     private FotoModel $fotoModel;
+    private AvistamientoService $avistamientoService;
+    private AuthService $authService;
 
+    /**
+     * Inicializa modelos y servicio.
+     */
     public function __construct()
     {
         $this->avistamientoModel = new AvistamientoModel();
         $this->mascotaModel = new MascotaModel();
-        $this->ubicacionModel = new UbicacionModel();
         $this->fotoModel = new FotoModel();
+        $this->avistamientoService = new AvistamientoService();
+        $this->authService = new AuthService();
     }
 
+    /**
+     * Lista los avistamientos de una mascota concreta.
+     */
     public function index(int $mascotaId): void
     {
         $mascota = $this->mascotaModel->getById($mascotaId);
@@ -51,10 +72,16 @@ class AvistamientoController
         ]);
     }
 
+    /**
+     * Crea un nuevo avistamiento para una mascota.
+     *
+     * Acepta dos casos:
+     * - usuario autenticado
+     * - usuario público/anónimo
+     */
     public function store(int $mascotaId): void
     {
-        $usuario = Request::user(); // puede ser null si viene público
-
+        $usuario = $this->getOptionalUser();
         $mascota = $this->mascotaModel->getById($mascotaId);
 
         if ($mascota === null) {
@@ -67,11 +94,6 @@ class AvistamientoController
 
         $input = $this->getInputData();
 
-        /*
-         * Caso 1: usuario autenticado
-         * Guardamos su usuario_id real y, si faltan datos de contacto,
-         * podemos completar con su perfil.
-         */
         if ($usuario !== null) {
             $input['usuario_id'] = (int) $usuario['id'];
 
@@ -83,10 +105,6 @@ class AvistamientoController
                 $input['correo'] = $usuario['correo'];
             }
         } else {
-            /*
-             * Caso 2: usuario público / anónimo
-             * No hay usuario interno asociado.
-             */
             $input['usuario_id'] = null;
         }
 
@@ -103,43 +121,18 @@ class AvistamientoController
         $data = $result['data'];
 
         try {
-            $this->avistamientoModel->beginTransaction();
-
-            $ubicacionId = $this->ubicacionModel->create($data['ubicacion']);
-
-            $newId = $this->avistamientoModel->create([
-                'mascota_id' => $mascotaId,
-                'usuario_id' => $data['usuario_id'], // puede ser int o null
-                'ubicaciones_avistamientos_id' => $ubicacionId,
-                'telefono' => $data['telefono'],
-                'correo' => $data['correo'],
-                'descripcion' => $data['descripcion'],
-                'fecha_hora' => $data['fecha_hora'],
-            ]);
-
-            if (Request::hasFile('fotos')) {
-                $savedFiles = FileHelper::saveImages(Request::file('fotos'), 'avistamientos');
-
-                foreach ($savedFiles as $file) {
-                    $this->fotoModel->createForAvistamiento($newId, $file);
-                }
-            }
-
-            $this->avistamientoModel->commit();
+            $created = $this->avistamientoService->create(
+                $mascotaId,
+                $data,
+                Request::hasFile('fotos') ? Request::file('fotos') : null
+            );
 
             Response::json([
                 'success' => true,
                 'message' => 'Avistamiento creado correctamente',
-                'data' => [
-                    'id' => $newId,
-                    'mascota_id' => $mascotaId,
-                    'usuario_id' => $data['usuario_id'],
-                    'ubicacion_id' => $ubicacionId
-                ]
+                'data' => $created
             ], 201);
         } catch (Throwable $e) {
-            $this->avistamientoModel->rollBack();
-
             Response::json([
                 'success' => false,
                 'message' => 'Error al crear el avistamiento',
@@ -148,6 +141,21 @@ class AvistamientoController
         }
     }
 
+    /**
+     * Intenta obtener el usuario autenticado actual sin obligar a que exista.
+     */
+    private function getOptionalUser(): ?array
+    {
+        return $this->authService->validateCurrentToken();
+    }
+
+    /**
+     * Obtiene los datos de entrada.
+     *
+     * Soporta:
+     * - multipart/form-data
+     * - JSON
+     */
     private function getInputData(): array
     {
         if (!empty($_POST)) {

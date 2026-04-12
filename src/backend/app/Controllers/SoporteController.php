@@ -9,18 +9,33 @@ require_once __DIR__ . '/../Validators/SoporteValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
 
+/**
+ * Controlador de soporte.
+ *
+ * Permite enviar mensajes al canal de soporte del sistema.
+ */
 class SoporteController
 {
     private SoporteModel $soporteModel;
 
+    /**
+     * Inicializa el modelo de soporte.
+     */
     public function __construct()
     {
         $this->soporteModel = new SoporteModel();
     }
 
+    /**
+     * Crea un nuevo mensaje de soporte.
+     *
+     * Puede venir de:
+     * - usuario autenticado
+     * - usuario público
+     */
     public function store(): void
     {
-        $usuario = Request::user(); // puede ser null
+        $usuario = Request::user();
         $input = Request::json();
 
         if ($usuario !== null) {
@@ -48,6 +63,7 @@ class SoporteController
                 'success' => false,
                 'errors' => $result['errors']
             ], 422);
+            return;
         }
 
         $data = $result['data'];

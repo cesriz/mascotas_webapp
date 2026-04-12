@@ -3,37 +3,60 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Services/AuthService.php';
+require_once __DIR__ . '/../Validators/AuthValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
 
+/**
+ * Controlador de autenticación.
+ *
+ * Gestiona:
+ * - login
+ * - usuario autenticado actual
+ * - logout
+ */
 class AuthController
 {
     private AuthService $authService;
 
+    /**
+     * Inicializa el servicio de autenticación.
+     */
     public function __construct()
     {
         $this->authService = new AuthService();
     }
 
-    // Login del usuario. Devuelve token + datos básicos.
+    /**
+     * Inicia sesión de un usuario.
+     *
+     * Flujo:
+     * 1. Lee el JSON de entrada
+     * 2. Valida los datos con AuthValidator
+     * 3. Llama al servicio de autenticación
+     * 4. Devuelve token y datos básicos del usuario
+     */
     public function login(): void
     {
         $input = Request::json();
+        $result = AuthValidator::validateLogin($input);
 
-        $correo = isset($input['correo']) ? trim((string) $input['correo']) : '';
-        $password = isset($input['password']) ? (string) $input['password'] : '';
-
-        if ($correo === '' || $password === '') {
+        if (!empty($result['errors'])) {
             Response::json([
                 'success' => false,
-                'message' => 'correo y password son obligatorios'
+                'errors' => $result['errors']
             ], 422);
             return;
         }
 
-        $result = $this->authService->login($correo, $password);
+        $data = $result['data'];
 
-        if ($result === null) {
+        $authResult = $this->authService->login(
+            $data['correo'],
+            $data['password']
+        );
+
+        if ($authResult === null) {
             Response::json([
                 'success' => false,
                 'message' => 'Credenciales no válidas'
@@ -44,11 +67,13 @@ class AuthController
         Response::json([
             'success' => true,
             'message' => 'Login correcto',
-            'data' => $result
+            'data' => $authResult
         ]);
     }
 
-    // Devuelve el usuario autenticado actual.
+    /**
+     * Devuelve los datos del usuario autenticado actual.
+     */
     public function me(): void
     {
         $usuario = Request::user();
@@ -75,7 +100,9 @@ class AuthController
         ]);
     }
 
-    // Cierra sesión invalidando el token guardado en base de datos.
+    /**
+     * Cierra sesión invalidando el token guardado en base de datos.
+     */
     public function logout(): void
     {
         $usuario = Request::user();

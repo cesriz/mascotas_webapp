@@ -10,21 +10,35 @@ require_once __DIR__ . '/../Validators/ReporteValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
 
+/**
+ * Controlador de reportes.
+ *
+ * Permite enviar reportes sobre un anuncio de mascota.
+ */
 class ReporteController
 {
     private ReporteModel $reporteModel;
     private MascotaModel $mascotaModel;
 
+    /**
+     * Inicializa los modelos necesarios.
+     */
     public function __construct()
     {
         $this->reporteModel = new ReporteModel();
         $this->mascotaModel = new MascotaModel();
     }
 
+    /**
+     * Crea un nuevo reporte asociado a una mascota.
+     *
+     * Puede venir de:
+     * - usuario autenticado
+     * - usuario público
+     */
     public function store(int $mascotaId): void
     {
-        $usuario = Request::user(); // puede ser null
-
+        $usuario = Request::user();
         $mascota = $this->mascotaModel->getById($mascotaId);
 
         if ($mascota === null) {
@@ -32,6 +46,7 @@ class ReporteController
                 'success' => false,
                 'message' => 'Mascota no encontrada'
             ], 404);
+            return;
         }
 
         $input = Request::json();
@@ -61,6 +76,7 @@ class ReporteController
                 'success' => false,
                 'errors' => $result['errors']
             ], 422);
+            return;
         }
 
         $data = $result['data'];

@@ -3,36 +3,57 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/MascotaModel.php';
-require_once __DIR__ . '/../Models/UbicacionModel.php';
 require_once __DIR__ . '/../Models/MascotaColorModel.php';
 require_once __DIR__ . '/../Models/AvistamientoModel.php';
 require_once __DIR__ . '/../Models/UsuarioModel.php';
 require_once __DIR__ . '/../Models/FotoModel.php';
+require_once __DIR__ . '/../Models/UbicacionModel.php';
+require_once __DIR__ . '/../Services/MascotaService.php';
 require_once __DIR__ . '/../Validators/MascotaValidator.php';
-require_once __DIR__ . '/../Helpers/FileHelper.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
 
+/**
+ * Controlador de mascotas.
+ *
+ * Mantiene la lógica simple en controlador:
+ * - listados
+ * - detalle
+ * - comprobación de pertenencia
+ * - respuestas HTTP
+ *
+ * Delega en service la lógica compleja:
+ * - crear mascota
+ * - actualizar mascota
+ * - subir fotos
+ */
 class MascotaController
 {
     private MascotaModel $mascotaModel;
-    private UbicacionModel $ubicacionModel;
     private MascotaColorModel $mascotaColorModel;
     private AvistamientoModel $avistamientoModel;
     private UsuarioModel $usuarioModel;
     private FotoModel $fotoModel;
+    private UbicacionModel $ubicacionModel;
+    private MascotaService $mascotaService;
 
+    /**
+     * Inicializa modelos y servicio.
+     */
     public function __construct()
     {
         $this->mascotaModel = new MascotaModel();
-        $this->ubicacionModel = new UbicacionModel();
         $this->mascotaColorModel = new MascotaColorModel();
         $this->avistamientoModel = new AvistamientoModel();
         $this->usuarioModel = new UsuarioModel();
         $this->fotoModel = new FotoModel();
+        $this->ubicacionModel = new UbicacionModel();
+        $this->mascotaService = new MascotaService();
     }
 
-    // Comprueba que la mascota exista y que sea del usuario autenticado.
+    /**
+     * Comprueba que la mascota exista y que pertenezca al usuario autenticado.
+     */
     private function getOwnedMascotaOrFail(int $mascotaId, int $userId): array
     {
         $mascota = $this->mascotaModel->getById($mascotaId);
@@ -56,7 +77,9 @@ class MascotaController
         return $mascota;
     }
 
-    // Lista mascotas aplicando filtros, orden y paginación.
+    /**
+     * Lista mascotas públicas con filtros, orden y paginación.
+     */
     public function index(): void
     {
         $result = MascotaValidator::validateIndexFilters($_GET);
@@ -93,7 +116,9 @@ class MascotaController
         ]);
     }
 
-    // Devuelve las mascotas recientes para la home.
+    /**
+     * Devuelve las mascotas recientes para la home.
+     */
     public function recientes(): void
     {
         $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 4;
@@ -110,7 +135,9 @@ class MascotaController
         ]);
     }
 
-    // Devuelve el detalle completo de una mascota.
+    /**
+     * Devuelve el detalle completo de una mascota.
+     */
     public function show(int $id): void
     {
         $mascota = $this->mascotaModel->getById($id);
@@ -158,7 +185,11 @@ class MascotaController
         ]);
     }
 
-    // Crea una mascota nueva usando el usuario autenticado como propietario.
+    /**
+     * Crea una mascota nueva del usuario autenticado.
+     *
+     * El controlador valida y delega la operación compleja al servicio.
+     */
     public function store(): void
     {
         $usuario = Request::user();
@@ -183,48 +214,17 @@ class MascotaController
         }
 
         $data = $result['data'];
-
-        // El usuario autenticado manda sobre cualquier usuario_id que venga del frontend.
         $data['usuario_id'] = (int) $usuario['id'];
 
         try {
-            $this->mascotaModel->beginTransaction();
-
-            $ubicacionId = $this->ubicacionModel->create($data['ubicacion']);
-
-            $newId = $this->mascotaModel->create([
-                'usuario_id' => $data['usuario_id'],
-                'nombre' => $data['nombre'],
-                'raza_id' => $data['raza_id'],
-                'sexo' => $data['sexo'],
-                'tiene_chip' => $data['tiene_chip'],
-                'tamano' => $data['tamano'],
-                'peso' => $data['peso'],
-                'fecha_nacimiento' => $data['fecha_nacimiento'],
-                'descripcion' => $data['descripcion'],
-                'fecha_perdida' => $data['fecha_perdida'],
-                'fecha_encontrada' => $data['fecha_encontrada'],
-                'fecha_recuperada' => $data['fecha_recuperada'],
-                'estado' => $data['estado'],
-                'recompensa' => $data['recompensa'],
-                'ubicaciones_perdida_id' => $ubicacionId,
-            ]);
-
-            $this->mascotaColorModel->syncColors($newId, $data['colores']);
-            $this->mascotaModel->commit();
+            $created = $this->mascotaService->create($data);
 
             Response::json([
                 'success' => true,
                 'message' => 'Mascota creada correctamente',
-                'data' => [
-                    'id' => $newId,
-                    'ubicacion_id' => $ubicacionId,
-                    'colores' => $data['colores']
-                ]
+                'data' => $created
             ], 201);
         } catch (Throwable $e) {
-            $this->mascotaModel->rollBack();
-
             Response::json([
                 'success' => false,
                 'message' => 'Error al crear la mascota',
@@ -233,7 +233,11 @@ class MascotaController
         }
     }
 
-    // Actualiza una mascota solo si pertenece al usuario autenticado.
+    /**
+     * Actualiza una mascota del usuario autenticado.
+     *
+     * El controlador valida y el service ejecuta la operación transaccional.
+     */
     public function update(int $id): void
     {
         $usuario = Request::user();
@@ -261,47 +265,21 @@ class MascotaController
         }
 
         $data = $result['data'];
-
-        // El backend fija siempre el propietario real.
         $data['usuario_id'] = $userId;
 
         try {
-            $this->mascotaModel->beginTransaction();
-
-            $this->mascotaModel->update($id, [
-                'usuario_id' => $data['usuario_id'],
-                'nombre' => $data['nombre'],
-                'raza_id' => $data['raza_id'],
-                'sexo' => $data['sexo'],
-                'tiene_chip' => $data['tiene_chip'],
-                'tamano' => $data['tamano'],
-                'peso' => $data['peso'],
-                'fecha_nacimiento' => $data['fecha_nacimiento'],
-                'descripcion' => $data['descripcion'],
-                'fecha_perdida' => $data['fecha_perdida'],
-                'fecha_encontrada' => $data['fecha_encontrada'],
-                'fecha_recuperada' => $data['fecha_recuperada'],
-                'estado' => $data['estado'],
-                'recompensa' => $data['recompensa'],
-            ]);
-
-            $this->ubicacionModel->update((int) $mascota['ubicacion_id'], $data['ubicacion']);
-            $this->mascotaColorModel->syncColors($id, $data['colores']);
-
-            $this->mascotaModel->commit();
+            $updated = $this->mascotaService->update(
+                $id,
+                (int) $mascota['ubicacion_id'],
+                $data
+            );
 
             Response::json([
                 'success' => true,
                 'message' => 'Mascota actualizada correctamente',
-                'data' => [
-                    'id' => $id,
-                    'ubicacion_id' => (int) $mascota['ubicacion_id'],
-                    'colores' => $data['colores']
-                ]
+                'data' => $updated
             ]);
         } catch (Throwable $e) {
-            $this->mascotaModel->rollBack();
-
             Response::json([
                 'success' => false,
                 'message' => 'Error al actualizar la mascota',
@@ -310,7 +288,11 @@ class MascotaController
         }
     }
 
-    // Marca una mascota como recuperada si pertenece al usuario autenticado.
+    /**
+     * Marca una mascota como recuperada.
+     *
+     * Esta acción sigue siendo simple y se puede mantener aquí.
+     */
     public function marcarRecuperada(int $id): void
     {
         $usuario = Request::user();
@@ -372,7 +354,12 @@ class MascotaController
         }
     }
 
-    // Borra una mascota y todo lo que depende de ella.
+    /**
+     * Borra una mascota y sus datos relacionados.
+     *
+     * De momento la dejamos como está en controller porque ya tiene
+     * una lógica concreta que no querías mover todavía.
+     */
     public function destroy(int $id): void
     {
         $usuario = Request::user();
@@ -455,7 +442,11 @@ class MascotaController
         }
     }
 
-    // Sube una o varias fotos y las asocia a una mascota existente.
+    /**
+     * Sube fotos para una mascota ya existente.
+     *
+     * La parte compleja de guardado físico y base de datos se delega al service.
+     */
     public function uploadFotos(int $id): void
     {
         $usuario = Request::user();
@@ -480,19 +471,15 @@ class MascotaController
         }
 
         try {
-            $savedFiles = FileHelper::saveImages(
-                Request::file('fotos'),
-                'mascotas'
+            $fotos = $this->mascotaService->uploadFotos(
+                $id,
+                Request::file('fotos')
             );
-
-            foreach ($savedFiles as $file) {
-                $this->fotoModel->createForMascota($id, $file);
-            }
 
             Response::json([
                 'success' => true,
                 'message' => 'Fotos subidas correctamente',
-                'data' => $this->fotoModel->getByMascotaId($id)
+                'data' => $fotos
             ], 201);
         } catch (Throwable $e) {
             Response::json([
@@ -503,7 +490,9 @@ class MascotaController
         }
     }
 
-    // Intenta borrar del disco los archivos ya eliminados en base de datos.
+    /**
+     * Elimina físicamente los archivos borrados en base de datos.
+     */
     private function deletePhysicalFiles(array $urls): void
     {
         $uniqueUrls = array_values(array_unique(array_filter($urls)));

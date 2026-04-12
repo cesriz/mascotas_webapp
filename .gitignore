@@ -19,7 +19,7 @@ src/backend/app/Config/database.php
 # PHP / Composer
 #################################
 vendor/
-composer.lock
+
 
 #################################
 # Node / Frontend

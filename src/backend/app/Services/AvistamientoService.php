@@ -1,21 +1,45 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/AvistamientoModel.php';
 require_once __DIR__ . '/../Models/UbicacionModel.php';
+require_once __DIR__ . '/../Models/FotoModel.php';
+require_once __DIR__ . '/../Helpers/FileHelper.php';
 
+/**
+ * Servicio de avistamientos.
+ *
+ * Aquí vive la lógica compleja de creación de avistamientos,
+ * especialmente cuando hay que guardar ubicación y fotos.
+ */
 class AvistamientoService
 {
     private AvistamientoModel $avistamientoModel;
     private UbicacionModel $ubicacionModel;
+    private FotoModel $fotoModel;
 
+    /**
+     * Inicializa los modelos necesarios para la operación.
+     */
     public function __construct()
     {
         $this->avistamientoModel = new AvistamientoModel();
         $this->ubicacionModel = new UbicacionModel();
+        $this->fotoModel = new FotoModel();
     }
 
-    public function create(int $mascotaId, array $data): array
+    /**
+     * Crea un avistamiento completo.
+     *
+     * Guarda:
+     * - la ubicación del avistamiento
+     * - el avistamiento
+     * - las fotos, si existen
+     *
+     * Todo queda dentro de una transacción.
+     */
+    public function create(int $mascotaId, array $data, ?array $uploadedFiles = null): array
     {
         try {
             $this->avistamientoModel->beginTransaction();
@@ -32,12 +56,22 @@ class AvistamientoService
                 'fecha_hora' => $data['fecha_hora'],
             ]);
 
+            if ($uploadedFiles !== null) {
+                $savedFiles = FileHelper::saveImages($uploadedFiles, 'avistamientos');
+
+                foreach ($savedFiles as $file) {
+                    $this->fotoModel->createForAvistamiento($avistamientoId, $file);
+                }
+            }
+
             $this->avistamientoModel->commit();
 
             return [
                 'id' => $avistamientoId,
                 'mascota_id' => $mascotaId,
-                'ubicacion_id' => $ubicacionId
+                'usuario_id' => $data['usuario_id'],
+                'ubicacion_id' => $ubicacionId,
+                'fotos' => $this->fotoModel->getByAvistamientoId($avistamientoId)
             ];
         } catch (Throwable $e) {
             $this->avistamientoModel->rollBack();

@@ -71,7 +71,7 @@ INSERT INTO usuarios (
     '111222333',
     'Murcia',
     'ADMIN',
-    '$2y$12$GMtO8xB7J0QQ2k0for48h.6R4129BvQL6sqXxi1oqwZBBs3ta5kqi',
+    '$2y$12$GMtO8xB7J0QQ2k0for48h.6R4129BvQL6sqXxi1oqwZBBs3ta5kqi', -- "123456"
     TRUE,
     TRUE
 ),

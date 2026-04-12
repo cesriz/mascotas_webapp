@@ -10,6 +10,17 @@ require_once __DIR__ . '/../Models/AvistamientoModel.php';
 require_once __DIR__ . '/../Models/ContactoModel.php';
 require_once __DIR__ . '/../Validators/UsuarioValidator.php';
 
+/**
+ * Controlador de la zona privada del usuario autenticado.
+ *
+ * Aquí se agrupan las acciones que solo puede ejecutar
+ * el usuario que ha iniciado sesión:
+ * - ver y editar su perfil
+ * - cambiar contraseña
+ * - desactivar su cuenta
+ * - consultar sus mascotas y avistamientos
+ * - consultar y marcar notificaciones
+ */
 class MeController
 {
     private UsuarioModel $usuarioModel;
@@ -17,6 +28,9 @@ class MeController
     private AvistamientoModel $avistamientoModel;
     private ContactoModel $contactoModel;
 
+    /**
+     * Inicializa los modelos necesarios.
+     */
     public function __construct()
     {
         $this->usuarioModel = new UsuarioModel();
@@ -25,8 +39,12 @@ class MeController
         $this->contactoModel = new ContactoModel();
     }
 
-    // Devuelve el perfil privado del usuario autenticado.
-    public function perfil(): void
+    /**
+     * Obtiene el usuario autenticado desde Request.
+     *
+     * Si no existe, responde 401 y corta la ejecución.
+     */
+    private function getAuthUserOrFail(): array
     {
         $usuario = Request::user();
 
@@ -35,9 +53,18 @@ class MeController
                 'success' => false,
                 'message' => 'No autorizado'
             ], 401);
-            return;
+            exit;
         }
 
+        return $usuario;
+    }
+
+    /**
+     * Devuelve el perfil privado del usuario autenticado.
+     */
+    public function perfil(): void
+    {
+        $usuario = $this->getAuthUserOrFail();
         $perfil = $this->usuarioModel->getPrivateById((int) $usuario['id']);
 
         if ($perfil === null) {
@@ -54,19 +81,19 @@ class MeController
         ]);
     }
 
-    // Actualiza nombre, apellidos, correo, teléfono y dirección.
+    /**
+     * Actualiza los datos del perfil del usuario autenticado.
+     *
+     * Campos esperados:
+     * - nombre
+     * - apellidos
+     * - correo
+     * - telefono
+     * - direccion
+     */
     public function updatePerfil(): void
     {
-        $usuario = Request::user();
-
-        if ($usuario === null) {
-            Response::json([
-                'success' => false,
-                'message' => 'No autorizado'
-            ], 401);
-            return;
-        }
-
+        $usuario = $this->getAuthUserOrFail();
         $input = Request::json();
 
         $result = UsuarioValidator::validateProfileUpdate($input);
@@ -109,19 +136,16 @@ class MeController
         ]);
     }
 
-    // Cambia la contraseña del usuario autenticado.
+    /**
+     * Cambia la contraseña del usuario autenticado.
+     *
+     * Se comprueba:
+     * - que la contraseña actual sea correcta
+     * - que la nueva cumpla la validación definida
+     */
     public function cambiarPassword(): void
     {
-        $usuario = Request::user();
-
-        if ($usuario === null) {
-            Response::json([
-                'success' => false,
-                'message' => 'No autorizado'
-            ], 401);
-            return;
-        }
-
+        $usuario = $this->getAuthUserOrFail();
         $input = Request::json();
 
         $result = UsuarioValidator::validatePasswordChange($input);
@@ -136,8 +160,10 @@ class MeController
 
         $data = $result['data'];
 
-        // Request::user() viene del token validado y AuthService ya mete password_hash.
-        if (!isset($usuario['password_hash']) || !password_verify($data['current_password'], $usuario['password_hash'])) {
+        if (
+            !isset($usuario['password_hash']) ||
+            !password_verify($data['current_password'], $usuario['password_hash'])
+        ) {
             Response::json([
                 'success' => false,
                 'errors' => ['La contraseña actual no es correcta']
@@ -161,18 +187,14 @@ class MeController
         ]);
     }
 
-    // "Eliminar cuenta" de forma lógica: desactiva el usuario y limpia token.
+    /**
+     * Desactiva la cuenta del usuario autenticado.
+     *
+     * Se trata de una baja lógica, no de un borrado físico.
+     */
     public function eliminarCuenta(): void
     {
-        $usuario = Request::user();
-
-        if ($usuario === null) {
-            Response::json([
-                'success' => false,
-                'message' => 'No autorizado'
-            ], 401);
-            return;
-        }
+        $usuario = $this->getAuthUserOrFail();
 
         $ok = $this->usuarioModel->deactivateAccountById((int) $usuario['id']);
 
@@ -190,10 +212,17 @@ class MeController
         ]);
     }
 
-    // Devuelve las notificaciones del usuario autenticado.
+    /**
+     * Devuelve las notificaciones del usuario autenticado.
+     *
+     * Incluye:
+     * - mensajes de contacto recibidos
+     * - avistamientos recibidos sobre sus mascotas
+     * - resumen de no leídas
+     */
     public function notificaciones(): void
     {
-        $usuario = Request::user();
+        $usuario = $this->getAuthUserOrFail();
         $userId = (int) $usuario['id'];
 
         $contactos = $this->contactoModel->getReceivedByUsuarioId($userId);
@@ -216,10 +245,14 @@ class MeController
         ]);
     }
 
-    // Marca un mensaje de contacto como leído.
+    /**
+     * Marca un mensaje de contacto como leído.
+     *
+     * Solo puede hacerlo el usuario destinatario del mensaje.
+     */
     public function marcarContactoLeido(int $id): void
     {
-        $usuario = Request::user();
+        $usuario = $this->getAuthUserOrFail();
         $userId = (int) $usuario['id'];
 
         $contacto = $this->contactoModel->getById($id);
@@ -256,10 +289,12 @@ class MeController
         ]);
     }
 
-    // Marca un avistamiento recibido como leído.
+    /**
+     * Marca como leído un avistamiento recibido sobre una mascota del usuario.
+     */
     public function marcarAvistamientoLeido(int $id): void
     {
-        $usuario = Request::user();
+        $usuario = $this->getAuthUserOrFail();
         $userId = (int) $usuario['id'];
 
         $avistamiento = $this->avistamientoModel->getById($id);
@@ -296,10 +331,12 @@ class MeController
         ]);
     }
 
-    // Devuelve las mascotas del usuario autenticado.
+    /**
+     * Devuelve las mascotas publicadas por el usuario autenticado.
+     */
     public function mascotas(): void
     {
-        $usuario = Request::user();
+        $usuario = $this->getAuthUserOrFail();
         $userId = (int) $usuario['id'];
 
         $mascotas = $this->mascotaModel->getCardsByUsuarioId($userId);
@@ -310,10 +347,12 @@ class MeController
         ]);
     }
 
-    // Devuelve los avistamientos creados por el usuario autenticado.
+    /**
+     * Devuelve los avistamientos creados por el usuario autenticado.
+     */
     public function avistamientos(): void
     {
-        $usuario = Request::user();
+        $usuario = $this->getAuthUserOrFail();
         $userId = (int) $usuario['id'];
 
         $avistamientos = $this->avistamientoModel->getCardsByUsuarioId($userId);

@@ -8,12 +8,24 @@ require_once __DIR__ . '/../Models/SoporteModel.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
 
+/**
+ * Controlador de administración.
+ *
+ * Gestiona operaciones reservadas al rol ADMIN:
+ * - moderación de anuncios
+ * - revisión de reportes
+ * - gestión de soporte
+ * - activación/desactivación de usuarios
+ */
 class AdminController
 {
     private AdminModel $adminModel;
     private ReporteModel $reporteModel;
     private SoporteModel $soporteModel;
 
+    /**
+     * Inicializa los modelos necesarios para la parte admin.
+     */
     public function __construct()
     {
         $this->adminModel = new AdminModel();
@@ -21,6 +33,9 @@ class AdminController
         $this->soporteModel = new SoporteModel();
     }
 
+    /**
+     * Devuelve el listado de anuncios para moderación.
+     */
     public function anuncios(): void
     {
         $data = $this->adminModel->getAnunciosModeracion();
@@ -31,6 +46,13 @@ class AdminController
         ]);
     }
 
+    /**
+     * Cambia el estado de publicación de un anuncio.
+     *
+     * Estados permitidos:
+     * - PUBLICADO
+     * - OCULTO
+     */
     public function cambiarEstadoAnuncio(int $id): void
     {
         $input = Request::json();
@@ -41,6 +63,7 @@ class AdminController
                 'success' => false,
                 'message' => 'estado_publicacion no válido'
             ], 422);
+            return;
         }
 
         $ok = $this->adminModel->changeEstadoPublicacionAnuncio($id, $estado);
@@ -50,6 +73,7 @@ class AdminController
                 'success' => false,
                 'message' => 'No se pudo cambiar el estado del anuncio'
             ], 500);
+            return;
         }
 
         Response::json([
@@ -58,6 +82,9 @@ class AdminController
         ]);
     }
 
+    /**
+     * Elimina un anuncio desde el panel de administración.
+     */
     public function eliminarAnuncio(int $id): void
     {
         $ok = $this->adminModel->deleteAnuncio($id);
@@ -67,6 +94,7 @@ class AdminController
                 'success' => false,
                 'message' => 'No se pudo eliminar el anuncio'
             ], 500);
+            return;
         }
 
         Response::json([
@@ -75,6 +103,9 @@ class AdminController
         ]);
     }
 
+    /**
+     * Devuelve todos los reportes con información relacionada.
+     */
     public function reportes(): void
     {
         $data = $this->reporteModel->getAllWithRelations();
@@ -85,6 +116,14 @@ class AdminController
         ]);
     }
 
+    /**
+     * Cambia el estado de un reporte.
+     *
+     * Estados permitidos:
+     * - PENDIENTE
+     * - REVISADO
+     * - DESCARTADO
+     */
     public function cambiarEstadoReporte(int $id): void
     {
         $usuario = Request::user();
@@ -98,6 +137,7 @@ class AdminController
                 'success' => false,
                 'message' => 'estado no válido'
             ], 422);
+            return;
         }
 
         $ok = $this->reporteModel->updateEstado($id, $estado, (int) $usuario['id'], $notasAdmin);
@@ -107,6 +147,7 @@ class AdminController
                 'success' => false,
                 'message' => 'No se pudo actualizar el reporte'
             ], 500);
+            return;
         }
 
         Response::json([
@@ -115,6 +156,9 @@ class AdminController
         ]);
     }
 
+    /**
+     * Devuelve todos los mensajes de soporte con sus relaciones.
+     */
     public function soporte(): void
     {
         $data = $this->soporteModel->getAllWithRelations();
@@ -125,6 +169,13 @@ class AdminController
         ]);
     }
 
+    /**
+     * Cambia el estado de un mensaje de soporte.
+     *
+     * Estados permitidos:
+     * - ABIERTO
+     * - CERRADO
+     */
     public function cambiarEstadoSoporte(int $id): void
     {
         $usuario = Request::user();
@@ -138,6 +189,7 @@ class AdminController
                 'success' => false,
                 'message' => 'estado no válido'
             ], 422);
+            return;
         }
 
         $ok = $this->soporteModel->updateEstado($id, $estado, (int) $usuario['id'], $notasAdmin);
@@ -147,6 +199,7 @@ class AdminController
                 'success' => false,
                 'message' => 'No se pudo actualizar el mensaje de soporte'
             ], 500);
+            return;
         }
 
         Response::json([
@@ -155,6 +208,9 @@ class AdminController
         ]);
     }
 
+    /**
+     * Devuelve el listado de usuarios para gestión administrativa.
+     */
     public function usuarios(): void
     {
         $data = $this->adminModel->getUsuariosGestion();
@@ -165,6 +221,13 @@ class AdminController
         ]);
     }
 
+    /**
+     * Activa o desactiva un usuario.
+     *
+     * Valores permitidos:
+     * - 1 = activo
+     * - 0 = inactivo
+     */
     public function cambiarEstadoUsuario(int $id): void
     {
         $input = Request::json();
@@ -175,6 +238,7 @@ class AdminController
                 'success' => false,
                 'message' => 'activo debe ser 0 o 1'
             ], 422);
+            return;
         }
 
         $ok = $this->adminModel->changeEstadoUsuario($id, $activo);
@@ -184,6 +248,7 @@ class AdminController
                 'success' => false,
                 'message' => 'No se pudo actualizar el estado del usuario'
             ], 500);
+            return;
         }
 
         Response::json([

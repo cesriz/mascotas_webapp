@@ -1,25 +1,45 @@
 <?php
 
-// IMPLEMENTAR EL SERVICE MÁS ADELANTE CUANDO YA NO VAYA A HABER MUCHOS CAMBIOS
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/MascotaModel.php';
 require_once __DIR__ . '/../Models/UbicacionModel.php';
 require_once __DIR__ . '/../Models/MascotaColorModel.php';
+require_once __DIR__ . '/../Models/FotoModel.php';
+require_once __DIR__ . '/../Helpers/FileHelper.php';
 
+/**
+ * Servicio de mascotas.
+ *
+ * Aquí se concentra la lógica de negocio que implica varias tablas
+ * o varias operaciones que deben hacerse como una sola unidad.
+ */
 class MascotaService
 {
     private MascotaModel $mascotaModel;
     private UbicacionModel $ubicacionModel;
     private MascotaColorModel $mascotaColorModel;
+    private FotoModel $fotoModel;
 
+    /**
+     * Inicializa los modelos necesarios para operaciones complejas.
+     */
     public function __construct()
     {
         $this->mascotaModel = new MascotaModel();
         $this->ubicacionModel = new UbicacionModel();
         $this->mascotaColorModel = new MascotaColorModel();
+        $this->fotoModel = new FotoModel();
     }
 
+    /**
+     * Crea una mascota completa con:
+     * - ubicación
+     * - anuncio principal
+     * - colores asociados
+     *
+     * Todo se guarda dentro de una transacción.
+     */
     public function create(array $data): array
     {
         try {
@@ -60,20 +80,17 @@ class MascotaService
         }
     }
 
-    public function update(int $id, array $data): array
+    /**
+     * Actualiza una mascota existente junto con su ubicación y sus colores.
+     *
+     * Recibe también el id de la ubicación actual para no volver a buscarlo aquí.
+     */
+    public function update(int $mascotaId, int $ubicacionId, array $data): array
     {
-        $mascota = $this->mascotaModel->getById($id);
-
-        if ($mascota === null) {
-            throw new RuntimeException('Mascota no encontrada');
-        }
-
         try {
             $this->mascotaModel->beginTransaction();
 
-            $this->ubicacionModel->update((int)$mascota['ubicacion_id'], $data['ubicacion']);
-
-            $this->mascotaModel->update($id, [
+            $this->mascotaModel->update($mascotaId, [
                 'usuario_id' => $data['usuario_id'],
                 'nombre' => $data['nombre'],
                 'raza_id' => $data['raza_id'],
@@ -90,15 +107,41 @@ class MascotaService
                 'recompensa' => $data['recompensa'],
             ]);
 
-            $this->mascotaColorModel->syncColors($id, $data['colores']);
+            $this->ubicacionModel->update($ubicacionId, $data['ubicacion']);
+            $this->mascotaColorModel->syncColors($mascotaId, $data['colores']);
 
             $this->mascotaModel->commit();
 
             return [
-                'id' => $id,
-                'ubicacion_id' => (int)$mascota['ubicacion_id'],
+                'id' => $mascotaId,
+                'ubicacion_id' => $ubicacionId,
                 'colores' => $data['colores']
             ];
+        } catch (Throwable $e) {
+            $this->mascotaModel->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Guarda una o varias fotos y las registra en base de datos.
+     *
+     * También usa transacción para que no queden registros a medias.
+     */
+    public function uploadFotos(int $mascotaId, array $files): array
+    {
+        $savedFiles = FileHelper::saveImages($files, 'mascotas');
+
+        try {
+            $this->mascotaModel->beginTransaction();
+
+            foreach ($savedFiles as $file) {
+                $this->fotoModel->createForMascota($mascotaId, $file);
+            }
+
+            $this->mascotaModel->commit();
+
+            return $this->fotoModel->getByMascotaId($mascotaId);
         } catch (Throwable $e) {
             $this->mascotaModel->rollBack();
             throw $e;

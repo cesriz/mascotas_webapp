@@ -39,7 +39,7 @@ class Router
 
             // Si la ruta es privada, ejecuta el middleware auth antes del controlador
             if (!empty($options['auth'])) {
-                $middlewareFile = __DIR__ . '/../Middelware/AuthMiddleware.php';
+                $middlewareFile = __DIR__ . '/../Middleware/AuthMiddleware.php';
 
                 if (!is_file($middlewareFile)) {
                     http_response_code(500);
@@ -69,7 +69,7 @@ class Router
 
             // Si la ruta requiere admin, ejecuta el middleware admin
             if (!empty($options['admin'])) {
-                $adminMiddlewareFile = __DIR__ . '/../Middelware/AdminMiddleware.php';
+                $adminMiddlewareFile = __DIR__ . '/../Middleware/AdminMiddleware.php';
 
                 if (!is_file($adminMiddlewareFile)) {
                     http_response_code(500);

@@ -36,6 +36,9 @@ Las puede usar cualquiera.
 ### Rutas privadas
 Solo funcionan si el usuario ha iniciado sesión.
 
+### Rutas admin
+Además de token, el usuario debe tener rol `ADMIN`.
+
 ---
 
 ## Respuesta típica del backend
@@ -204,6 +207,9 @@ Cambiar la contraseña **no cierra la sesión actual automáticamente**.
 ### Qué suele devolver
 - mensaje de cuenta desactivada
 
+### Importante
+Es una baja lógica. No es borrado físico completo.
+
 ### Se usa en
 - botón “Eliminar cuenta”
 
@@ -289,14 +295,33 @@ Un objeto con:
 **Tipo:** pública  
 **Sirve para:** listar mascotas publicadas.
 
+### Admite filtros
+- estado
+- especie_id
+- raza_id
+- sexo
+- tamano
+- municipio
+- provincia
+- q_ubicacion
+- fecha_desde
+- fecha_hasta
+- color_ids
+- tiene_chip
+- con_fotos
+- orden
+- page
+- limit
+
 ### Qué suele devolver
 Una lista de mascotas con datos resumidos, por ejemplo:
 - id
 - nombre
 - estado
-- especie/raza si aplica
+- especie/raza
 - ubicación resumida
 - foto principal
+- metadatos de paginación
 
 ### Se usa en
 - tablón principal
@@ -329,12 +354,10 @@ Normalmente:
 - fotos
 - ubicación
 - avistamientos relacionados
-- datos del usuario que publicó
+- datos públicos del usuario que publicó
 
 ### Importante
-En este proyecto, en el detalle se pueden mostrar también:
-- correo del usuario que publicó
-- teléfono del usuario que publicó
+Si un anuncio está oculto, solo lo puede ver su dueño o un admin.
 
 ### Se usa en
 - pantalla detalle de mascota
@@ -348,11 +371,11 @@ En este proyecto, en el detalle se pueden mostrar también:
 **Sirve para:** crear una nueva publicación de mascota.
 
 ### Qué manda el frontend
-Los datos del formulario de alta de mascota.
+JSON con datos de la mascota, colores y ubicación.
 
 ### Qué suele devolver
 - mensaje de creación correcta
-- id de la nueva mascota
+- datos de la nueva mascota
 
 ### Se usa en
 - formulario “Publicar mascota”
@@ -378,11 +401,12 @@ Los datos del formulario de alta de mascota.
 
 ### Qué manda el frontend
 - `multipart/form-data`
-- archivos de imagen
+- campo `fotos`
+- uno o varios archivos de imagen
 
 ### Qué suele devolver
 - mensaje de subida correcta
-- lista de fotos guardadas o datos relacionados
+- lista de fotos guardadas
 
 ### Se usa en
 - añadir fotos después de crear mascota
@@ -407,6 +431,7 @@ Los datos del formulario de alta de mascota.
 
 ### Qué suele devolver
 - mensaje de estado actualizado
+- estado nuevo y fecha_recuperada
 
 ### Se usa en
 - botón “Marcar como recuperada”
@@ -425,7 +450,7 @@ Una lista con datos como:
 - fecha y hora
 - ubicación
 - descripción
-- fotos del avistamiento si tiene
+- fotos del avistamiento
 - teléfono y correo si se guardaron
 
 ### Se usa en
@@ -443,7 +468,7 @@ Una lista con datos como:
 - una persona sin cuenta
 
 ### Qué suele mandar el frontend
-Como mínimo, según tu lógica actual:
+Como mínimo:
 - teléfono
 - fecha_hora
 - ubicación
@@ -453,13 +478,13 @@ Y además puede mandar:
 - descripción
 - fotos
 
-### Si va con imágenes
-Se puede enviar como `multipart/form-data`.
+### Formatos admitidos
+- `application/json`
+- `multipart/form-data`
 
 ### Qué suele devolver
 - mensaje de creación correcta
-- id del avistamiento
-- id de la mascota
+- datos del avistamiento creado
 
 ### Se usa en
 - formulario “He visto esta mascota”
@@ -495,7 +520,65 @@ Se puede enviar como `multipart/form-data`.
 
 ---
 
-# 7. Catálogos
+# 7. Reportes de anuncios
+
+## POST /api/mascotas/{id}/reportes
+**Tipo:** pública  
+**Sirve para:** reportar un anuncio desde frontend.
+
+### Lo puede usar
+- un usuario logueado
+- una persona sin cuenta
+
+### Qué suele mandar el frontend
+```json
+{
+  "asunto": "Anuncio sospechoso",
+  "motivo": "fraude",
+  "mensaje": "El contenido no parece real",
+  "nombre": "Ana",
+  "correo": "ana@email.com",
+  "telefono": "600000000"
+}
+```
+
+### Qué suele devolver
+- mensaje de envío correcto
+- id del reporte creado
+
+### Se usa en
+- acción “Reportar anuncio”
+
+---
+
+# 8. Soporte general
+
+## POST /api/soporte
+**Tipo:** pública  
+**Sirve para:** enviar un mensaje al soporte general de la aplicación.
+
+### Qué suele mandar el frontend
+```json
+{
+  "asunto": "Problema con mi cuenta",
+  "categoria": "GENERAL",
+  "mensaje": "No puedo acceder a una sección",
+  "nombre": "Cesar",
+  "correo": "cesar@email.com",
+  "telefono": "600000000"
+}
+```
+
+### Qué suele devolver
+- mensaje de envío correcto
+- id del mensaje creado
+
+### Se usa en
+- formulario de contacto o soporte general
+
+---
+
+# 9. Catálogos
 
 ## GET /api/colores
 **Tipo:** pública  
@@ -527,98 +610,181 @@ Se puede enviar como `multipart/form-data`.
 **Tipo:** pública  
 **Sirve para:** listar razas.
 
+### Query opcional
+- `especie_id`
+
 ### Se usa en
 - formularios
-- filtros
+- filtros dependientes por especie
 
 ---
 
-# 8. Usuarios
-
-## GET /api/usuarios
-**Tipo:** pública  
-**Sirve para:** listar usuarios.
-
-### Importante
-De momento este endpoint sigue existiendo porque la parte de administración todavía no está cerrada.
-
----
-
-## GET /api/usuarios/{id}
-**Tipo:** pública  
-**Sirve para:** ver un usuario concreto.
-
-### Importante
-Igual que el anterior, de momento se deja documentado tal cual existe en backend.
-
----
+# 10. Usuarios públicos
 
 ## POST /api/usuarios
 **Tipo:** pública  
 **Sirve para:** registrar un nuevo usuario.
 
 ### Qué manda el frontend
-Los datos del formulario de registro.
+```json
+{
+  "nombre": "Cesar",
+  "apellidos": "Ruiz",
+  "correo": "cesar@email.com",
+  "telefono": "600000000",
+  "direccion": "Murcia",
+  "password": "123456"
+}
+```
+
+### Importante
+Aunque el frontend mande un rol, el backend lo ignora y fuerza siempre `USUARIO`.
 
 ### Qué suele devolver
-- mensaje de usuario creado
-- id del nuevo usuario
+- mensaje de creación correcta
+- id del usuario creado
 
 ### Se usa en
 - pantalla de registro
 
 ---
 
-# 9. Resumen ultra rápido
+# 11. Panel admin
 
-## Públicas
-- `POST /api/auth/login`
-- `GET /api/mascotas`
-- `GET /api/mascotas/recientes`
-- `GET /api/mascotas/{id}`
-- `GET /api/mascotas/{id}/avistamientos`
-- `POST /api/mascotas/{id}/avistamientos`
-- `POST /api/mascotas/{id}/contactos`
-- `GET /api/colores`
-- `GET /api/colores/{id}`
-- `GET /api/especies`
-- `GET /api/razas`
-- `GET /api/usuarios`
-- `GET /api/usuarios/{id}`
-- `POST /api/usuarios`
+## GET /api/admin/anuncios
+**Tipo:** admin  
+**Sirve para:** listar anuncios para moderación.
 
-## Privadas
-- `GET /api/auth/me`
-- `POST /api/auth/logout`
-- `GET /api/me/perfil`
-- `PUT /api/me/perfil`
-- `PATCH /api/me/password`
-- `DELETE /api/me/cuenta`
-- `GET /api/me/mascotas`
-- `GET /api/me/avistamientos`
-- `GET /api/me/notificaciones`
-- `PATCH /api/me/notificaciones/contactos/{id}/leer`
-- `PATCH /api/me/notificaciones/avistamientos/{id}/leer`
-- `POST /api/mascotas`
-- `PUT /api/mascotas/{id}`
-- `POST /api/mascotas/{id}/fotos`
-- `DELETE /api/mascotas/{id}`
-- `PATCH /api/mascotas/{id}/recuperar`
+### Qué suele devolver
+- lista de anuncios con datos del anuncio, usuario, estado y publicación
+
+### Se usa en
+- panel de moderación
 
 ---
 
-# 10. Qué documento mirar según lo que necesites
+## PATCH /api/admin/anuncios/{id}/estado
+**Tipo:** admin  
+**Sirve para:** cambiar el estado de publicación de un anuncio.
 
-Si quieres una visión rápida, usa este archivo.
-
-Si quieres ver:
-- ejemplos más completos
-- cuerpos detallados
-- respuestas más largas
-- reglas de negocio explicadas con más detalle
-
-entonces mira:
-
-```txt
-documentacion/api.md
+### Qué manda el frontend
+```json
+{
+  "estado_publicacion": "OCULTO"
+}
 ```
+
+### Valores válidos
+- `PUBLICADO`
+- `OCULTO`
+
+### Se usa en
+- acciones de moderación del panel admin
+
+---
+
+## DELETE /api/admin/anuncios/{id}
+**Tipo:** admin  
+**Sirve para:** eliminar un anuncio desde administración.
+
+### Se usa en
+- acciones destructivas del panel admin
+
+---
+
+## GET /api/admin/reportes
+**Tipo:** admin  
+**Sirve para:** listar reportes enviados sobre anuncios.
+
+### Qué suele devolver
+- lista de reportes con relaciones y estado
+
+### Se usa en
+- panel admin de reportes
+
+---
+
+## PATCH /api/admin/reportes/{id}/estado
+**Tipo:** admin  
+**Sirve para:** actualizar el estado de un reporte.
+
+### Qué manda el frontend
+```json
+{
+  "estado": "REVISADO",
+  "notas_admin": "Revisado por el equipo"
+}
+```
+
+### Valores válidos
+- `PENDIENTE`
+- `REVISADO`
+- `DESCARTADO`
+
+### Se usa en
+- flujo de revisión de reportes
+
+---
+
+## GET /api/admin/soporte
+**Tipo:** admin  
+**Sirve para:** listar mensajes de soporte.
+
+### Qué suele devolver
+- lista de tickets o mensajes con su estado
+
+### Se usa en
+- panel admin de soporte
+
+---
+
+## PATCH /api/admin/soporte/{id}/estado
+**Tipo:** admin  
+**Sirve para:** cambiar el estado de un mensaje de soporte.
+
+### Qué manda el frontend
+```json
+{
+  "estado": "CERRADO",
+  "notas_admin": "Incidencia resuelta"
+}
+```
+
+### Valores válidos
+- `ABIERTO`
+- `CERRADO`
+
+### Se usa en
+- gestión de soporte
+
+---
+
+## GET /api/admin/usuarios
+**Tipo:** admin  
+**Sirve para:** listar usuarios para gestión administrativa.
+
+### Qué suele devolver
+- lista de usuarios con estado y datos básicos
+
+### Se usa en
+- panel admin de usuarios
+
+---
+
+## PATCH /api/admin/usuarios/{id}/estado
+**Tipo:** admin  
+**Sirve para:** activar o desactivar un usuario.
+
+### Qué manda el frontend
+```json
+{
+  "activo": 0
+}
+```
+
+### Valores válidos
+- `1` activo
+- `0` inactivo
+
+### Se usa en
+- bloquear o reactivar usuarios desde administración

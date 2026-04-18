@@ -734,6 +734,14 @@ Listado general de mascotas con filtros, orden y paginación.
 - `tamano`: `PEQUENO`, `MEDIANO`, `GRANDE`, `DESCONOCIDO`
 - `orden`: `recientes`, `antiguos`, `nombre_asc`, `nombre_desc`
 
+**Nota**
+Los valores de `provincia` y `municipio` pueden obtenerse desde los endpoints de catálogos:
+- `GET /api/provincias`
+- `GET /api/municipios`
+- `GET /api/municipios?provincia=Murcia`
+
+Esto permite rellenar selects dinámicos en frontend y luego reutilizar esos valores en `GET /api/mascotas`.
+
 **Ejemplo**
 
 ```txt
@@ -1405,6 +1413,56 @@ Lista razas.
 
 ---
 
+### GET /api/provincias
+
+Lista las provincias existentes en la tabla `ubicaciones`.
+
+**Privada:** no
+
+**Respuesta típica**
+
+```json
+{
+  "success": true,
+  "data": [
+    "Murcia",
+    "Alicante"
+  ]
+}
+
+```
+---
+
+### GET /api/municipios
+
+Lista los municipios existentes en la tabla `ubicaciones`.
+
+**Privada:** no
+
+**Query params**
+- `provincia` opcional
+
+**Ejemplos**
+
+GET /api/municipios
+GET /api/municipios?provincia=Murcia
+
+**Respuesta típica**
+
+```json
+
+{
+  "success": true,
+  "data": [
+    "Cartagena",
+    "Molina de Segura",
+    "Murcia"
+  ]
+}
+
+```
+
+
 ## 8.9 Usuarios públicos
 
 ### POST /api/usuarios
@@ -1741,6 +1799,8 @@ Activa o desactiva un usuario.
 - `GET /api/colores/{id}`
 - `GET /api/especies`
 - `GET /api/razas`
+- `GET /api/provincias`
+- `GET /api/municipios`
 
 ### Usuarios públicos
 - `POST /api/usuarios`

@@ -85,4 +85,51 @@ class UbicacionModel extends BaseModel
     {
         return $this->deleteById('ubicaciones', $id);
     }
+
+    // Devuelve el catálogo de provincias existentes en ubicaciones.
+    public function getProvincias(): array
+    {
+        $sql = "
+            SELECT DISTINCT provincia
+            FROM ubicaciones
+            WHERE provincia IS NOT NULL
+              AND TRIM(provincia) <> ''
+            ORDER BY provincia ASC
+        ";
+
+        $rows = $this->fetchAll($sql);
+
+        return array_map(
+            static fn(array $row): string => $row['provincia'],
+            $rows
+        );
+    }
+
+    // Devuelve el catálogo de municipios.
+    // Si se indica provincia, filtra por esa provincia.
+    public function getMunicipios(?string $provincia = null): array
+    {
+        $sql = "
+            SELECT DISTINCT municipio
+            FROM ubicaciones
+            WHERE municipio IS NOT NULL
+              AND TRIM(municipio) <> ''
+        ";
+
+        $params = [];
+
+        if ($provincia !== null) {
+            $sql .= " AND provincia = :provincia";
+            $params['provincia'] = $provincia;
+        }
+
+        $sql .= " ORDER BY municipio ASC";
+
+        $rows = $this->fetchAll($sql, $params);
+
+        return array_map(
+            static fn(array $row): string => $row['municipio'],
+            $rows
+        );
+    }
 }

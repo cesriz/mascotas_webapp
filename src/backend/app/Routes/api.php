@@ -68,6 +68,8 @@ return [
     ['GET', '/api/colores/{id}', 'ColorController@show'],
     ['GET', '/api/especies', 'EspecieController@index'],
     ['GET', '/api/razas', 'RazaController@index'],
+    ['GET', '/api/provincias', 'UbicacionController@provincias'],
+    ['GET', '/api/municipios', 'UbicacionController@municipios'],
 
     // =========================
     // Usuarios

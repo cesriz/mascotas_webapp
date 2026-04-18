@@ -619,6 +619,34 @@ Y además puede mandar:
 
 ---
 
+## GET /api/provincias
+**Tipo:** pública  
+**Sirve para:** listar provincias existentes en `ubicaciones`.
+
+### Qué suele devolver
+Un array simple de textos, por ejemplo:
+- Murcia
+- Alicante
+- Valencia
+
+### Se usa en
+- select de provincias
+- filtros de búsqueda
+- formularios con ubicación
+
+---
+
+## GET /api/municipios
+**Tipo:** pública  
+**Sirve para:** listar municipios existentes en `ubicaciones`.
+
+### Query opcional
+- `provincia`
+
+### Ejemplos
+GET /api/municipios
+GET /api/municipios?provincia=Murcia
+
 # 10. Usuarios públicos
 
 ## POST /api/usuarios

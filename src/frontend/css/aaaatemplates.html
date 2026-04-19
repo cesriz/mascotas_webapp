@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+            <style>
+        :host {
+            display: none; /* Oculto por defecto hasta que se active */
+        }
+
+        :host(.is-visible) {
+            display: block;
+        }
+
+        .pet-avistamiento {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(600px, 90vw);
+            z-index: 1000;
+            max-height: 90vh;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex; 
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            background-color: var(--backgroundblue);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .pet-contact-title {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: var(--text-md);
+            gap: 5px;
+            margin-bottom: 10px;
+            transform: translate(-10px,0);
+        }
+
+        .pet-contact-title img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .pet-avistamiento-inputs {
+            display: flex;
+            flex-direction: column; 
+            gap: 15px;
+            width: 100%;
+        }
+
+        .pet-avistamiento-inputs > div {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .privacy-input {
+            display: flex;
+            margin-top: 10px;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .privacy-input input {
+            width: auto;
+            margin-top: 4px;
+        }
+
+        .privacy-input a {
+            color: var(--secondary500);
+            text-decoration: underline;
+        }
+
+        .avistamiento-buttons {
+            width: auto;
+            display: flex;
+            flex-direction: row !important;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        } 
+
+        .avistamiento-buttons button {
+            flex: 1;
+            max-width: 150px;
+            padding: 10px;
+        }
+
+        .panel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        /* --------Tablets y móviles--------- */
+        @media (max-width: 600px) {
+            .avistamiento-buttons {
+                flex-direction: column;
+            }
+            .avistamiento-buttons button {
+                max-width: 100%;
+            }
+            .pet-avistamiento {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+
+    <div class="panel-overlay" id="panel-bg"></div>
+    <div class="pet-avistamiento">
+        <div class="pet-contact-title">
+            <img src="../assets/icons/material-symbols--mail-outline.png">
+            <h3>Registra un avistamiento</h3>
+        </div>
+
+        <form id="avistamiento-form">
+            <div class="pet-avistamiento-inputs">
+                <div>            
+                    <label for="avistamiento-form-name">Nombre</label>
+                    <input type="text" id="avistamiento-form-name" required>
+                </div>
+                <div>            
+                    <label for="avistamiento-form-email">Email</label>
+                    <input type="email" id="avistamiento-form-email" required>
+                </div>
+                <div>            
+                    <label for="avistamiento-form-telefono">Teléfono</label>
+                    <input type="tel" id="avistamiento-form-telefono">
+                </div>
+                <div>            
+                    <label for="avistamiento-form-loc">¿Dónde has visto a ${petName}</label>
+                    <input type="tel" id="avistamiento-form-loc">
+                </div>
+                <div>            
+                    <label for="avistamiento-form-date">¿Cuándo has visto a ${petName}</label>
+                    <input type="tel" id="avistamiento-form-date">
+                    <div id="map-container">
+                </div>
+                <div>            
+                    <label for="contact-desc">Descripción</label>
+                    <textarea id="contact-msg" placeholder="Escribe aquí tu mensaje..." required></textarea>
+                </div>
+                <div>            
+                    <label for="contact-foto">Sube una foto</label>
+                </div>
+            </div>
+
+            <label class="privacy-input">
+                <input type="checkbox" id="privacy-check" required>
+                <span>Mediante el envío de mis datos confirmo que he leído y acepto la <a href="privacidad.html" target="_blank">política de privacidad</a>.</span>
+            </label>
+
+            <div class="avistamiento-buttons">
+                <button type="button" class="button-secondary" id="avistamiento-btn-reset">Limpiar</button>
+                <button type="submit" class="button-primary" id="avistamiento-btn-send">Enviar</button> 
+            </div>
+        </form>
+    </div>
+
+    <script>
+
+
+
+
+
+
+
+    </script>
+
+</body>
+</html>
+
+
+

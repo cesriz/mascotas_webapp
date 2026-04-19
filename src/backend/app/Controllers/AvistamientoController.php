@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Throwable;
-
 require_once __DIR__ . '/../Models/AvistamientoModel.php';
 require_once __DIR__ . '/../Models/MascotaModel.php';
 require_once __DIR__ . '/../Models/FotoModel.php';

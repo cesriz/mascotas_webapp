@@ -65,8 +65,9 @@ function marcarEnlaceActivo() {
  * Gestor de errores
  * Capturar errores y mostrarlos a través de http-cats
  */
-export function showHttpError(error) {
-    const httpCat = document.querySelector('http-cat');
+export function showHttpError(error, container = document) {
+    const httpCat = container.querySelector('http-cat');
+    if (!httpCat) return;
 
     httpCat.setAttribute('code', error.code || 500);
 

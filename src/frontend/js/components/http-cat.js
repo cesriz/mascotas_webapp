@@ -49,6 +49,7 @@ template.innerHTML = `
     </style>
 
     <div class="http-cat">
+        <h3>'¡OH NO, HA OCURRIDO UN ERROR!</h3>
         <img id="cat-img">
         <div id="messages"></div>
     </div>

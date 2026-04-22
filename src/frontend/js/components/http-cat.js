@@ -48,13 +48,16 @@ template.innerHTML = `
             }
     </style>
 
-    <div class="http-cat" id="http-cat"></div>
+    <div class="http-cat">
+        <img id="cat-img">
+        <div id="messages"></div>
+    </div>
 `;
 
 export class HttpCat extends HTMLElement {
     // Función que sirve para que el navegador actualice el código si este cambia.
     static get observedAttributes() { 
-        return ['code', 'message']; 
+        return ['code', 'message', 'errors']; 
     }
 
     attributeChangedCallback() { 
@@ -66,16 +69,32 @@ export class HttpCat extends HTMLElement {
     }
 
     render() {
-        const code = this.getAttribute('code') || '404';
-        const message = this.getAttribute('message') || '¡Oh no! Ha ocurrido un error inesperado';
-
-        this.innerHTML = '';
+        this.innerHTML = ''; 
         this.appendChild(template.content.cloneNode(true));
         
-        const container = this.querySelector('#http-cat');
-        container.innerHTML = `
-            <img src="https://http.cat/${code}" alt="Error-cat ${code}">
-            <p class="error-msg">${message}</p>`;
+        const code = this.getAttribute('code') || '500';
+        const message = this.getAttribute('message');
+        const errors = this.getAttribute('errors');
+
+        const img = this.querySelector('#cat-img');
+        const messagesContainer = this.querySelector('#messages');
+
+        img.src = `https://http.cat/${code}`;
+
+        let html = '';
+
+        if (message) {
+            html += `<p class="error-msg">${message}</p>`;
+        }
+
+        if (errors) {
+            const parsed = JSON.parse(errors);
+            parsed.forEach(err => {
+                html += `<p class="error-msg">${err}</p>`;
+            });
+            }
+
+            messagesContainer.innerHTML = html;
     }
 }
 customElements.define('http-cat', HttpCat);

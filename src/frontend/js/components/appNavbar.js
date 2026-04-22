@@ -7,7 +7,7 @@ template.innerHTML = `
         .header {
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 998;
             display: grid;
             grid-template-rows: auto auto ;
             width: 100%;

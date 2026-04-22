@@ -202,9 +202,7 @@ template.innerHTML = `
             <p id="badge-text"></p>
         </div>
 
-        <div class="pet-card-title">
-
-        </div>
+        <div class="pet-card-title"></div>
 
         <div class="pet-card-info">
             <div>
@@ -285,13 +283,31 @@ export class PetCard extends HTMLElement {
 
             btnDelete.onclick = async (e) => {
                 e.stopPropagation();
-                if(confirm('¿Borrar anuncio?')) { 
-                    await API.deleteMascota(pet.id); this.remove(); }
+                if (!confirm('¿Borrar anuncio?')) return;
+
+                try {
+                    await API.deleteMascota(pet.id);
+
+                    showSuccess('Anuncio eliminado correctamente');
+                    this.remove();
+
+                } catch (error) {
+                    showHttpError(error, this);
+                }
             };
 
             btnRecuperar.onclick = async (e) => {
-                await API.marcarRecuperada(pet.id);
-                window.location.reload();
+                e.stopPropagation();
+                try {
+                    await API.marcarRecuperada(pet.id);
+
+                    showSuccess('Mascota marcada como recuperada');
+
+                    window.location.reload();
+
+                } catch (error) {
+                    showHttpError(error);
+                }
             };
 
             // Si ya está recuperada, ocultamos el botón de "¡Recuperada!".
@@ -362,7 +378,6 @@ export class PetCard extends HTMLElement {
             badgeText.textContent = est.toUpperCase();
         }
 
-        
         // Función para mostrar el título del anuncio de forma dinámica según el estado
         applyTitle(pet) {
             const container = this.querySelector('.pet-card-title');

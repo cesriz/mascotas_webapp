@@ -1,15 +1,16 @@
 import { API } from '../api.js';
 import { Auth } from '../auth.js';
+import { showHttpError, showSuccess } from '../main.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
-        :host {
-            display: none; /* Oculto por defecto hasta que se active */
+        pet-contact-form {
+            display: none !important; /* Oculto por defecto hasta que se active */
         }
 
-        :host(.is-visible) {
-            display: block;
+        pet-contact-form.is-visible {
+            display: block !important;
         }
 
         .pet-contact-form {
@@ -107,16 +108,6 @@ template.innerHTML = `
             cursor: pointer;
         }
 
-        .panel-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
         /* --------Tablets y móviles--------- */
         @media (max-width: 600px) {
             .contact-buttons {
@@ -130,13 +121,16 @@ template.innerHTML = `
             }
         }
     </style>
-
-    <div class="panel-overlay" id="panel-bg"></div>
+    
+    <div class="panel-overlay" id="panel-overlay"></div>
     <div class="pet-contact-form">
         <div class="pet-contact-title">
             <img src="../assets/icons/material-symbols--mail-outline.png">
             <h3>Contacta</h3>
         </div>
+
+        <http-cat style="display: none;"></http-cat>
+        <div id="success-div"></div>
 
         <form id="form-contact">
             <div class="pet-contact-form-inputs">
@@ -146,7 +140,7 @@ template.innerHTML = `
                 </div>
                 <div>            
                     <label for="contact-email">Email</label>
-                    <input type="email" id="contact-email" required>
+                    <input type="email" id="contact-correo" required>
                 </div>
                 <div>            
                     <label for="contact-phone">Teléfono</label>
@@ -190,7 +184,7 @@ export class PetContactForm extends HTMLElement {
         this.innerHTML = '';
         this.appendChild(template.content.cloneNode(true));
 
-        const bg = this.querySelector('#panel-bg');
+        const bg = this.querySelector('#panel-overlay');
         const form = this.querySelector('#form-contact');
         const btnReset = this.querySelector('#contact-btn-reset');
 
@@ -208,6 +202,10 @@ export class PetContactForm extends HTMLElement {
     }
 
     async sendMsg() {
+        // Limpiamos posibles errores previos
+        const httpCat = document.querySelector('http-cat');
+        if (httpCat) httpCat.style.display = 'none';
+
         if (!this._petId) {
             alert("Error: No se ha especificado la mascota.");
             return;
@@ -215,37 +213,36 @@ export class PetContactForm extends HTMLElement {
 
         const data = {
             nombre: this.querySelector('#contact-name').value,
-            email: this.querySelector('#contact-email').value,
+            correo: this.querySelector('#contact-correo').value,
             telefono: this.querySelector('#contact-phone').value,
             mensaje: this.querySelector('#contact-msg').value
         };
 
         try {
-            // Según tu api.md: POST /api/mascotas/{id}/contacto
-            await API.call(`/api/mascotas/${this._petId}/contacto`, {
-                method: 'POST',
-                headers: API.getHeaders(),
-                body: JSON.stringify(data)
-            });
-
-            alert("Mensaje enviado correctamente.");
-            this.close();
+            // POST /api/mascotas/{id}/contacto
+            await API.enviarContacto(this._petId, data);
+            showSuccess("Mensaje enviado correctamente");
+            setTimeout(() => this.close(), 2000); // Se cierra automáticamente tras 2s
+        
         } catch (error) {
             console.error("Error al enviar contacto:", error);
-            alert("Hubo un error al enviar el mensaje. Inténtalo de nuevo.");
+            showHttpError(error, this);
         }
+        
     }
 
+    // Método para abrir el formulario
     open(petId) {
         this._petId = petId;
         this.classList.add('is-visible');
         document.body.style.overflow = 'hidden'; // Evita scroll de fondo
     }
 
+    // Método para cerrar el formulario
     close() {
         this.classList.remove('is-visible');
         document.body.style.overflow = 'auto';
-        this.querySelector('#form-comunicacion').reset();
+        this.querySelector('#form-contact').reset();
     }
 }
 

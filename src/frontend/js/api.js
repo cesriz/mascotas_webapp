@@ -51,7 +51,7 @@ export const API = {
 
             // Si es un error de red (fetch falló totalmente), simulamos un 404
             console.error("Error de red o servidor:", error);
-            throw { code: 404, message: "No se pudo conectar con el servidor" };
+            throw { code: 500, message: "Error de red o servidor" };;
         }
         
     },
@@ -299,3 +299,19 @@ export const API = {
         return this.call('/api/config', { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(data) }); 
     },
 };
+
+// Función para gestión de errores con http-cats
+async function handleApiResponse(response) {
+    const data = await response.json();
+
+    if (!response.ok || data.success === false) {
+        return {
+            ok: false,
+            status: response.status,
+            message: data.message,
+            errors: data.errors
+        };
+    }
+
+    return { ok: true, data };
+}

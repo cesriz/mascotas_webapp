@@ -12,36 +12,78 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-            <style>
-        :host {
-            display: none; /* Oculto por defecto hasta que se active */
-        }
+    <style>
+        /* Switch para seleccionar el estado */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            }
 
-        :host(.is-visible) {
-            display: block;
-        }
+            .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            }
 
-        .pet-avistamiento {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            /* Fondo */
+            .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: var(--primary);
+            border-radius: var(--radius-md);
+            transition: 0.3s;
+            }
+
+            /* Bolita */
+            .slider::before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            top: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            }
+
+            /* Estado activo */
+            input:checked + .slider {
+            background-color: var(--secondary500);
+            }
+
+            input:checked + .slider::before {
+            transform: translateX(24px);
+            }
+
+        /* Contenedores */
+        .pet-create-data {
             width: min(600px, 90vw);
-            z-index: 1000;
-            max-height: 90vh;
+            margin: 0 auto;
             padding: 2rem;
-            overflow-y: auto;
-            display: flex; 
+            display: flex;
             flex-direction: column;
-            align-items: stretch;
-            gap: 10px;
+            gap: 20px;
+        }
+        
+        .pet-create-data-section {
             background-color: var(--backgroundblue);
             border: 2px solid var(--primary);
             border-radius: var(--radius-md);
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 1.5rem;
         }
-        
-        .pet-contact-title {
+
+        .pet-create-data-location {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Títulos */
+        .pet-create-title {
             width: 100%;
             display: flex;
             justify-content: center;
@@ -52,28 +94,23 @@
             transform: translate(-10px,0);
         }
 
-        .pet-contact-title img {
+        .pet-create-title img {
             width: 24px;
             height: 24px;
         }
 
-        .pet-avistamiento-inputs {
+        /* Inputs */
+        .pet-create-data-inputs {
             display: flex;
             flex-direction: column; 
-            gap: 15px;
             width: 100%;
-        }
-
-        .pet-avistamiento-inputs > div {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+            gap: 10px;
         }
 
         input, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--inputbackground);
             border-radius: var(--radius-sm);
             font-family: inherit;
         }
@@ -83,7 +120,7 @@
             resize: vertical;
         }
 
-        .privacy-input {
+        .reward-input {
             display: flex;
             margin-top: 10px;
             align-items: flex-start;
@@ -91,50 +128,89 @@
             font-size: 0.9rem;
         }
 
-        .privacy-input input {
+        .reward-input input {
             width: auto;
-            margin-top: 4px;
         }
 
-        .privacy-input a {
-            color: var(--secondary500);
-            text-decoration: underline;
-        }
-
-        .avistamiento-buttons {
-            width: auto;
+        /* Fotografías */
+        .foto-div {
             display: flex;
-            flex-direction: row !important;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            text-align: center;
             gap: 10px;
-        } 
+            margin-top: -10px;
+            margin-top:10px;
+            padding: 20px;
+            background-color: var(--inputbackground);
+            border: 2px dashed var(--primary);
+            border-radius: var(--radius-sm);
+            
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+            
+        .foto-div:hover { background: rgba(0,0,0,0.05); }
 
-        .avistamiento-buttons button {
-            flex: 1;
+        .foto-div img {
+            width: 40px;
+            height: 40px;
+            opacity: 0.7;
+        }
+
+        #pet-create-data-foto { 
+            display: none; 
+        }
+
+        #preview-img {
+            display:none; 
+            width: 100%;
+            min-height: 200px;
+            max-height: 180px; 
+            object-fit: contain; 
+            margin-top: 10px;
+            background-color: var(--inputbackground);
+            border-radius: var(--radius-sm);
+        }
+
+        /* Botones */
+        .pet-create-data-buttons {
+            width: auto;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            padding-top: 10px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+
+
+        #pet-create-data-search-btn{
             max-width: 150px;
+            margin-top: 10px;
+            align-self: flex-end;
+        }
+
+
+        .pet-create-data-buttons button {
+            flex: 1;
+            max-width: 250px;
             padding: 10px;
         }
 
-        .panel-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
 
         /* --------Tablets y móviles--------- */
         @media (max-width: 600px) {
-            .avistamiento-buttons {
+            .pet-create-data-buttons {
                 flex-direction: column;
             }
-            .avistamiento-buttons button {
+            .pet-create-data-buttons button {
                 max-width: 100%;
             }
-            .pet-avistamiento {
+            .pet-create-data {
                 padding: 1.5rem;
             }
         }
@@ -143,67 +219,124 @@
 </head>
 <body>
 
+<div id="success-div"></div>
+<form class="pet-create-data" id="pet-create-data-form">
 
-    <div class="panel-overlay" id="panel-bg"></div>
-    <div class="pet-avistamiento">
-        <div class="pet-contact-title">
-            <img src="../assets/icons/material-symbols--mail-outline.png">
-            <h3>Registra un avistamiento</h3>
+        <label class="switch">
+        <input type="checkbox" id="pet-creation-estado">
+        <span class="slider"></span>
+        </label>
+
+        <div class="pet-create-data-section">
+            <div class="pet-create-title">
+                <img src="../assets/icons/streamline-plump--pet-paw.png">
+                <h3>Datos de la mascota</h3>
+            </div>
+
+            <div class="pet-create-data-inputs">
+                <div>            
+                    <label for="pet-create-data-form-name">Nombre</label>
+                     <input type="text" id="pet-create-data-form-name" required>
+                 </div>
+
+                <div>            
+                    <label for="pet-create-data-form-especie">Especie</label>
+                    <select id="pet-create-data-form-especie"></select>
+                </div>
+
+                 <div>            
+                    <label for="pet-create-data-form-raza">Raza</label>
+                     <select id="pet-create-data-form-raza" required></select>
+                 </div>
+
+                 <div>
+                    <label for="pet-create-data-form-sexo">Sexo</label>
+                    <select id="pet-create-data-form-sexo" required></select>
+                 </div>
+
+                <div>            
+                    <label for="pet-create-data-form-birth">Fecha de nacimiento</label>
+                    <input type="number" id="pet-create-data-form-birth">
+                </div>
+
+                <div>           
+                    <label for="pet-create-data-form-tamano">Tamaño</label>
+                    <select id="pet-create-data-form-tamano" required></select>
+                </div>
+
+                <div>            
+                    <label for="pet-create-data-form-peso">Peso</label>
+                    <input type="number" id="pet-create-data-form-peso">
+                </div>
+
+                <div>           
+                    <label for="pet-create-data-form-color">Colores</label>
+                    <select id="pet-create-data-form-color" required></select>
+                </div>
+                    
+                <div>            
+                    <label for="pet-create-data-form-chip">¿Tiene chip?</label>
+                    <select id="pet-create-data-form-chip"></select>
+                </div>
+            </div>
         </div>
 
-        <form id="avistamiento-form">
-            <div class="pet-avistamiento-inputs">
-                <div>            
-                    <label for="avistamiento-form-name">Nombre</label>
-                    <input type="text" id="avistamiento-form-name" required>
-                </div>
-                <div>            
-                    <label for="avistamiento-form-email">Email</label>
-                    <input type="email" id="avistamiento-form-email" required>
-                </div>
-                <div>            
-                    <label for="avistamiento-form-telefono">Teléfono</label>
-                    <input type="tel" id="avistamiento-form-telefono">
-                </div>
-                <div>            
-                    <label for="avistamiento-form-loc">¿Dónde has visto a ${petName}</label>
-                    <input type="tel" id="avistamiento-form-loc">
-                </div>
-                <div>            
-                    <label for="avistamiento-form-date">¿Cuándo has visto a ${petName}</label>
-                    <input type="tel" id="avistamiento-form-date">
-                    <div id="map-container">
-                </div>
-                <div>            
-                    <label for="contact-desc">Descripción</label>
-                    <textarea id="contact-msg" placeholder="Escribe aquí tu mensaje..." required></textarea>
-                </div>
-                <div>            
-                    <label for="contact-foto">Sube una foto</label>
-                </div>
+        <div class="pet-create-data-section">
+            <div class="pet-create-title">
+                <img src="../assets/icons/solar--camera-linear.png">
+                <h3>Fotos de la mascota</h3>
             </div>
 
-            <label class="privacy-input">
-                <input type="checkbox" id="privacy-check" required>
-                <span>Mediante el envío de mis datos confirmo que he leído y acepto la <a href="privacidad.html" target="_blank">política de privacidad</a>.</span>
-            </label>
-
-            <div class="avistamiento-buttons">
-                <button type="button" class="button-secondary" id="avistamiento-btn-reset">Limpiar</button>
-                <button type="submit" class="button-primary" id="avistamiento-btn-send">Enviar</button> 
+            <label for="pet-create-data-foto">Sube las mejores fotos de tu mascota para que sea más fácil reconocerla</label>
+            <div class="foto-div">            
+                <img src="../assets/icons/proicons--photo.png" alt="Subir foto" id="upload-icon">
+                <span id="file-name-label">Haz clic para seleccionar o arrastra una imagen</span>
+                <input type="file" id="pet-create-data-foto" accept="image/*">
+                <img id="preview-img">
             </div>
-        </form>
+        </div>
+
+        <div class="pet-create-data-section">
+            <div class="pet-create-title">
+                <img src="../assets/icons/iconoir--post.png">
+                <h3>Detalles del suceso</h3>
+            </div>
+
+            <div class="pet-create-data-inputs">
+                <div>            
+                    <label for="pet-create-data-form-date">¿Cuándo has visto a tu mascota por última vez?</label>
+                     <input type="date" id="pet-create-data-form-date" required>
+                </div>
+
+                <div class="pet-create-data-location">            
+                    <label for="pet-create-data-form-loc">¿Dónde has visto a tu mascota por última vez?</label>
+                    <input type="" id="pet-create-data-form-loc" placeholder="Escribe una dirección">
+                    <button class="button-primary" type="button" id="pet-create-data-search-btn">Buscar en mapa</button>
+                </div>
+                <div><pet-map id="pet-create-data-map"></pet-map></div>
+                <input type="hidden" name="latitud" id="pet-create-data-lat-input" required>
+                <input type="hidden" name="longitud" id="pet-create-data-lng-input" required>
+
+                <div>            
+                    <label for="pet-create-data-form-descripcion">Descripción</label>
+                    <textarea id="pet-create-data-form-descripcion" required> </textarea>
+                </div>
+                
+                <label class="reward-input">
+                    <input type="checkbox" id="reward-check" required>
+                    Ofrecer recompensa por recuperación
+                </label>
+            </div>
+        </div>
+
+
+        <div class="pet-create-data-buttons">
+            <button type="button" class="button-secondary" id="pet-create-data-btn-reset">Limpiar</button>
+            <button type="submit" class="button-primary" id="pet-create-data-btn-send">PUBLICAR ANUNCIO</button> 
+        </div>
     </div>
+</form>
 
-    <script>
-
-
-
-
-
-
-
-    </script>
 
 </body>
 </html>

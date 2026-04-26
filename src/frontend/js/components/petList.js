@@ -1,5 +1,5 @@
 import './petCard.js';
-import './http-cat.js';
+import { showHttpError } from '../main.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -23,7 +23,7 @@ template.innerHTML = `
 
     <div class= "pet-list">
         <div class="grid-container" id="grid"></div>
-        <div id="empty-message" style="display: none;"></div>
+        <http-cat style="display: none;"></http-cat>
     </div> 
 `;
 
@@ -47,20 +47,16 @@ export class PetList extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
 
         const grid = this.querySelector('#grid');
-        const emptyMessage = this.querySelector('#empty-message');
-        const httpCat = document.createElement('http-cat');
 
         // Si no hay mascotas, mostramos el mensaje de "vacío"
         if (!this._pets || this._pets.length === 0) {
             grid.style.display = 'none';
-            emptyMessage.style.display = 'block';
-            emptyMessage.appendChild(httpCat);
+            showHttpError(error, this);
             return;
         }
 
         // Si hay mascotas, las mostramos
         grid.style.display = 'grid';
-        emptyMessage.style.display = 'none';
 
         this._pets.forEach(petData => {
             const card = document.createElement('pet-card');

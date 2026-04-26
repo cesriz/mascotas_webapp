@@ -12,6 +12,8 @@ import './components/petList.js';
 import './components/petFilters.js';
 import './components/petMap.js';
 import './components/petContactForm.js';
+import './components/avistamientoCreationForm.js';
+import './components/petDetails.js';
 // Importarás los demás según los vayas creando:
 // import './components/PetForm.js';
 
@@ -46,12 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     marcarEnlaceActivo();
     await renderPets();
 
-
-
 });
-
-
-
 
 /**
  * Función para resaltar en qué página estamos
@@ -65,23 +62,52 @@ function marcarEnlaceActivo() {
 }
 
 /**
- * Gestor de errores globales
- * Útil para capturar errores de la API que no hayamos controlado en los componentes
+ * Gestor de errores
+ * Capturar errores y mostrarlos a través de http-cats
  */
-window.addEventListener('unhandledrejection', evento => {
-    if (evento.reason && evento.reason.code === 401) {
-        console.warn("Sesión expirada");
-        Auth.clearSession();
-        window.location.href = 'login.html';
+export function showHttpError(error) {
+    const httpCat = document.querySelector('http-cat');
+
+    httpCat.setAttribute('code', error.code || 500);
+
+    if (error.message) {
+        httpCat.setAttribute('message', error.message);
     }
-});
+
+    if (error.validationErrors) {
+        httpCat.setAttribute(
+            'errors',
+            JSON.stringify(error.validationErrors)
+        );
+    }
+
+    httpCat.style.display = 'block';
+}
+
+/**
+ * Gestor de exitos
+ * Capturar exitos y mostrarlos a en mensajes
+ * /
+ **/
+export function showSuccess(message) {
+    const successDiv = document.querySelector('#success-div');
+    successDiv.className = 'success-div';
+    successDiv.textContent = message;
+
+    setTimeout(() => {
+        successDiv.classList.add('visible');
+    }, 10);
+
+    setTimeout(() => {
+        successDiv.classList.remove('visible');
+        setTimeout(() => successDiv.remove(), 300);
+    }, 3000);
+}
 
 
 /**
  * 
- * 
  * FUNCIONES DE LOS COMPONENTES
- * 
  * 
  */
 
@@ -135,41 +161,5 @@ if (filtersComponent) {
 }
 
 
-/**
- * PETMAP.JS / PET-DETAIL.JS - Mostrar ubicación en mapa según dirección
- */
-
-/*
-const mapa = document.querySelector('pet-map');
-const inputDireccion = document.querySelector('#address-input');
-const btnBuscar = document.querySelector('#btn-search');
-
-// Al hacer clic en buscar
-btnBuscar.addEventListener('click', async () => {
-    const direccion = inputDireccion.value;
-    const coords = await mapa.searchAddress(direccion);
-    
-    if (coords) {
-        // Guardamos las coordenadas en campos ocultos o variables para el envío POST
-        document.querySelector('#latitud-input').value = coords.lat;
-        document.querySelector('#longitud-input').value = coords.lon;
-    }
-});
-
-// Opcional: Permitir que funcione al pulsar "Enter"
-inputDireccion.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') btnBuscar.click();
-});
-
-*/
-
-
 // ESTO ES SOLO PARA PRUEBAS DE PETMAP - BORRAR DESPUÉS
-    const elMapa = document.querySelector('#mapa-mascota');
-    
-    // El ID que quieras probar (uno que exista en tu base de datos)
-    const idPrueba = 1; 
 
-    // Llamamos al método que tú creaste
-    // Esto disparará: API.getMascotaById -> API.getAvistamientos -> renderMarkers
-    await elMapa.setData(idPrueba);

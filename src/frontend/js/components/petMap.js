@@ -182,7 +182,7 @@ export class PetMap extends HTMLElement {
 
             this.renderMarkers(); // Mostramos marcadores en el mapa
         } catch (error) {
-            console.error("Error cargando datos del mapa:", error);
+             showHttpError(error);
         }
     }
 
@@ -331,11 +331,12 @@ export class PetMap extends HTMLElement {
         if (!address) return;
         try {
             // Consultamos a Nominatim (OpenStreetMap Geocoding)
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=es`);
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(address)}&countrycodes=es`);
             const data = await response.json();
 
             if (data.length > 0) {
-                const { lat, lon, display_name } = data[0];
+                // Guardamos resultado de petición a Nominata en variables
+                const { lat, lon, display_name, address } = data[0];
                 const coords = [parseFloat(lat), parseFloat(lon)];
 
                 // Centramos el mapa
@@ -353,13 +354,54 @@ export class PetMap extends HTMLElement {
 
                 this.registrationMarker.bindPopup(`<b>Ubicación encontrada:</b><br>${display_name}`).openPopup();
 
-                return { lat, lon };
+                // Guardamos los detalles para que el formulario avistamientoCreationForm pueda pedirlos
+                this._lastAddressDetails = address;
+                this._lastDisplayName = display_name;
+
+                return { lat, lon, displayName: display_name, details: address };
             } else {
                 alert("No se ha encontrado la ubicación. Intenta ser más específico.");
+                return null;
             }
         } catch (error) {
             console.error("Error en el geocoding:", error);
+            return null;
         }
+    }
+
+    // Método para habilitar el modo "selección" en el formulario
+    initRegistrationMode() {
+        if (!this.map) return;
+
+        // Si no existe el marcador de registro, lo creamos en el centro del mapa
+        if (!this.registrationMarker) {
+            const center = this.map.getCenter();
+            this.registrationMarker = L.marker(center, {
+                draggable: true,
+                icon: this.getIcon('red')
+            }).addTo(this.map);
+
+            // Evento cuando se termina de arrastrar el marcador
+            this.registrationMarker.on('dragend', () => {
+                const position = this.registrationMarker.getLatLng();
+                this.dispatchLocationEvent(position.lat, position.lng);
+            });
+
+            // También permitimos hacer click en el mapa para mover el marcador
+            this.map.on('click', (e) => {
+                this.registrationMarker.setLatLng(e.latlng);
+                this.dispatchLocationEvent(e.latlng.lat, e.latlng.lng);
+            });
+        }
+    }
+
+    // Lanza un evento que el formulario podrá escuchar
+    dispatchLocationEvent(lat, lng) {
+        this.dispatchEvent(new CustomEvent('location-selected', {
+            detail: { lat, lng },
+            bubbles: true,
+            composed: true
+        }));
     }
 
 }

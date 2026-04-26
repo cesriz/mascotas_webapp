@@ -253,37 +253,37 @@ template.innerHTML = `
 
             <div class="more-filter-group">
                 <div>            
-                    <label>Raza</label>
+                    <label for="raza-select">Raza</label>
                     <select id="raza-select"></select>
                 </div>
 
                 <div>
-                    <label>Sexo</label>
+                    <label for="sexo-select">Sexo</label>
                     <select id="sexo-select"></select>
                 </div>
 
                 <div>
-                    <label>Tamaño</label>
+                    <label for="tamano-select">Tamaño</label>
                     <select id="tamano-select"></select>
                 </div>
 
                 <div>
-                    <label>Color</label>
+                    <label for="color-select">Color</label>
                     <select id="color-select"></select>
                 </div>            
 
                 <div>
-                    <label>¿Tiene chip?</label>
+                    <label for="chip-select">¿Tiene chip?</label>
                     <select id="chip-select"></select>
                 </div>
                 
                 <div>
-                    <label>Solo con fotos</label>
+                    <label for="foto-select">Solo con fotos</label>
                     <select id="foto-select"></select>
                 </div>
 
                 <div>
-                    <label>Ordenar por</label>
+                    <label for="orden-select">Ordenar por</label>
                     <select id="orden-select"></select>
                 </div>
             </div>

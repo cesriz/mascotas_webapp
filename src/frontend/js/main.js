@@ -14,8 +14,11 @@ import './components/petMap.js';
 import './components/petContactForm.js';
 import './components/avistamientoCreationForm.js';
 import './components/petDetails.js';
+import './components/petCreationForm.js';
+import './components/authLogin.js';
+import './components/heroSection.js';
 // Importarás los demás según los vayas creando:
-// import './components/PetForm.js';
+
 
 
 
@@ -101,7 +104,7 @@ export function showSuccess(message) {
 
     setTimeout(() => {
         successDiv.classList.remove('visible');
-        setTimeout(() => successDiv.remove(), 300);
+        setTimeout(() => successDiv.textContent = '', 300);
     }, 3000);
 }
 

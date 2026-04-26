@@ -1,59 +1,8 @@
-const template = document.createElement('template');
-template.innerHTML = `
-    <style>
-        .http-cat { 
-            display: block; 
-            text-align: center;
-            width: 100%;
-        }
+import { createTemplate } from "../ui-utils.js";
+import { httpCatHTML, httpCatCSS } from "../templates/http-catTemplate.js";
 
-        img {
-            width: 100%;
-            max-width: 450px;
-            border-radius: var(--radius-xs);
-            object-fit: contain;
-            height: auto;
-        }
-
-        .error-msg {
-            margin-top: 1.5rem;
-            font-size: var(--text-md);
-            color: black;
-            font-weight: bold;
-        }
-
-        /* -------- Tablet y móvil -------- */
-        @media (max-width: 768px) {
-            img {
-                max-width: 350px;
-            }
-
-            .error-msg {
-                font-size: var(--text-sm);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .http-cat {
-                padding: 5px;
-            }
-
-            img {
-                max-width: 280px;
-            }
-
-            .error-msg {
-                font-size: var(--text-xs);
-                margin-top: 1rem;
-            }
-    </style>
-
-    <div class="http-cat">
-        <h3>'¡OH NO, HA OCURRIDO UN ERROR!</h3>
-        <img id="cat-img">
-        <div id="messages"></div>
-    </div>
-`;
+// Importamos plantilla (HTML y CSS)
+const template = createTemplate(httpCatHTML, httpCatCSS);
 
 export class HttpCat extends HTMLElement {
     // Función que sirve para que el navegador actualice el código si este cambia.

@@ -52,6 +52,7 @@ body {
     color:black;
     margin: 0;
     background-color: var(--background);
+    text-wrap: wrap;
 
 }
 
@@ -195,7 +196,7 @@ label + input,select {
 /* Div para el mensaje de éxito */
 .success-div {
     position: fixed;
-    top: 50%;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     background: var(--success);

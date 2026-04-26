@@ -1,31 +1,12 @@
 import './petCard.js';
 import { showHttpError } from '../main.js';
+import { createTemplate } from "../ui-utils.js";
+import { petListHTML, petListCSS } from "../templates/petListTemplate.js";
 
-const template = document.createElement('template');
-template.innerHTML = `
-    <style>
-        .pet-list{
-            display: block;
-            width: 100%;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 1rem;
-        }
+// Importamos plantilla (HTML y CSS)
+const template = createTemplate(petListHTML, petListCSS);
 
-        .empty-state img {
-            max-width: 200px;
-            margin-bottom: 1rem;
-        }
-    </style>
 
-    <div class= "pet-list">
-        <div class="grid-container" id="grid"></div>
-        <http-cat style="display: none;"></http-cat>
-    </div> 
-`;
 
 export class PetList extends HTMLElement {
     constructor() {
@@ -33,9 +14,16 @@ export class PetList extends HTMLElement {
         this._pets = [];
     }
 
+    // Usamos un setter para pasarle las mascotas
     set pets(data) {
         this._pets = data;
         this.render();
+    }
+
+    setError(error) {
+        this._pets = null; // Limpiamos mascotas para que no choquen visualmente
+        this.render();
+        showHttpError(error, this);
     }
 
     connectedCallback() {
@@ -47,23 +35,42 @@ export class PetList extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
 
         const grid = this.querySelector('#grid');
+        const emptyMsg = this.querySelector('#empty-msg');
+        const httpCat = this.querySelector('http-cat');
 
-        // Si no hay mascotas, mostramos el mensaje de "vacío"
-        if (!this._pets || this._pets.length === 0) {
+        // Si hay algún error en la llamada en la API, se utiliza http-cats
+        if (this._pets === null) {
             grid.style.display = 'none';
-            showHttpError(error, this);
+            emptyMsg.style.display = 'none';
             return;
         }
 
-        // Si hay mascotas, las mostramos
+        // Si la llamada a la API es exitosa pero no hay mascotas
+        if (this._pets.length === 0) {
+            grid.style.display = 'none';
+            emptyMsg.style.display = 'block';
+            httpCat.style.display = 'none';
+            return;
+        }
+
+        // Éxito
         grid.style.display = 'grid';
+        emptyMsg.style.display = 'none';
+        httpCat.style.display = 'none';
 
         this._pets.forEach(petData => {
             const card = document.createElement('pet-card');
-            
-            // Le pasamos los datos del objeto a cada tarjeta
             card.petData = petData; 
             
+            // Evento para editar
+            card.addEventListener('edit-pet', (e) => {
+                this.dispatchEvent(new CustomEvent('request-edit', {
+                    detail: { petId: e.detail.petId },
+                    bubbles: true,
+                    composed: true
+                }));
+            });
+
             grid.appendChild(card);
         });
     }

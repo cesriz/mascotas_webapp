@@ -9,6 +9,10 @@ return [
     ['GET', '/api/auth/me', 'AuthController@me', ['auth' => true]],
     ['POST', '/api/auth/logout', 'AuthController@logout', ['auth' => true]],
 
+    // Recuperación de contraseña
+    ['POST', '/api/auth/forgot-password', 'AuthController@forgotPassword'],
+    ['POST', '/api/auth/reset-password', 'AuthController@resetPassword'],
+
     // =========================
     // Zona privada del usuario autenticado
     // =========================

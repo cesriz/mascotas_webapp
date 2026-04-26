@@ -130,4 +130,64 @@ class AuthController
             'message' => 'Logout correcto'
         ]);
     }
+
+    public function forgotPassword(): void
+    {
+        $input = Request::json();
+
+        // Validamos el correo
+        $result = AuthValidator::validateForgotPassword($input);
+
+        if (!empty($result['errors'])) {
+            Response::json([
+                'success' => false,
+                'errors' => $result['errors']
+            ], 422);
+            return;
+        }
+
+        // Pedimos al servicio que genere el token
+        $resetResult = $this->authService->forgotPassword($result['data']['correo']);
+
+        Response::json([
+            'success' => true,
+            'message' => 'Si el correo existe, se enviará un enlace para recuperar la contraseña',
+            'data' => $resetResult
+        ]);
+    }
+
+    public function resetPassword(): void
+    {
+        $input = Request::json();
+
+        // Validamos token y contraseña nueva
+        $result = AuthValidator::validateResetPassword($input);
+
+        if (!empty($result['errors'])) {
+            Response::json([
+                'success' => false,
+                'errors' => $result['errors']
+            ], 422);
+            return;
+        }
+
+        // Intentamos cambiar la contraseña
+        $ok = $this->authService->resetPassword(
+            $result['data']['token'],
+            $result['data']['password']
+        );
+
+        if (!$ok) {
+            Response::json([
+                'success' => false,
+                'message' => 'Token inválido o caducado'
+            ], 400);
+            return;
+        }
+
+        Response::json([
+            'success' => true,
+            'message' => 'Contraseña actualizada correctamente'
+        ]);
+    }
 }

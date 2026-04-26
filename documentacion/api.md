@@ -347,6 +347,82 @@ No necesita body.
 
 ---
 
+### POST /api/auth/forgot-password
+
+Permite solicitar la recuperación de contraseña mediante correo electrónico.
+
+El usuario introduce su correo y el sistema genera un token temporal de recuperación, almacenándolo en la base de datos.
+
+Actualmente, en entorno de desarrollo, el token y enlace de recuperación se devuelven en la respuesta JSON para facilitar pruebas.  
+
+En entorno real, este enlace debería enviarse por correo electrónico.
+
+**Privada:** No
+
+### Body
+
+```json
+{
+  "correo": "usuario@email.com"
+}
+```
+
+**Respuesta típica**
+```json
+{
+  "success": true,
+  "message": "Solicitud procesada correctamente",
+  "data": {
+    "reset_url": "http://localhost/reset-password?token=abc123...",
+    "token": "abc123..."
+  }
+}
+
+```
+**Notas**
+- No se indica si el correo existe o no por motivos de seguridad.
+- El token tiene caducidad temporal.
+- El token solo puede usarse una vez.
+
+
+### POST /api/auth/reset-password
+
+Permite establecer una nueva contraseña usando un token de recuperación válido.
+
+**Privada:** No
+
+### Body
+
+```json
+{
+  "token": "abc123...",
+  "password": "Nueva123",
+  "password_confirm": "Nueva123"
+}
+```
+
+**Respuesta típica**
+
+```json
+{
+  "success": true,
+  "message": "Contraseña actualizada correctamente"
+}
+```
+**Error típico**
+```json
+{
+  "success": false,
+  "message": "Token inválido o caducado"
+}
+
+```
+**Notas**
+- Una vez usada la recuperación, el token queda invalidado.
+- Si el token ha expirado, será necesario solicitar uno nuevo.
+
+---
+
 ## 8.2 Zona privada del usuario autenticado
 
 ### GET /api/me/perfil
@@ -357,7 +433,7 @@ Devuelve el perfil privado completo del usuario autenticado.
 
 **Éxito**
 
-```json
+```json 
 {
   "success": true,
   "data": {
@@ -1763,6 +1839,8 @@ Activa o desactiva un usuario.
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 - `POST /api/auth/logout`
+- `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
 
 ### Zona privada
 - `GET /api/me/perfil`

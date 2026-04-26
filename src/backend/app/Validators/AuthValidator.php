@@ -53,4 +53,58 @@ class AuthValidator
             ]
         ];
     }
+
+    public static function validateForgotPassword(array $data): array
+    {
+        $errors = [];
+
+        // Recogemos el correo enviado por JSON
+        $correo = isset($data['correo']) ? trim((string) $data['correo']) : '';
+
+        if ($correo === '') {
+            $errors[] = 'correo es obligatorio';
+        } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'correo no válido';
+        }
+
+        return [
+            'errors' => $errors,
+            'data' => [
+                'correo' => $correo
+            ]
+        ];
+    }
+
+    public static function validateResetPassword(array $data): array
+    {
+        $errors = [];
+
+        $token = isset($data['token']) ? trim((string) $data['token']) : '';
+        $password = isset($data['password']) ? (string) $data['password'] : '';
+        $passwordConfirm = isset($data['password_confirm']) ? (string) $data['password_confirm'] : '';
+
+        if ($token === '') {
+            $errors[] = 'token es obligatorio';
+        }
+
+        if ($password === '') {
+            $errors[] = 'password es obligatoria';
+        } elseif (strlen($password) < 6) {
+            $errors[] = 'password debe tener al menos 6 caracteres';
+        }
+
+        if ($passwordConfirm === '') {
+            $errors[] = 'password_confirm es obligatoria';
+        } elseif ($password !== $passwordConfirm) {
+            $errors[] = 'password y password_confirm no coinciden';
+        }
+
+        return [
+            'errors' => $errors,
+            'data' => [
+                'token' => $token,
+                'password' => $password
+            ]
+        ];
+    }
 }

@@ -66,14 +66,14 @@ export const heroSectionCSS = `
         text-align: center;
     }
 
-    h1 {
-        font-size: 3rem;
-        font-weight: 800;
+    .hero-content h1 {
+        font-size: 5rem;
+        font-weight: 900;
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Sombra para dar legibilidad */
         margin-bottom: 10px;
     }
 
-    h2 {
+    . hero-content h2 {
         font-size: 1.2rem;
         font-weight: 400;
         max-width: 600px;
@@ -91,5 +91,64 @@ export const heroSectionCSS = `
     a {
         text-decoration: none;
         font-weight: bold;
+    }
+
+
+    /* --------Tablets y móviles--------- */
+    @media (max-width: 768px) {
+        .hero {
+            height: 70vh;
+        }
+
+        .hero-content {
+            padding: 2rem;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+        }
+
+        .hero-content h2 {
+            font-size: 1rem;
+            max-width: 90%;
+        }
+
+        .hero-buttons {
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero {
+            height: 65vh;
+        }
+
+        .hero-content {
+            padding: 1.5rem;
+        }
+
+        .hero-content h1 {
+            font-size: 2.2rem;
+            line-height: 1.1;
+        }
+
+        .hero-content h2 {
+            font-size: 0.95rem;
+            max-width: 100%;
+            padding: 0 10px;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .hero-buttons a,
+        .hero-buttons button {
+            width: 90%;
+        }
     }
 `;

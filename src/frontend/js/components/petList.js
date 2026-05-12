@@ -11,7 +11,7 @@ const template = createTemplate(petListHTML, petListCSS);
 export class PetList extends HTMLElement {
     constructor() {
         super();
-        this._pets = [];
+        this._pets = null;
     }
 
     // Usamos un setter para pasarle las mascotas
@@ -20,36 +20,33 @@ export class PetList extends HTMLElement {
         this.render();
     }
 
-    setError(error) {
-        this._pets = null; // Limpiamos mascotas para que no choquen visualmente
-        this.render();
-        showHttpError(error, this);
-    }
-
     connectedCallback() {
-        this.render();
+        if (this._pets && this._pets.length > 0) {
+            this.render();
+        }
     }
 
     render() {
         this.innerHTML = '';
         this.appendChild(template.content.cloneNode(true));
 
-        const grid = this.querySelector('#grid');
+        const grid = this.querySelector('#grid-container');
         const emptyMsg = this.querySelector('#empty-msg');
         const httpCat = this.querySelector('http-cat');
 
         // Si hay algún error en la llamada en la API, se utiliza http-cats
         if (this._pets === null) {
-            grid.style.display = 'none';
-            emptyMsg.style.display = 'none';
+            if (grid) grid.style.display = 'none';
+            if (emptyMsg) emptyMsg.style.display = 'none';
+            if (httpCat) httpCat.style.display = 'block';
             return;
         }
-
-        // Si la llamada a la API es exitosa pero no hay mascotas
-        if (this._pets.length === 0) {
-            grid.style.display = 'none';
-            emptyMsg.style.display = 'block';
-            httpCat.style.display = 'none';
+        const items = Array.isArray(this._pets) ? this._pets : []; 
+        // Si no hay mascotas, mostramos el mensaje de "No encontrado"
+        if (!this._pets || this._pets.length === 0) {
+            if (grid) grid.style.display = 'none';
+            if (emptyMsg) emptyMsg.style.display = 'block';
+            if (httpCat) httpCat.style.display = 'none';
             return;
         }
 
@@ -58,9 +55,10 @@ export class PetList extends HTMLElement {
         emptyMsg.style.display = 'none';
         httpCat.style.display = 'none';
 
-        this._pets.forEach(petData => {
+        items.forEach(petData => {
             const card = document.createElement('pet-card');
             card.petData = petData; 
+            grid.appendChild(card);
             
             // Evento para editar
             card.addEventListener('edit-pet', (e) => {
@@ -71,8 +69,12 @@ export class PetList extends HTMLElement {
                 }));
             });
 
-            grid.appendChild(card);
+            
         });
+    }
+
+    getGrid() {
+        return this.querySelector('#grid-container');
     }
 }
 

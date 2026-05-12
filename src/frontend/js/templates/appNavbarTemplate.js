@@ -10,7 +10,7 @@ export const navBarHTML = `
 
             <div class="nav-btn" id="desktop-btn">
                 <button class="button-secondary" id="btn-auth"></button>
-                <button class="button-primary" id="btn-publicar"> Publicar anuncio </button>
+                <button class="button-primary" id="btn-publicar"> PUBLICAR ANUNCIO </button>
             </div>
 
             <!-- Botón hamburguesa -->
@@ -20,13 +20,14 @@ export const navBarHTML = `
         </div>
         <nav class="navbar" id="navbar">
             <a href="index.html">Inicio</a>
-            <a href="Tablon.html">Tablón de anuncios</a>
-            <a href="FinalesFelices.html">Finales felices</a>
-            <a href="FaQ.html">FaQ</a>
+            <a href="tablon.html">Tablón de anuncios</a>
+            <a href="felices.html">Finales felices</a>
+            <a href="faq.html">FaQ</a>
+            <a href="soporte.html">Contacto</a>
 
             <div class="nav-btn" id="mobile-btn">
                 <button class="button-secondary" id="mobile-btn-auth"></button>
-                <button class="button-primary" id="mobile-btn-publicar"> Publicar anuncio </button>
+                <button class="button-primary" id="mobile-btn-publicar"> PUBLICAR ANUNCIO </button>
             </div>
         </nav>
     </div> 
@@ -64,22 +65,40 @@ export const navBarCSS = `
             .logo-img {
                 height: 40px;
                 width: auto;
+                transition: all 0.2s ease;
             }
 
             .logo-text {
                 font-size: var(--text-lg);
                 font-weight: 800;
+                transition: all 0.2s ease;
             }
 
             .text-black { color: black }
-            .text-orange { color: var(--primary) }
+            .text-orange { 
+                color: var(--primary);
+                transition: all 0.2s ease;
+            }
+
+            .logo:hover .logo-img {
+                transform: rotate(15deg);
+            }
+
+            .logo:hover .logo-text {
+                color: var(--secondary);
+                font-size: 1.3rem;
+            }
+
+            .logo:hover .text-orange {
+                color: var(--secondary);
+            }
 
         .nav-btn {
             display:flex;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
-
+            
         .hamburger-btn {
             display: none;
             background: none;
@@ -106,15 +125,41 @@ export const navBarCSS = `
                 text-decoration: none;
                 font-weight: 600;
                 color: black;
+                transition: all 0.2s ease;
             }
 
-            .navbar a:hover {
+            .navbar a:hover:not(.active) {
                 color: var(--secondary500);
+                transform: translateX(-2px) translateY(-2px);
+            }
+
+            .navbar a.active {
+                color: var(--primary);
+                font-weight: bold;
+                border-bottom: 2px solid var(--primary);
+                transition: all 0.2s ease;
+            }
+
+            .navbar a.active:hover {
+                color: var(--secondary500);
+                transform: translateX(-2px) translateY(-2px);
+                border-bottom: 2px solid var(--secondary);
             }
 
             #mobile-btn {
                 display: none;
             }
+
+
+        .badge {
+            background: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            position: absolute;
+            top: 0;
+        }
 
     /* -------- Tablet y móvil -------- */
     @media (max-width: 768px) {
@@ -179,7 +224,7 @@ export const navBarCSS = `
         .hamburger-btn {
             display: block;
             position: absolute;
-            transform: translate(-10px, -7px);
+            transform: translate(0px, 5px);
         }
     }      
 `;

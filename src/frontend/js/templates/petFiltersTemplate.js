@@ -9,43 +9,47 @@ export const petFiltersHTML = `
             </div>
 
             <div class="filter-group">
-                <div>            
-                    <label>Situación</label>
+                <div id="situacion-div">            
+                    <label for="situacion-select">Situación</label>
                     <select id="situacion-select"></select>
                 </div>
 
                 <div>
-                    <label>Especie</label>
+                    <label for="especie-select">Especie</label>
                     <select id="especie-select"></select>
                 </div>
 
                 <div>
-                    <label>Provincia</label>
+                    <label for="prov-select">Provincia</label>
                     <select id="prov-select"></select>
                 </div>
 
                 <div>
-                    <label>Municipio</label>
+                    <label for="mun-select">Municipio</label>
                     <select id="mun-select"></select>
                 </div>
 
                 <div class="filter-dates">
                     <div class="date-group">
-                        <label id="date-from-label">Desde</label>
+                        <label for="date-from" id="date-from-label">Desde</label>
                         <input type="date" id="date-from">
                     </div>
 
                     <div class="date-group">
-                        <label id="date-to-label">Hasta</label>
+                        <label for="date-to" id="date-to-label">Hasta</label>
                         <input type="date" id="date-to">
                     </div>
                 </div>
             </div>
 
             <div class="filter-buttons">
+                <button class="button-secondary" id="btn-reset-main">Limpiar filtros</button>
                 <button class="button-secondary" id="btn-more">Más filtros</button>
                 <button class="button-primary" id="btn-apply-main">Aplicar filtros</button>
             </div>       
+        </div>
+        <div class="results-counter">
+            <p>Se han encontrado <span id="pet-count">0</span> mascotas</p>
         </div>
 
 
@@ -101,12 +105,14 @@ export const petFiltersHTML = `
 `;
 
 export const petFiltersCSS = `
+    /* Panel principal*/
     .pet-filters-panel {
+        width: 100%;
+        align-self: center;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 100%;
         padding: 3rem;
         border-radius: var(--radius-md);
         box-shadow: var(--shadow-default);
@@ -137,6 +143,7 @@ export const petFiltersCSS = `
         display:flex;
         align-self: flex-end;
         gap: 10px;
+        margin-top: 10px;
     }
 
     .filter-dates {
@@ -202,6 +209,25 @@ export const petFiltersCSS = `
         align-self: center;
     }
 
+    /* Contador de resultados*/
+    .results-counter {
+        display: none;
+        margin: 2rem 0;
+        font-size: 1.1rem;
+    }
+
+    .is-visible {
+        display: block;
+    }
+
+    #pet-count {
+        font-weight: bold;
+        color: var(--primary);
+        background-color: white;
+        border-radius: 12px;
+    }
+
+
     /* --------Tablets y móviles--------- */
     @media (max-width: 768px) {
 
@@ -221,13 +247,17 @@ export const petFiltersCSS = `
         .filter-buttons {
             width: 100%;
             justify-content: center;
-            align-self: center;
+            align-content: center;
             flex-wrap: wrap;
             margin-top: 10px;
         }
 
         .filter-buttons button {
-            max-width: 150px;
+            max-width: 200px;
+        }
+
+        #btn-apply-main {
+            max-width: 410px;
         }
 
 
@@ -259,7 +289,7 @@ export const petFiltersCSS = `
         }
 
         .more-filter-group {
-            width: 100%;
+            width: 80%;
         }
 
         .more-filter-group > div > input,
@@ -288,6 +318,10 @@ export const petFiltersCSS = `
         }
 
         .filter-buttons button {
+            max-width: 200px;
+        }
+
+        #btn-apply-main {
             max-width: 200px;
         }
     }      

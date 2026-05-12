@@ -163,6 +163,15 @@ export class PetFilters extends HTMLElement {
         // Clonamos plantilla
         this.appendChild(template.content.cloneNode(true));
 
+        // Obtenemos elementos del HTML
+        const panel = this.querySelector('#more-pet-filters');
+        const bg = this.querySelector('#panel-bg');
+        const btnMore = this.querySelector('#btn-more');
+        const btnApplyMain = this.querySelector('#btn-apply-main');
+        const btnApplyMore = this.querySelector('#btn-apply-more');
+        const btnResetMain = this.querySelector('#btn-reset-main');
+        const btnReset = this.querySelector(`#btn-reset`);
+
         // Lógica para actualizar las opciones del select razas según la especie
         const especieSelect = this.querySelector('#especie-select');
         // Cada vez que cambie la especie, actualizamos las razas
@@ -181,14 +190,6 @@ export class PetFilters extends HTMLElement {
             await this.updateMunicipioOptions(provSeleccionada);
         }
     }
-
-        // Creamos variables del HTML
-        const panel = this.querySelector('#more-pet-filters');
-        const bg = this.querySelector('#panel-bg');
-        const btnMore = this.querySelector('#btn-more');
-        const btnApplyMain = this.querySelector('#btn-apply-main');
-        const btnApplyMore = this.querySelector('#btn-apply-more');
-        const btnReset = this.querySelector(`#btn-reset`);
 
 
         // Lógica para abrir/cerrar el panel de más filtros
@@ -234,17 +235,28 @@ export class PetFilters extends HTMLElement {
             }));
         };
 
+        // Lógica para los botones de reset
+        const resetFilters = () => {
+            // Seleccionamos todos los selects e inputs
+            const selects = this.querySelectorAll('select');
+            const inputs = this.querySelectorAll('input');
+
+            // Limpiamos visualmente
+            selects.forEach(s => s.value = "");
+            inputs.forEach(i => i.value = "");
+
+            console.log("Filtros reseteados visualmente");
+
+            // Aplicamos filtros
+            dispatchFilter();
+        };
+
         // Aplicamos la lógica a los botones
         btnApplyMain.onclick = dispatchFilter;
         btnApplyMore.onclick = dispatchFilter;
+        btnResetMain.onclick = resetFilters;
+        btnReset.onclick = resetFilters;
 
-        // Lógica para el botón reset
-        if (btnReset) {
-            btnReset.onclick = () => {
-                this.querySelectorAll('select').forEach(s => s.value = "");
-                this.querySelectorAll('input').forEach(i => i.value = "");
-            };
-        }
     }        
 }
 

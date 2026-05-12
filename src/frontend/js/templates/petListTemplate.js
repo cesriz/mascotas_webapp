@@ -1,25 +1,23 @@
 export const petListHTML = `
-    <div class="pet-list">
-        <http-cat style="display: none;"></http-cat>
+    <http-cat style="display: none;"></http-cat>
 
-        <div class="grid-container" id="grid"></div>
+    <div id="grid-container"></div>
 
-        <div id="empty-msg" class="empty-state">
-            <p>No se encontraron mascotas en esta categoría.</p>
-        </div>
+    <div id="empty-msg" class="empty-state">
+        <p>No se encontraron mascotas en esta categoría.</p>
     </div>
 `;
 
 export const petListCSS = `
-    .pet-list{
-        display: block;
+    :host{
         width: 100%;
     }
-    .grid-container {
+    
+    #grid-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
         gap: 2rem;
-        padding: 1rem;
+        width: 100%;
     }
 
     .empty-state {
@@ -28,5 +26,34 @@ export const petListCSS = `
         color: #666;
         display: none;
     }
-      
+
+/* --------Tablets y móviles--------- */
+    @media (max-width: 768px) {
+        #grid-container {
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .empty-state {
+            padding: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+
+        :host {
+            padding: 0.5rem;
+            box-sizing: border-box;
+        }
+
+        #grid-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .empty-state {
+            padding: 1.5rem;
+            font-size: 0.95rem;
+        }
+    }
 `;

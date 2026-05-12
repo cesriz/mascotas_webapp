@@ -65,18 +65,44 @@ export class AppNavbar extends HTMLElement {
                     btn.classList.toggle("active");
                 });
             });
-    }}
 
+        // Declarada abajo
+        this.updateActiveLinks();
+    }
+}
     // Función para cambiar el contenido y la funcionalidad de un botón según autenticación de usuario
     setupAuthButton(btn, isLoggedIn) {
         if (!btn) return;                
-            btn.textContent = isLoggedIn ? 'Mi Perfil' : 'Iniciar sesión';
+            btn.textContent = isLoggedIn ? 'MI PERFIL' : 'INICIAR SESIÓN';
 
             btn.onclick = () => {
                 window.location.href = isLoggedIn ? 'Usuario.html' : 'Auth.html';
             };
         }
+    
+    // Función para marcar el link según la vista activa
+    updateActiveLinks() {
+        // Obtenemos la ruta actual (ej: "/Tablon.html")
+        // Usamos decodeURI por si hay caracteres especiales y eliminamos barras iniciales
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+
+        // Buscamos todos los enlaces dentro del componente
+        const links = this.querySelectorAll('nav.navbar a');
+
+        links.forEach(link => {
+            // Obtenemos solo el nombre del archivo del atributo href
+            const linkPath = link.getAttribute('href').split('/').pop();
+
+            // Comparamos y añadimos/quitamos la clase
+            if (linkPath === currentPath) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    }
 }
+
 
 
 customElements.define('app-navbar', AppNavbar);

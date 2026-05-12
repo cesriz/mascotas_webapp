@@ -1,4 +1,7 @@
-//Configuración de peticiones HTTP al backend
+/**
+ * api.js configura las peticiones HTTP al backend
+ */
+
 const BASE_URL = 'http://localhost:3000'; // Cambia esto por tu URL real
 
 
@@ -64,6 +67,17 @@ export const API = {
         return this.call('/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) }); 
     },
 
+    // Recuperar contraseña con email
+    forgotPassword(email) { 
+        return this.call('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify( { correo: email } ) }); 
+    },
+
+    // Restablecer contraseña con token de recuperación
+    resetPassword(data) {
+        return this.call('/api/auth/reset-password', { method: 'POST', body: JSON.stringify(data)
+    });
+},
+
     // Ver listado de usuarios
     getUsuarios() { 
         return this.call('/api/usuarios', { headers: this.getHeaders() }); 
@@ -121,7 +135,7 @@ export const API = {
 
     // Ver notificaciones
     getNotificaciones() { 
-        return this.call('api/me/notificaciones', { headers: this.getHeaders() }); 
+        return this.call('/api/me/notificaciones', { headers: this.getHeaders() }); 
     },
     
     // Marcar notificaciones como leídas
@@ -137,6 +151,7 @@ export const API = {
 // Zona pública de mascotas
     // Listar mascotas publicadas
     getMascotas(filtros = "") { 
+        const query = (filtros && !filtros.startsWith('?')) ? `?${filtros}` : filtros;
         return this.call(`/api/mascotas${filtros}`); 
     },
 
@@ -210,6 +225,23 @@ export const API = {
         });
     },
 
+    // Enviar un mensaje de reporte sobre un anuncio de mascota
+    crearReporte(idMascota, data) {
+        return this.call(`/api/mascotas/${idMascota}/reportes`, { 
+            method: 'POST', 
+            headers: this.getHeaders(), 
+            body: JSON.stringify(data) 
+        });
+    },
+
+    // Enviar un mensaje de soporte 
+    crearSoporte(idUsuario, data) {
+        return this.call(`/api/mascotas/${idUsuario}/soporte`, { 
+            method: 'POST', 
+            headers: this.getHeaders(), 
+            body: JSON.stringify(data) 
+        });
+    },
 
 // Catálogos
     // Listar colores disponibles
@@ -245,6 +277,24 @@ export const API = {
     },
 
 // Administración y configuración
+    // Listar los anuncios de mascotas para moderación
+    getAdminAnuncios() {
+        return this.call('/api/admin/anuncios', { headers: this.getHeaders() });
+    },
+
+    // Actualizar el estado de un anuncio de mascota (publicado u oculto)
+    updateAnuncioEstado(id, data) {
+        return this.call(`/api/admin/anuncios/${id}/estado`, {
+            method: 'PATCH',
+            headers: this.getHeaders(),
+            body: JSON.stringify(data)
+        });
+    },
+
+    // Eliminar un anuncio
+    deleteAnuncio(id) { 
+        return this.call(`/api/admin/anuncios/${id}`, { method: 'DELETE', headers: this.getHeaders() }); 
+    },
 
     // Listar reportes de mascotas (problemas, contenido inapropiado, etc.)
     getAdminReportes() {
@@ -299,19 +349,3 @@ export const API = {
         return this.call('/api/config', { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(data) }); 
     },
 };
-
-// Función para gestión de errores con http-cats
-async function handleApiResponse(response) {
-    const data = await response.json();
-
-    if (!response.ok || data.success === false) {
-        return {
-            ok: false,
-            status: response.status,
-            message: data.message,
-            errors: data.errors
-        };
-    }
-
-    return { ok: true, data };
-}

@@ -7,7 +7,7 @@ import { createTemplate } from "../ui-utils.js";
 import { petDetailsHTML, petDetailsCSS } from "../templates/petDetailsTemplate.js";
 
 // Importamos plantilla (HTML y CSS)
-const template = createTemplate(petDetailsCSS);
+const template = createTemplate(petDetailsHTML, petDetailsCSS);
 
 
 export class PetDetail extends HTMLElement {
@@ -38,7 +38,7 @@ export class PetDetail extends HTMLElement {
         if (httpCat) httpCat.style.display = 'none';
 
         try {
-            // Utilizamos el método getMascotaById(id) de tu archivo api.js
+            // Utilizamos el método getMascotaById(id) de api.js
             console.log('fetch');
             this.petData = await API.getMascotaById(id);
             this.render();
@@ -54,8 +54,8 @@ export class PetDetail extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
 
         // Imágenes
-            const carrousel = this.querySelector('#carousel');
-            const dotsContainer = this.querySelector('#carousel-dots');
+            const carrousel = this.querySelector('#carrousel');
+            const dotsContainer = this.querySelector('#carrousel-dots');
             const photos = this.petData.fotos || [];
 
             if (photos.length > 0) {
@@ -81,36 +81,67 @@ export class PetDetail extends HTMLElement {
                 this.querySelector('#prev-btn').classList.add('hidden');
                 this.querySelector('#next-btn').classList.add('hidden');
             }
-    
+            
+        // Datos del evento
+        // Fecha - mostramos una fecha u otra según el estado de la mascota
+            const eventDateMap = {
+                PERDIDA: this.petData.fecha_perdida,
+                ENCONTRADA: this.petData.fecha_encontrada
+            };
+            const eventDate = this.petData.recuperada === 'RECUPERADA' ? this.petData.fecha_recuperada : eventDateMap[this.petData.estado] || '';
+            
+            // Formateamos fecha a DD/MM/YYYY
+            const eventDateFormatted = eventDate ? new Date(eventDate).toLocaleDateString('es-ES') : 'No disponible';
+            
+            this.querySelector('#pet-det-date').textContent = `Fecha del suceso: ${eventDateFormatted}`;
+
+        // Dirección
+            this.querySelector('#pet-det-loc').textContent = `Lugar del suceso: ${this.petData.direccion_formateada}`
+        
+        // Recompensa.
+            const reward = this.querySelector('.pet-det-reward-div');
+
+            if (reward && this.petData.recompensa !== null && this.petData.recompensa > 0) {
+                reward.style.display = 'flex';
+            } else if (reward) {
+                reward.style.display = 'none';
+            }
+
         // Descripción y nombre
             this.querySelector('#pet-det-description').textContent = `${this.petData.descripcion}`;
-            this.querySelector('#pet-name').textContent = `Datos de ${this.petData.nombre}`;
+            this.querySelector('#pet-name').textContent = `Características de ${this.petData.nombre}`;
 
         // Lista de detalles
             const list = this.querySelector('#pet-det-list');
             list.innerHTML = '';
 
-            // Función rápida para poner la primera letra de una palabra en mayúscula y resto minúscula
+            // Ponemos primera letra de cada palabra en mayúscula y resto minúscula
             const formatText = (str) => {
                 if (!str) return 'Desconocido';
+                return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
             };
-
+            
             // Colores
-            const colores = this.petData.colores;
+            const colors = this.petData.colores;
 
-            const coloresFormateados = colores.map(
+            const formatColors = colors.map(
                 col => col.nombre).join(', ');
 
-            const info = [
-                `<strong>Estado:</strong> ${this.petData.estado}`,
-                `<strong>Raza:</strong> ${this.petData.raza_nombre || 'Desconocida'}`,
-                `<strong>Sexo:</strong> ${(this.petData.sexo || '').toLowerCase()}`,
-                `<strong>Tamaño:</strong> ${(this.petData.tamano || '').toLowerCase()}`,
-                `<strong>Colores:</strong> ${coloresFormateados || 'No especificados'}`,
-                `<strong>Chip:</strong> ${(this.petData.tiene_chip ? 'Sí' : 'No').toLowerCase()}`,
-                `<strong>Vista por última vez:</strong> ${this.petData.municipio}, ${this.petData.provincia}`            
-            ];
+            // Edad - la calculamos según el año de nacimiento
+            const birthDate = this.petData.fecha_nacimiento;
+            const age = birthDate ? `${new Date().getFullYear() - new Date(birthDate).getFullYear()} años` : 'Desconocida';
 
+            // Resto de datos
+            const info = [
+                `<strong>Especie:</strong> ${this.petData.especie_nombre || 'Desconocida'}`,
+                `<strong>Raza:</strong> ${this.petData.raza_nombre || 'Desconocida'}`,
+                `<strong>Sexo:</strong> ${(this.petData.sexo || '').toLowerCase() || 'Desconocido'}`,
+                `<strong>Edad:</strong> ${age}`,
+                `<strong>Tamaño:</strong> ${(this.petData.tamano || '').toLowerCase() || 'Desconocido'} `,
+                `<strong>Peso:</strong> ${(this.petData.peso || '') || 'Desconocido'} `,
+                `<strong>Colores:</strong> ${formatColors || 'No especificados'}`,
+                `<strong>Chip:</strong> ${(this.petData.tiene_chip ? 'Sí' : 'No').toLowerCase() || 'Desconocido '}`          
+            ];
             
                 info.forEach(item => {
                 const li = document.createElement('li');
@@ -131,7 +162,7 @@ export class PetDetail extends HTMLElement {
         if (index >= photos.length) index = 0;
 
         this.currentIndex = index;
-        const carrousel = this.querySelector('#carousel');
+        const carrousel = this.querySelector('#carrousel');
         const dots = this.querySelectorAll('.dot');
 
         // Desplazamos el track horizontalmente
@@ -173,22 +204,31 @@ export class PetDetail extends HTMLElement {
             };
         };
 
-/*PENDIENTE IMPLEMENTAR QR  
-  const QRBtn = this.querySelector('#btn-qr');
-        const QR = this.querySelector('#qr');
-        QRBtn.addEventListener('click', () => {
-            if (this.petData && this.petData.id) {
-                QR.open(this.petData.id);
-            }
-        });
-*/
+        /*PENDIENTE IMPLEMENTAR QR  
+        const QRBtn = this.querySelector('#btn-qr');
+                const QR = this.querySelector('#qr');
+                QRBtn.addEventListener('click', () => {
+                    if (this.petData && this.petData.id) {
+                        QR.open(this.petData.id);
+                    }
+                });
+        */
 
+        // Botón reportar
+        const reporteBtn = this.querySelector('#btn-report');
+        const reportForm = this.querySelector('#report-modal');
 
+        if (reporteBtn && reportForm) {
+            reporteBtn.onclick = () => {
+                console.log("Click en botón de reporte");
+                reportForm.open(this.petData.id);
+            };
+        };
 
-//PENDIENTE IMPLEMENTAR BOTONES RRSS
+        //PENDIENTE IMPLEMENTAR BOTONES RRSS
   
     }
 
 }
 
-customElements.define('pet-detail-section', PetDetail);
+customElements.define('pet-details', PetDetail);

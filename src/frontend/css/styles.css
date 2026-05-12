@@ -35,6 +35,7 @@
     --radius-sm: 30px;
     --radius-md: 50px;
     --radius-lg: 70px;
+    --radius-xl: 100px;
 }    
 
 
@@ -48,7 +49,7 @@
 body {
     font-family: "DM Sans", sans-serif;
     font-optical-sizing: auto;
-    font-size: var(--text-md);
+    font-size: 18px;
     color:black;
     margin: 0;
     background-color: var(--background);
@@ -56,6 +57,10 @@ body {
 
 }
 
+/* Clase para ocultar componentes */
+.hidden {
+    display: none !important;
+}
 
 /* Botones */
 .button-primary {
@@ -69,23 +74,67 @@ body {
     box-shadow: var(--shadow-button);
     background-color: var(--primary);
     color: white;
-    font-size: var(--text-sm);
+    font-size: var(--text-md);
+    font-weight: 550;
 
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     }
 
 .button-primary:hover {
     background-color: var(--secondary);
     border-color: var(--secondary500);
+    transform: translateX(-2px) translateY(-2px);
 }
 
 .button-success {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-style: solid;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-button);
+    font-size: var(--text-md);
+    background-color: inherit;
+    border-color: var(--success);
+    color: var(--success);
+    font-size: var(--text-md);
+    font-weight: 550;
+
+    cursor: pointer;
+    transition: all 0.2s ease;}
+
+.button-success:hover {
     background-color: var(--success);
+    color: white;
+    border-color: var(--success);
+    transform: translateX(-2px) translateY(-2px);
 }
 
 .button-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-style: solid;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-button);
+    font-size: var(--text-md);
+    background-color: inherit;
+    border-color: var(--danger);
+    color: var(--danger);
+    font-size: var(--text-md);
+    font-weight: 550;   
+    
+    cursor: pointer;
+    transition: all 0.2s ease;}
+
+.button-danger:hover {
     background-color: var(--danger);
+    color: white;
+    border-color: var(--danger);
+    transform: translateX(-2px) translateY(-2px);
 }
 
 .button-secondary {
@@ -100,14 +149,15 @@ body {
     box-shadow: var(--shadow-button);
     background-color: inherit;
     color: var(--primary);
-    font-size: var(--text-sm);
-
-    transition: background-color 0.2s ease;
+    font-size: var(--text-md);
+    font-weight: 550;
+    transition: all 0.2s ease;
     cursor: pointer;
     }
 
 .button-secondary:hover {
     background-color: var(--primary);
+    transform: translateX(-2px) translateY(-2px);
     color: white
 }
 
@@ -223,8 +273,34 @@ label + input,select {
     background: rgba(0,0,0,0.5);
     z-index: 999;
 }
-    
-/* Tablets y móviles */
+
+/* Contenedores de vistas completas */
+.dashboard-wrapper {
+    padding:0 3rem;
+}
+
+/* Títulos del contenedor principal*/
+.dashboard-wrapper-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--primary);
+    text-align: center;
+    padding: 3rem;
+}
+
+/* pet-list de tablon.html */
+#all-pets {
+    width: 100%;
+    padding: 2rem 3rem;
+}
+
+/* pet-list de tablon.html */
+#found-pets {
+    width: 100%;
+    padding: 2rem 3rem;
+}
+
+/* -------- Tablet y móvil -------- */
 @media (max-width: 768px) {
     :root {
         --text-xs: 0.7rem;
@@ -253,6 +329,22 @@ label + input,select {
 
     label {
         margin-left: 5px;
+    }
+
+    /* Contenedores de vistas completas */
+    .dashboard-wrapper {
+        padding:0 2rem;
+    }
+
+    /* Títulos del contenedor principal*/
+    .dashboard-wrapper-title {
+        font-size: 2rem;
+        padding: 2rem;
+    }
+
+    /* pet-list de tablon.html */
+    #all-pets {
+        padding: 0;
     }
 }
 

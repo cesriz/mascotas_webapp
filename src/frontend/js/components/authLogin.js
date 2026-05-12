@@ -146,35 +146,23 @@ export class AuthLogin extends HTMLElement {
             }
         });
 
-    }
-}
-
- /**       // Recuperar contraseña
+    // Recuperar contraseña
         const forgotForm = this.querySelector('#forgot-pss');
         forgotForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = this.querySelector('#forgot-correo').value;
-            
+
             try {
+                const data = await API.forgotPassword(email);
 
-
- * 
- * 
- * 
- * FALTA UN ENDPOINT PARA LA CONTRASEÑA
- * 
- * 
- * 
- * 
-
-                await API.call.//
-                
-                this.showMessage("Si el email existe, recibirás instrucciones pronto.", "success");
+                showSuccess("Se ha procesado la solicitud. Revisa tu correo electrónico.")
             } catch (error) {
-                this.handleError(error);
+                showHttpError(error, this);
             }
         });
     }
-} */
+}
+       
+
 
 customElements.define('auth-login', AuthLogin);

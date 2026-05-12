@@ -1,10 +1,25 @@
 export const petDetailsHTML = `
     <div class="pet-det-container">
         <div class="pet-det-images">
-            <button class="carousel-btn btn-prev" id="prev-btn">&#10094;</button>
-            <div class="carousel" id="carousel"></div>
-            <button class="carousel-btn btn-next" id="next-btn">&#10095;</button>
-            <div class="carousel-dots" id="carousel-dots"></div>
+            <button class="carrousel-btn btn-prev" id="prev-btn">&#10094;</button>
+            <div class="carrousel" id="carrousel"></div>
+            <button class="carrousel-btn btn-next" id="next-btn">&#10095;</button>
+            <div class="carrousel-dots" id="carrousel-dots"></div>
+        </div>
+
+        <div class="pet-det-event" id="pet-det-event">
+            <div>
+                <img src="../assets/icons/mdi--location.png" alt="Icono ubicación">
+                <h3 id="pet-det-loc"></h3>
+            </div>
+            <div>
+                <img src="../assets/icons/solar--calendar-linear.png" alt="Icono fecha">
+                <h3 id="pet-det-date"></h3>
+            </div>
+            <div class = "pet-det-reward-div">
+                <img src="../assets/icons/tabler--tax-euro.png" alt="Icono recompensa">
+                <h3 id="pet-det-reward">¡Ofrecemos recompensa!</h3>
+            </div>
         </div>
 
         <div class="pet-det-description" id="pet-det-description"></div>
@@ -18,7 +33,7 @@ export const petDetailsHTML = `
                 <img src="https://img.icons8.com/?size=100&id=16713&format=png&color=000000" alt="Whatsapp icon" id="whastapp">
                 <img src="https://img.icons8.com/?size=100&id=63306&format=png&color=000000" alt="Telegram icon" id="telegram">        </div>
         </div>
-
+        
         <div class="pet-det-data">
             <div class="pet-det-data-title">
                 <img src="../assets/icons/streamline-plump--pet-paw.png" alt="icon">
@@ -34,11 +49,13 @@ export const petDetailsHTML = `
                 <button class="button-primary" id="btn-contact">CONTACTAR</button>
                 <button class="button-primary" id="btn-avistamiento">REGISTRAR AVISTAMIENTO</button>
                 <button class="button-secondary" id="btn-qr">GENERAR QR</button>
+                <button class="button-secondary" id="btn-report">REPORTAR ANUNCIO</button>
             </div>
         </div>
 
         <pet-contact-form id="contact-modal"></pet-contact-form>
         <avistamiento-creation-form id="avistamiento-modal"></avistamiento-creation-form>
+        <report-form id="report-modal"></report-form>
     </div> 
 `;
 
@@ -50,7 +67,7 @@ export const petDetailsCSS = `
         .pet-det-container {
             display: grid;
             grid-template-columns: 1.2fr 0.9fr;
-            grid-template-rows: auto auto auto; 
+            grid-template-rows: auto auto auto auto; 
             gap: 30px;
             padding: 2rem;
             align-items: start;
@@ -86,20 +103,20 @@ export const petDetailsCSS = `
             align-items: center;
         }
 
-        .carousel {
+        .carrousel {
             display: flex;
             transition: transform 0.4s ease-in-out;
             width: 100%;
             height: 100%;
         }
 
-        .carousel img {
+        .carrousel img {
             min-width: 100%;
             height: 100%;
             object-fit: contain;
         }
 
-        .carousel-btn {
+        .carrousel-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
@@ -114,11 +131,11 @@ export const petDetailsCSS = `
             transition: background 0.3s;
         }
 
-        .carousel-btn:hover { background: rgba(0, 0, 0, 0.8); }
+        .carrousel-btn:hover { background: rgba(0, 0, 0, 0.8); }
         .btn-prev { left: 10px; }
         .btn-next { right: 10px; }
 
-        .carousel-dots {
+        .carrousel-dots {
             position: absolute;
             bottom: 10px;
             left: 50%;
@@ -137,13 +154,44 @@ export const petDetailsCSS = `
 
         .dot.active { background: white; }
 
-        /* Ocultar botones si solo hay una imagen */
-        .hidden { display: none; }
+        /* Detalles del anuncio */
+        .pet-det-event {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 2rem;
+            background-color: var(--backgroundblue);
+            border-radius: var(--radius-md);
+        }
+
+        .pet-det-event div {
+            display: flex;
+            gap: 5px;
+            justify-content: start;
+            align-items: center;
+        }
+
+        .pet-det-event img {
+            min-width: 18px;
+            max-width: 30px;
+            min-height: 18px;
+            max-height: 30px;
+        }
+
+        .pet-det-event h3{
+            font-weight: 500;
+        }
+
+        .pet-det-reward-div {
+            display: none;
+        }
 
         /* Descripción */
         .pet-det-description {
             grid-column: 1;
-            grid-row: 2;
+            grid-row: 3;
             padding: 2rem;
             background-color: var(--backgroundblue);
             border-radius: var(--radius-md);
@@ -153,7 +201,7 @@ export const petDetailsCSS = `
         /* Div de redes sociales */
         .social-media {
             grid-column: 1;
-            grid-row: 3;
+            grid-row: 4;
             padding: 2rem;
             display: flex; 
             flex-direction: column;
@@ -215,10 +263,15 @@ export const petDetailsCSS = `
 
         .pet-det-data {
             grid-column: 1;
-            grid-row: auto; /* MODIFICADO: flujo natural */
+            grid-row: auto;
         }
 
         .pet-det-images {
+            grid-column: 1;
+            grid-row: auto;
+        }
+
+        .pet-det-event {
             grid-column: 1;
             grid-row: auto;
         }
@@ -231,7 +284,7 @@ export const petDetailsCSS = `
 
         .social-media {
             grid-column: 1;
-            grid-row: 4;
+            grid-row: 5;
             padding: 1.5rem;
         }
     }
@@ -257,7 +310,7 @@ export const petDetailsCSS = `
             padding: 0.8rem;
         }
 
-        .carousel-btn {
+        .carrousel-btn {
             padding: 10px 8px;
             font-size: 1.2rem;
         }

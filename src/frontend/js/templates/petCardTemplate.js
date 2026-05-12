@@ -47,13 +47,15 @@ export const petCardCSS = `
         gap: 10px;
         padding: 20px 10px;
         width: 100%;
-        max-width: 300px;
-        margin: 0 auto; 
+        box-sizing: border-box;
+        min-width: 300px;
+        max-width: 350px;
+        margin: 0;
         cursor: pointer;
     }
 
     /* Imagen de la mascota */
-    .pet-card > img:first-child {
+    #card-pet-img {
         width: 95%;
         height: auto;
         max-height: 200px;
@@ -68,6 +70,7 @@ export const petCardCSS = `
         font-size: var(--text-lg);
         align-items: center;
         color: black;
+        margin-top: 10px;
     }
 
     #card-pet-name {
@@ -88,6 +91,7 @@ export const petCardCSS = `
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: none;
         }
 
         .pet-card-info img {
@@ -97,7 +101,8 @@ export const petCardCSS = `
 
         .pet-card-info p {
             margin: 0;
-            font-size: var(--text-sm);
+            font-size: var(--text-md);
+            word-break: break-word;
         }
 
     /* Overlay con degradado - Menú */
@@ -146,13 +151,17 @@ export const petCardCSS = `
 
     /* Badges */
     .badge {
-        padding: 5px 15px;
-        border-style: solid black;
+        padding: 5px 20px;
         border-radius: var(--radius-xs);
         box-shadow: var(--shadow-button);
-        font-size: var(--text-xs);
+        font-size: var(--text-sm);
         color: white;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+        font-weight: bold;
         text-transform: uppercase;
+        position: absolute;
+        top: 200px;
+        z-index: 5;
     }
 
     .badge-perdido { background-color: var(--danger); }
@@ -164,19 +173,22 @@ export const petCardCSS = `
 
         .pet-card {
             max-width: 100%;
-            padding: 20px;
+            padding: 18px;
         }
 
-        .pet-card > img:first-child {
-            max-height: 200px;
+        #card-pet-img {
+            max-height: 180px;
         }
 
-        .pet-card-info {
-            width: 80%;
+
+        .badge {
+            font-size: var(--text-xs);
+            padding: 5px 14px;
+            top: 180px;
         }
 
-        .pet-card-info > div {
-            justify-content: flex-start;
+        .card-overlay button {
+            width: 100%;
         }
     }
 
@@ -185,24 +197,22 @@ export const petCardCSS = `
         .pet-card {
             padding: 12px;
             gap: 8px;
+            max-width: 100%;
         }
 
-        .pet-card > img:first-child {
-            max-height: 150px; /*
+        #card-pet-img {
+            max-height: 150px;
         }
 
         .pet-card h3,
         #card-pet-name {
-            font-size: var(--text-md);
+            line-height: 1.2;
         }
 
-        .pet-card-info p {
-            font-size: var(--text-xs);
-        }
-
-        .pet-card-info img {
-            width: 16px;
-            height: 16px;
+        .badge {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            top: 150px;
         }
 
         .card-overlay {
@@ -210,8 +220,9 @@ export const petCardCSS = `
         }
 
         .card-overlay button {
-            font-size: var(--text-sm);
-            padding: 8px;
+            width: 100%;
+            font-size: var(--text-xs);
+            padding: 10px;
         }
-    }     
+    } 
 `;

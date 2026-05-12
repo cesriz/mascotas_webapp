@@ -1,8 +1,8 @@
 import { Auth } from '../auth.js'; // Importante para la lógica de dueño
 import { API } from '../api.js';
-
 import { createTemplate } from "../ui-utils.js";
 import { petCardHTML, petCardCSS } from "../templates/petCardTemplate.js";
+import { showSuccess, showHttpError } from "../main.js";
 
 // Importamos plantilla (HTML y CSS)
 const template = createTemplate(petCardHTML, petCardCSS);
@@ -20,8 +20,6 @@ export class PetCard extends HTMLElement {
     }
 
     connectedCallback() {
-        this.style.display = 'block';
-        
         if (this._petData) {
             this.render();
         }
@@ -34,40 +32,44 @@ export class PetCard extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
 
         const pet = this._petData;
-
         const card = this.querySelector('.pet-card');
+        const overlay = this.querySelector('.card-overlay');
 
-        // Datos de la mascota
+        // Lógica del usuario - overlay
+        // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
+        const currentUser = Auth.getUserData(); 
+        const isOwner = currentUser && currentUser.id === pet.usuario_id;
+
+        // Datos básicos de la mascota
         this.querySelector('#card-pet-img').alt = `Foto de ${pet.nombre}`;
         this.querySelector('#card-pet-raza').textContent = pet.raza_nombre || 'Desconocida';
         this.querySelector('#card-pet-loc').textContent = `${pet.municipio}, ${pet.provincia}`;
         this.querySelector('#card-pet-date').textContent = pet.fecha_evento ? new Date(pet.fecha_evento).toLocaleDateString() : 'Fecha no disponible';
 
-        // Lógica del usuario - overlay
-        // Obtenemos los datos del usuario logueado desde Auth
-        const currentUser = Auth.getUserData(); 
-        const isOwner = currentUser && currentUser.id === pet.usuario_id;
-        const overlay = this.querySelector('.card-overlay');
-        const btnVer = this.querySelector('#btn-ver');
-        const btnEdit = this.querySelector('#btn-edit');
-        const btnRecuperar = this.querySelector('#btn-recuperar');
-        const btnDelete = this.querySelector('#btn-delete');
-
         // Si el usuario es el dueño, mostramos el overlay y sus botones
         if (isOwner) {
             card.classList.add('is-owner');
 
+            // Botones
+            const btnVer = this.querySelector('#btn-ver');
+            const btnEdit = this.querySelector('#btn-edit');
+            const btnRecuperar = this.querySelector('#btn-recuperar');
+            const btnDelete = this.querySelector('#btn-delete');
+
             // Lógica de botones
-            btnVer.onclick = (e) => {
+            // Ver detalles
+            this.onclick = (e) => {
                 e.stopPropagation();
                 window.location.href = `detalles.html?id=${pet.id}`
             };
 
+            // Editar
             btnEdit.onclick = (e) => {
                 e.stopPropagation();
                 window.location.href = `editar.html?id=${pet.id}`;
             };
 
+            // Borrar
             btnDelete.onclick = async (e) => {
                 e.stopPropagation();
                 if (!confirm('¿Borrar anuncio?')) return;
@@ -83,6 +85,7 @@ export class PetCard extends HTMLElement {
                 }
             };
 
+            // Marcar como recuperada
             btnRecuperar.onclick = async (e) => {
                 e.stopPropagation();
                 try {
@@ -117,8 +120,8 @@ export class PetCard extends HTMLElement {
         this.applyTitle(pet);
     }
 
-    // Función para mostrar la fotografía
-    // Obtiene tanto fotos en local como procedentes de Cloudinary
+        // Función para mostrar la fotografía
+        // Obtiene tanto fotos en local como procedentes de Cloudinary
         applyPhoto() {
             const BASE_URL = 'http://localhost:3000'; // Servidor local
 
@@ -139,7 +142,7 @@ export class PetCard extends HTMLElement {
                     }
                 }
 
-            // Buscar la imagen y asignarle la URL
+            // Buscamos la imagen y asignamos la URL
             const imgElement = this.querySelector('#card-pet-img');
             if (imgElement) {
                 imgElement.src = finalUrl;

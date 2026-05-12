@@ -1,0 +1,210 @@
+#how-it-works {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: var(--secondary);
+    padding: 2rem;
+
+}
+
+#how-it-title {
+    font-size: 3rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#how-it-cards {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.how-step {
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    text-align: center;
+}
+
+.how-img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+    transition: transform 0.4s ease;
+}
+
+.how-img:hover {
+    animation: shake 0.6s ease-in-out;
+}
+
+@keyframes shake {
+    0%   { transform: rotate(0deg); }
+    25%  { transform: rotate(10deg); }
+    50%  { transform: rotate(-10deg); }
+    75%  { transform: rotate(8deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.how-number {
+    border-radius: var(--radius-lg);
+    background-color: var(--primary);
+    width: clamp(40px, 5vw, 50px);
+    height: clamp(40px, 5vw, 50px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--shadow-sharp);
+    text-align: center;
+}
+
+.how-number h2 {
+    font-size: var(--text-xl);
+}
+
+.how-step h3 {
+    color: var(--primary);
+    font-size: var(--text-xl);
+    text-shadow: 2px 2px 5px rgb(94, 94, 94);
+}
+
+#recent-pets {
+    text-align: center;
+    padding: 3rem;
+    display:flex;
+    flex-direction: column;
+    gap: 3rem;
+    font-size: var(--text-xl);
+}
+
+#happy-ed {
+    width: 100%;
+    min-height: 600px;
+    height: auto;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 30px;
+    padding: 3rem;
+}
+
+#happy-ed video {
+    max-width: 800px;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sharp);
+}
+
+#happy-ed-tx {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 1rem;
+    text-align: center;
+}
+
+#happy-ed-tx h1 {
+    color: var(--secondary);
+    font-size: 4rem;
+    font-weight: 900;
+}
+
+#happy-ed-tx button {
+    width: 50%;
+    margin-top: 20px;
+    transition: transform 0.2s ease;
+
+}
+
+#happy-ed-tx button:hover {  
+    transform: translateX(-2px) translateY(-2px);
+}
+
+
+/* -------- Tablet y móvil -------- */
+@media (max-width: 768px) {
+    #how-it-title {
+        font-size: 2.2rem;
+    }
+
+    #how-it-cards {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    .how-step {
+        max-width: 45%;
+    }
+
+    #happy-ed {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+    }
+
+    #happy-ed video {
+        max-width: 100%;
+    }
+
+    #happy-ed-tx h1 {
+        font-size: 3rem;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+    #how-it-title {
+        font-size: 1.8rem;
+    }
+
+    #how-it-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .how-step {
+        max-width: 90%;
+    }
+
+    .how-img {
+        max-width: 160px;
+    }
+
+    #recent-pets {
+        padding: 2rem;
+        font-size: var(--text-lg);
+        gap: 2rem;
+    }
+
+    #happy-ed {
+        padding: 1.5rem;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    #happy-ed-tx h1 {
+        font-size: 2.2rem;
+        text-align: center;
+    }
+
+    #happy-ed-tx button {
+        width: 80%;
+    }
+
+    #happy-ed video {
+        width: 100%;
+    }
+}

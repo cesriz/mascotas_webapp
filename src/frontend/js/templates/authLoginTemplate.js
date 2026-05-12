@@ -3,8 +3,8 @@ export const authLoginHTML = `
     <div id="http-cat"></div>
     <div id="login-div">
         <div class="auth-buttons-section">
-            <div class="init-btn-div"><button id="init-btn">Iniciar sesión</button></div>
-            <div class="register-btn-div"><button id="register-btn">Registrarse</button></div>
+            <div class="init-btn-div"><button id="init-btn">INICIAR SESIÓN</button></div>
+            <div class="register-btn-div"><button id="register-btn">REGISTRARSE</button></div>
         </div>
 
         <div class="pet-auth-section" id="init-div">
@@ -60,10 +60,7 @@ export const authLoginHTML = `
                 <label for="forgot-correo">Email</label>
                 <input type="text" id="forgot-correo">
 
-                <label for="forgot-pass">Contraseña</label>
-                <input type="text" id="forgot-pass">
-
-                <div class="auth-form-buttons">
+                <div class="auth-form-buttons"> 
                     <button class="button-primary auth-btn" type="submit">ENVIAR CONTRASEÑA NUEVA</button>
                 </div>
             </form>
@@ -120,7 +117,8 @@ export const authLoginCSS = `
         border: none;
         padding: 1.5rem;
         background-color: inherit;
-        font-weight: 600;
+        font-size: var(--text-md);
+        font-weight: 550;
         text-align: center;
         cursor: pointer;
     }
@@ -162,6 +160,7 @@ export const authLoginCSS = `
     #changer {
         border: none;
         width: fit-content;
+        font-size: var(--text-md);
     }
 
     #changer:hover {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/index.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,18 +13,69 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     
-    <title>Mascotas webAPP</title>
+    <title>MascotasPerdidas web</title>
 </head>
 <body>
-    <main class="container">
-        <app-navbar></app-navbar>
-        <hero-section></hero-section>
-        <pet-filters></pet-filters>
-        <pet-list></pet-list> 
-        <pet-map id="mapa-mascota"></pet-map>
+    <app-navbar></app-navbar>
 
-        <app-footer></app-footer>
-    </main>
+    <div>
+
+        <hero-section></hero-section>
+
+        <section id="how-it-works">
+            <h2 id="how-it-title">CÓMO FUNCIONA</h2>
+
+            <div id="how-it-cards">
+                <div class="how-step">
+                    <img src="../assets/Gemini_Generated_Image_gtywh5gtywh5gtyw.png" alt="Perro tecleando en un ordenador" class="how-img">
+                    <div class="how-number">
+                        <h2>1</h2>
+                    </div>
+                    <h3>Crea tu anuncio</h3>
+                    <p>Regístrate y rellena el formulario con los datos clave de la mascota.</p>
+                </div>
+
+                <div class="how-step">
+                    <img src="../assets/Gemini_Generated_Image_4jbn714jbn714jbnrecor.png" alt="Gaviota gritando" class="how-img">
+                    <div class="how-number">
+                        <h2>2</h2>
+                    </div>
+                    <h3>Activa las alertas</h3>
+                    <p>El anuncio aparecerá en nuestro tablón público de forma inmediata.</p>
+                </div>
+
+                <div class="how-step">
+                    <img src="../assets/Gemini_Generated_Image_r23ucnr23ucnr23u.png" alt="Gato con un teléfono" class="how-img">
+                    <div class="how-number">
+                        <h2>3</h2>
+                    </div>
+                    <h3>Recibe avisos</h3>
+                    <p>Los usuarios podrán enviarte mensajes directamente a través de nuestro formulario de contacto.</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="recent-pets">
+            <h2>ANUNCIOS RECIENTES</h2>
+            <pet-list></pet-list>
+        </div>
+
+        <section id="happy-ed">
+            <video autoplay muted loop>
+                <source src="../assets/video-dog.mp4" type="video/mp4">
+            </video>
+            <div id="happy-ed-tx">
+                <h1 id="how-it-title">FINALES FELICES</h1>
+                <h3>No son solo mascotas, son parte de nuestra historia</h3>
+                <h3>¡Bienvenidos a casa!</h3>
+                <button class="button-primary">VER MÁS</button>
+            </div>
+        </section>
+
+        
+    </div>
+
+    <app-footer></app-footer>
     
     <script type="module" src="js/main.js"></script>
 </body>

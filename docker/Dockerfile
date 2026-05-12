@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+# Instala composer para gestionar librerías de php
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # Instala las extensiones necesarias para trabajar con PDO y MySQL
 RUN docker-php-ext-install pdo pdo_mysql
 

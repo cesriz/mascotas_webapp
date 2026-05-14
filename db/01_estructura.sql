@@ -89,7 +89,14 @@ CREATE TABLE IF NOT EXISTS ubicaciones (
     descripcion TEXT NULL,
     codigo_postal VARCHAR(10) NULL,
     latitud DECIMAL(10,7) NULL,
-    longitud DECIMAL(10,7) NULL
+    longitud DECIMAL(10,7) NULL,
+
+    CONSTRAINT chk_ubicaciones_latitud
+        CHECK (latitud IS NULL OR latitud BETWEEN -90 AND 90),
+
+    CONSTRAINT chk_ubicaciones_longitud
+        CHECK (longitud IS NULL OR longitud BETWEEN -180 AND 180)
+
 ) ENGINE=InnoDB;
 
 -- =========================================
@@ -132,7 +139,20 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
         FOREIGN KEY (ubicaciones_perdida_id)
         REFERENCES ubicaciones(id)
         ON DELETE RESTRICT
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    
+    CONSTRAINT chk_anuncio_peso
+        CHECK (peso IS NULL OR peso >= 0),
+
+    CONSTRAINT chk_anuncio_recompensa
+        CHECK (recompensa IS NULL OR recompensa >= 0),
+    
+    CONSTRAINT chk_anuncio_fecha_estado
+        CHECK (
+            (estado = 'PERDIDA' AND fecha_perdida IS NOT NULL AND fecha_encontrada IS NULL AND fecha_recuperada IS NULL) OR
+            (estado = 'ENCONTRADA' AND fecha_perdida IS NULL AND fecha_encontrada IS NOT NULL AND fecha_recuperada IS NULL) OR
+            (estado = 'RECUPERADA' AND fecha_perdida IS NULL AND fecha_encontrada IS NULL AND fecha_recuperada IS NOT NULL)
+        )
 ) ENGINE=InnoDB;
 
 -- =========================================

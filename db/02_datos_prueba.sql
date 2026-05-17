@@ -211,7 +211,7 @@ INSERT INTO anuncio_mascotas (
 (
     2,
     'Nala',
-    3,
+    5,
     'HEMBRA',
     TRUE,
     'PEQUENO',

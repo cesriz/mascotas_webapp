@@ -16,10 +16,6 @@ export const reportFormHTML = `
                     <input type="text" id="report-subject" required>
                 </div>
                 <div>            
-                    <label for="report-reason">Motivo</label>
-                    <input type="text" id="report-reason" required>
-                </div>
-                <div>            
                     <label for="report-msg">Mensaje</label>
                     <textarea id="report-msg" placeholder="Escribe aquí tu mensaje..." required></textarea>
                 </div>

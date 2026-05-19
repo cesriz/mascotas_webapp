@@ -301,7 +301,6 @@ CREATE TABLE IF NOT EXISTS reportes_anuncios (
     usuario_propietario_id INT UNSIGNED NOT NULL,
 
     asunto VARCHAR(150) NOT NULL,
-    motivo VARCHAR(100) NOT NULL,
     mensaje TEXT NOT NULL,
 
     nombre VARCHAR(100) NOT NULL,

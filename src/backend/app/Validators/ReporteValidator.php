@@ -12,10 +12,6 @@ class ReporteValidator
             $errors[] = 'asunto es obligatorio';
         }
 
-        if (empty($data['motivo'])) {
-            $errors[] = 'motivo es obligatorio';
-        }
-
         if (empty($data['mensaje'])) {
             $errors[] = 'mensaje es obligatorio';
         }
@@ -42,7 +38,6 @@ class ReporteValidator
             'data' => [
                 'usuario_reportante_id' => $data['usuario_reportante_id'] ?? null,
                 'asunto' => trim((string) $data['asunto']),
-                'motivo' => trim((string) $data['motivo']),
                 'mensaje' => trim((string) $data['mensaje']),
                 'nombre' => trim((string) $data['nombre']),
                 'correo' => trim((string) $data['correo']),

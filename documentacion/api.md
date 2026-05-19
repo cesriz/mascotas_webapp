@@ -1336,7 +1336,6 @@ Crea un reporte sobre un anuncio.
 ```json
 {
   "asunto": "Anuncio sospechoso",
-  "motivo": "fraude",
   "mensaje": "No parece una publicación real",
   "nombre": "Ana",
   "correo": "ana@email.com",
@@ -1346,7 +1345,6 @@ Crea un reporte sobre un anuncio.
 
 **Reglas de validación**
 - `asunto` obligatoria
-- `motivo` obligatoria
 - `mensaje` obligatoria
 - `nombre` obligatoria
 - `correo` obligatoria y válida

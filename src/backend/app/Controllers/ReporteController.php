@@ -87,7 +87,6 @@ class ReporteController
                 'usuario_reportante_id' => $data['usuario_reportante_id'],
                 'usuario_propietario_id' => (int) $mascota['usuario_id'],
                 'asunto' => $data['asunto'],
-                'motivo' => $data['motivo'],
                 'mensaje' => $data['mensaje'],
                 'nombre' => $data['nombre'],
                 'correo' => $data['correo'],

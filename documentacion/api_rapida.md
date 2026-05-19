@@ -534,7 +534,6 @@ Y además puede mandar:
 ```json
 {
   "asunto": "Anuncio sospechoso",
-  "motivo": "fraude",
   "mensaje": "El contenido no parece real",
   "nombre": "Ana",
   "correo": "ana@email.com",

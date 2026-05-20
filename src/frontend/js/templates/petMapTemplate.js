@@ -69,9 +69,16 @@ export const petMapCSS = `
         flex-direction: column;
         align-items: start;
 
+        gap: 0p;
+
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+
+        transition: max-height 0.3s ease, opacity 0.3s ease;
     }
 
-        .map-popup-contact div {
+        .map-popup-contact p {
             display: flex;
             align-items: center;
             gap: 5px;
@@ -80,6 +87,11 @@ export const petMapCSS = `
         .map-popup-contact img {
             width: 18px;
             height: 18px;
+        }
+        
+        .map-popup-contact.open {
+            max-height: 100px;
+            opacity: 1;
         }
 
     /* -------- Tablet y móvil -------- */

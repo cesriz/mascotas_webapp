@@ -33,12 +33,6 @@ export class PetCard extends HTMLElement {
 
         const pet = this._petData;
         const card = this.querySelector('.pet-card');
-        const overlay = this.querySelector('.card-overlay');
-
-        // Lógica del usuario - overlay
-        // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
-        const currentUser = Auth.getUserData(); 
-        const isOwner = currentUser && currentUser.id === pet.usuario_id;
 
         // Datos básicos de la mascota
         this.querySelector('#card-pet-img').alt = `Foto de ${pet.nombre}`;
@@ -46,73 +40,86 @@ export class PetCard extends HTMLElement {
         this.querySelector('#card-pet-loc').textContent = `${pet.municipio}, ${pet.provincia}`;
         this.querySelector('#card-pet-date').textContent = pet.fecha_evento ? new Date(pet.fecha_evento).toLocaleDateString() : 'Fecha no disponible';
 
-        // Si el usuario es el dueño, mostramos el overlay y sus botones
+        // Lógica para los botones de acción
+        const actions = this.querySelector('.pet-card-actions');
+        
+        // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
+        const currentUser = Auth.getUserData(); 
+        const isOwner = currentUser && currentUser.id === pet.usuario_id;
+
         if (isOwner) {
             card.classList.add('is-owner');
 
             // Botones
-            const btnVer = this.querySelector('#btn-ver');
             const btnEdit = this.querySelector('#btn-edit');
-            const btnRecuperar = this.querySelector('#btn-recuperar');
+            const btnRecover = this.querySelector('#btn-recover');
             const btnDelete = this.querySelector('#btn-delete');
 
-            // Lógica de botones
-            // Ver detalles
-            this.onclick = (e) => {
-                e.stopPropagation();
-                window.location.href = `detalles.html?id=${pet.id}`
-            };
-
-            // Editar
+            // Editar anuncio de mascota
             btnEdit.onclick = (e) => {
                 e.stopPropagation();
-                window.location.href = `editar.html?id=${pet.id}`;
+                if (btnEdit) {
+                    const petId = this._petData.id;
+                    console.log (petId);
+                    if (petId) {
+                        window.location.href = 'perfil?panel=publicar&editar=' + petId;
+                    } else 
+                        window.location.href = 'index.html';
+                }
             };
 
-            // Borrar
+            // Borrar anuncio de mascota
             btnDelete.onclick = async (e) => {
                 e.stopPropagation();
-                if (!confirm('¿Borrar anuncio?')) return;
+                if (!confirm('¿Estás seguro de que quieres borrar este anuncio? Esta acción no se puede deshacer')) return;
 
                 try {
+                    console.log(pet.id);
                     await API.deleteMascota(pet.id);
 
                     showSuccess('Anuncio eliminado correctamente');
+                    console.log('Borrado con éxito');
                     this.remove();
 
+                    window.location.reload();
                 } catch (error) {
+                    console.log(error);
                     showHttpError(error, this);
                 }
             };
 
             // Marcar como recuperada
-            btnRecuperar.onclick = async (e) => {
+            btnRecover.onclick = async (e) => {
                 e.stopPropagation();
                 try {
                     await API.marcarRecuperada(pet.id);
 
-                    showSuccess('Mascota marcada como recuperada');
-
-                    window.location.reload();
-
+window.location.reload();
                 } catch (error) {
-                    showHttpError(error);
+                   console.log(error);
                 }
             };
 
             // Si ya está recuperada, ocultamos el botón de "¡Recuperada!".
             if (pet.estado?.toLowerCase() === 'recuperada') {
-                btnRecuperar.style.display = 'none';
+                btnRecover.style.display = 'none';
             }
 
         } else {
-            // Si no, toda la tarjeta es un link que redirecciona a pet-detail
-            card.addEventListener('click', () => {
-                window.location.href = `detalles.html?id=${pet.id}`;
-            });
-
-            overlay.remove();
+            // Si no es el dueño, eliminamos el elemento del DOM por seguridad
+            actions.remove(); 
         }
+
+
+        // Ver detalles de mascota: toda la tarjeta es un link que redirecciona a pet-detail
+        card.addEventListener('click', () => {
+            const id = this._petData.id;
+            if (id) {
+                window.location.href = `detalles?id=${id}`;
+            } else {
+                console.error("Error: La mascota no tiene ID", this._petData);
+            }
+        });
 
         // Aplicamos funciones para mostrar la foto, el badge y el titulo
         this.applyPhoto();
@@ -167,6 +174,7 @@ export class PetCard extends HTMLElement {
             if (est === 'recuperada') badge.classList.add('badge-recuperado');
             badgeText.textContent = est.toUpperCase();
         }
+
 
         // Función para mostrar el título del anuncio de forma dinámica según el estado
         applyTitle(pet) {

@@ -96,11 +96,12 @@ export const API = {
 // Zona privada de usuario
     // Cerrar sesión
     logout() { 
-        return this.call('/auth/logout', { method: 'POST', headers: this.getHeaders() }); 
+        return this.call('/api/auth/logout', { method: 'POST', headers: this.getHeaders() }); 
     },
 
     // Ver qué usuario está logueado
-    getMe() { return this.call('/auth/me', { headers: this.getHeaders() }); 
+    getMe() { 
+        return this.call('/api/auth/me', { headers: this.getHeaders() }); 
     },
 
     // Obtener los datos de perfil del usuario
@@ -192,7 +193,7 @@ export const API = {
 
     // Marcar mascota como recuperada
     marcarRecuperada(id) { 
-        return this.call(`api/mascotas/${id}/recuperar`, { method: 'PATCH', headers: this.getHeaders() }); 
+        return this.call(`/api/mascotas/${id}/recuperar`, { method: 'PATCH', headers: this.getHeaders() }); 
     },
 
     // Eliminar mascota

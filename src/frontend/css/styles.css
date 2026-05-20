@@ -4,7 +4,7 @@
     --inputbackground: white;
     --backgroundorange: #FFF1E8;
     --backgroundblue: #E5EFF4;
-    --primary: #FFA362;
+    --primary: #ffa86a;
     --primary300: #FFCDAA;
     --secondary: #90C3DE;
     --secondary500: #5FB5E2;
@@ -274,18 +274,53 @@ label + input,select {
     z-index: 999;
 }
 
-/* Contenedores de vistas completas */
+/* Autocompletado de los inputs de ubicaciones (Nominatim) */
+.loc-autocomplete {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--inputbackground);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    border: 1px solid #e0e0e0;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    /* Ocultar barra de desplazamiento */
+    -ms-overflow-style: none; /* IE y Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Ocultar barra de desplazamiento para Chrome, Safari y Opera */
+.loc-autocomplete::-webkit-scrollbar {
+    display: none;
+}
+
+.autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    
+}
+.autocomplete-item:hover { background-color: var(--backgroundorange) }
+
+
+
+/* ---------- Estilos de vistas completas----------- */
 .dashboard-wrapper {
     padding:0 3rem;
 }
 
-/* Títulos del contenedor principal*/
+/* Títulos del contenedor principal */
 .dashboard-wrapper-title {
     font-size: 3rem;
     font-weight: 900;
     color: var(--primary);
     text-align: center;
-    padding: 3rem;
+    padding: 2rem;
 }
 
 /* pet-list de tablon.html */
@@ -294,11 +329,42 @@ label + input,select {
     padding: 2rem 3rem;
 }
 
-/* pet-list de tablon.html */
-#found-pets {
+/* pet-list de felices.html */
+#recovered-pets {
     width: 100%;
     padding: 2rem 3rem;
 }
+
+#av-title {
+    text-align: center;
+    padding: 2.5rem;
+}
+
+/* panel de usuario */
+.dashboard-wrapper-aside {
+    display: flex;
+    height: 100%;
+}
+
+#main-content {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: inherit;
+    padding-left: 2rem;
+    padding-top: 1rem;
+}
+
+    /* Efecto de transición */
+    #main-content > * {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
 /* -------- Tablet y móvil -------- */
 @media (max-width: 768px) {
@@ -345,6 +411,11 @@ label + input,select {
     /* pet-list de tablon.html */
     #all-pets {
         padding: 0;
+    }
+
+    /* panel de usuario */
+    .dashboard-wrapper-aside {
+        flex-direction: column;
     }
 }
 

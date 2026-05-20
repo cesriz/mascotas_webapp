@@ -2,7 +2,7 @@ export const reportFormHTML = `
     <div class="panel-overlay" id="panel-overlay"></div>
     <div class="report-form">
         <div class="report-title">
-            <img src="../assets/icons/material-symbols--report-outline.png">
+            <img src="../assets/icons/mingcute--alert-line.svg">
             <h3>Reportar anuncio</h3>
         </div>
 

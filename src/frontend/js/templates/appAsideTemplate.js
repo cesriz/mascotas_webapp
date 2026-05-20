@@ -1,52 +1,50 @@
 export const appAsideHTML = `
-    <aside id="aside-admin">
+    <aside id="aside">
         <button class="aside-btn" id="aside-btn">
-            <img src="../assets/icons/material-symbols--arrow-back-2-outline.png" alt="Botón para esconder aside">
+            <img src="../assets/icons/material-symbols--arrow-back-2-outline.svg" alt="Botón para esconder aside">
         </button>
+            <div class="aside-links">
+                <div class="aside-title">
+                    <h3>ÁREA PERSONAL</h3>
+                </div>
+                <a class="aside-a" data-panel="mascotas"><img src="../assets/icons/streamline-plump--pet-paw-black.svg"> Mis mascotas</a>
+                <a class="aside-a" data-panel="avistamientos"><img src="../assets/icons/iconamoon--eye-black.svg"> Mis avistamientos</a>
+                <a class="aside-a" data-panel="notificaciones"><img src="../assets/icons/mi--notification-black.svg"> Notificaciones</a>
+                <a class="aside-a" data-panel="miperfil"><img src="../assets/icons/mdi--user-outline-black.svg"> Mi perfil</a>
+                <a class="aside-a" data-panel="publicar"><img src="../assets/icons/mingcute--announcement-line.svg"> PUBLICAR ANUNCIO</a>
+            </div>
 
-        <div class="aside-title" id="aside-title">
-            <img src="../assets/icons/lsicon--setting-outline.png" alt="Icono panel-control">
-            <h3>Panel de control</h3>
-        </div>
+            <div class="aside-links" id="admin-links">
+                <div class="aside-title">
+                    <h3>PANEL DE CONTROL</h3>
+                </div>
+                <a class="aside-a" data-panel="admin-anuncios"><img src="../assets/icons/iconoir--post-black.svg" alt="Icono anuncios"> Moderación de anuncios</a>
+                <a class="aside-a" data-panel="admin-usuarios"><img src="../assets/icons/cuida--users-outline-black.svg" alt="Icono usuarios"> Gestión de usuarios</a>
+                <a class="aside-a" data-panel="admin-reportes"><img src="../assets/icons/mingcute--alert-line-black.svg" alt="Icono reportes"> Reportes</a>
+                <a class="aside-a" data-panel="admin-soporte"><img src="../assets/icons/material-symbols--help-outline-black.svg" alt="Icono soporte"> Soporte</a>
+            </div>
 
-        <div class="aside-links" id="aside-links"></div>
-
-        <button class="button-primary" id="aside-action-btn"></button>
+            <a class="aside-a" data-panel="logout" id="a-logout"><img src="../assets/icons/humbleicons--logout.svg" alt="Icono anuncios">CERRAR SESIÓN</a>
     </aside>
 `;
 
 export const appAsideCSS = `
-
-    /* Contenedor */
-    aside {
+        
+    /* Contenedor principal*/
+    #aside {
         background-color: var(--backgroundblue);
-        max-width: 500px;
-        min-width: 200px;
+        width: 350px;
         height: 100%;
-        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         box-shadow: var(--shadow-sharp);
-        padding: 1rem;
-
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        gap: 30px;
-    }
-
-    /* Título */
-    .aside-title {
-        display: flex;
-        justify-content: start;
-        align-items: center;
-        gap: 5px;
-        width: 70%;
-        font-size: var(--text-xl);
-    }
-
-    .aside-title img {
-        width: 30px;
-        height: 30px;
+        gap: 1rem;
+        padding: 2rem;
+        border-radius: 0 0 var(--radius-md) 0;
+        overflow: hidden;
+        transition: width 0.3s ease, padding 0.3s ease;
     }
 
     /* Botón */
@@ -58,6 +56,8 @@ export const appAsideCSS = `
         border: none;
         width: 42px;
         height: 42px;
+        align-self: start;
+        margin-left: 1rem;
 
         cursor: pointer;
 
@@ -76,106 +76,139 @@ export const appAsideCSS = `
         box-shadow: var(--shadow-button);
     }
 
+    /* Títulos*/
+    .aside-title {
+        width: 100%;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 5px;
+        font-size: var(--text-md);
+        padding: 1rem
+    }
+
     /* Links */
     .aside-links {
-        width: 70%;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: start;
-        gap: 10px;
+        gap:0.5rem;
+        border-bottom: 1px solid var(--secondary500);
+        padding-bottom: 1rem;
     }
 
-    a {
-        color: var(--primary);
-        font-size: var(--text-lg);
+    .aside-a img {
+        width: 20px;
+    }
+
+    .aside-a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 1rem;
+        width: 90%;
+        margin-left: 1rem;
+        font-size: var(--text-2md);
         text-decoration: none;
         text-wrap: wrap;
+        border-radius: var(--radius-sm);
+        cursor:pointer;
+        transition: all 0.2s ease;
     }
 
-    a:hover {
-        font-weight: 700;
+    .aside-a:hover {
         cursor: pointer;
+        background-color: var(--backgroundorange);
     }
 
-    a.active {
-        color: var(--secondary);
-        cursor: pointer;
+    .aside-a-active {
+        font-weight: 600;
+        background-color: var(--backgroundorange);
     }
+
 
     /* Clase para colapsar el aside */
     .aside-collapsed {
-        min-width: 60px !important;
-        width: 60px !important;
+        width: 120px !important;
     }
 
     /* Ocultar elementos cuando está colapsado */
-    .aside-collapsed .aside-admin-title,
+    .aside-collapsed .aside-links,
+    .aside-collapsed .aside-title,
     .aside-collapsed .aside-links a,
-    .aside-collapsed #aside-action-btn {
+    .aside-collapsed #a-logout{
         display: none !important;
+        border-bottom: none;
     }
 
     /* Ajuste del botón para que se centre al colapsar */
     .aside-collapsed .aside-btn {
-        margin-right: 0;
+        
     }
+
 
     /* --------Tablets y móviles--------- */
     @media (max-width: 768px) {
+        #aside {
+            width: 100%;
+            max-width: 100%;
+            min-width: 100%;
+            height: auto;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-radius: 0;
+        }
+
+        .aside-a {
+            font-size: var(--text-md);
+            padding: 0.8rem;
+            width: 100%;
+            margin-left: 0;
+        }
+
         .aside-title {
-            font-size: var(--text-lg);
-            gap: 8px;
+            font-size: var(--text-md);
+            padding: 0.5rem 0;
         }
 
-          .aside-title img {
-             width: 26px;
-             height: 26px;
-        }
-
-        a {
-            font-size: var(--text-lg);
+        .aside-btn {
+            order: -1;
+            margin-left: 0;
+            align-self: center;
         }
     }
 
     @media (max-width: 480px) {
-        aside {
+
+        #aside {
             width: 100%;
-            max-height: fit-content;
+            height: auto;
+            flex-direction: column;
             padding: 1rem;
-            gap: 20px;
+            gap: 1rem;
             border-radius: 0;
-        }
-        .aside-title {
-            width: 100%;
-            justify-content: center;
-            text-align: center;
-            font-size: var(--text-md);
-            gap: 6px;
-        }
-
-        .aside-title img {
-            width: 22px;
-            height: 22px;
-        }
-
-        .aside-btn {
-            width: 38px;
-            height: 38px;
-        }
-
-        .aside-btn img {
-            width: 16px;
-            height: 16px;
         }
 
         .aside-links {
-            justify-content: center;
-            align-items: center;
+            width: 100%;
+            align-items: stretch;
         }
 
-        a {
+        .aside-title {
+            justify-content: center;
+            text-align: center;
             font-size: var(--text-md);
         }
+
+        .aside-a {
+            font-size: var(--text-md);
+            padding: 1rem;
+            width: 100%;
+            margin-left: 0;
+            justify-content: flex-start;
+        }
+
     }
 `;

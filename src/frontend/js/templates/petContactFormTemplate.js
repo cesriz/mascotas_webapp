@@ -2,7 +2,7 @@ export const petContactFormHTML = `
     <div class="panel-overlay" id="panel-overlay"></div>
     <div class="pet-contact-form">
         <div class="pet-contact-title">
-            <img src="../assets/icons/material-symbols--mail-outline.png">
+            <img src="../assets/icons/material-symbols--mail-outline-rounded-orange.svg" alt="Icono email">
             <h3>Contacta</h3>
         </div>
 

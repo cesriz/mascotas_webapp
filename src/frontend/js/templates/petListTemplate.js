@@ -30,7 +30,7 @@ export const petListCSS = `
 /* --------Tablets y móviles--------- */
     @media (max-width: 768px) {
         #grid-container {
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 0.8rem;
         }
 

@@ -2,7 +2,7 @@ export const avisCreationFormHTML = `
     <div class="panel-overlay" id="a-panel-overlay"></div>
     <div class="avistamiento-creation">
         <div class="pet-contact-title">
-            <img src="../assets/icons/material-symbols--mail-outline.png">
+            <img src="../assets/icons/material-symbols--mail-outline-rounded-orange.svg" alt="Icono email">
             <h3>Registra un avistamiento</h3>
         </div>
 
@@ -22,11 +22,14 @@ export const avisCreationFormHTML = `
 
                 <div class="avistamiento-form-location">            
                     <label for="avistamiento-form-loc">¿Dónde has visto a la mascota por última vez?*</label>
-                    <input type="" id="avistamiento-form-loc" placeholder="Escribe una dirección">
-                    <button class="button-primary" type="button" id="avistamiento-search-btn">Buscar en mapa</button>
+                    <div style="position: relative;">
+                        <input type="text" id="avistamiento-form-loc" placeholder="Escribe una dirección" autocomplete="off">
+                        <div id="loc-autocomplete" class="loc-autocomplete"></div>
+                    </div>
+                    <button class="button-primary" type="button" id="avistamiento-search-btn">Buscar</button>
                 </div>
                 <div>
-                    <pet-map id="avistamiento-form-map"></pet-map>
+                    <pet-map id="avistamiento-form-map" mode="select"></pet-map>
                 </div>
                 <input type="hidden" name="latitud" id="lat-input" required>
                 <input type="hidden" name="longitud" id="lng-input" required>
@@ -46,7 +49,7 @@ export const avisCreationFormHTML = `
 
                 <label for="avistamiento-foto">Sube una foto</label>
                 <div class="foto-div">            
-                    <img src="../assets/icons/proicons--photo.png" alt="Subir foto" id="upload-icon">
+                    <img src="../assets/icons/proicons--photo.svg" alt="Icono subir foto" id="upload-icon">
                     <span id="file-name-label">Haz clic para seleccionar o arrastra una imagen</span>
                     <input type="file" id="avistamiento-foto" accept="image/*">
                     <img id="preview-img">
@@ -67,9 +70,8 @@ export const avisCreationFormHTML = `
 `;
 
 export const avisCreationFormCSS = `
-avistamiento-creation-form {
-    display: 
-        none; /* Oculto por defecto hasta que se active */
+    avistamiento-creation-form {
+        display: none; /* Oculto por defecto hasta que se active */
     }
 
     avistamiento-creation-form.is-visible {
@@ -101,9 +103,9 @@ avistamiento-creation-form {
         border: 2px solid var(--primary);
         border-radius: var(--radius-md);
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-
     }
-    
+
+    /* Título */
     .pet-contact-title {
         width: 100%;
         display: flex;
@@ -120,6 +122,7 @@ avistamiento-creation-form {
         height: 24px;
     }
 
+    /* Formulario */
     #avistamiento-form {
         display: flex;
         flex-direction: column;
@@ -128,6 +131,25 @@ avistamiento-creation-form {
         gap: 20px;
     }
 
+    /* Barra de desplazamiento del formulario */
+    #avistamiento-form::-webkit-scrollbar {
+        width: 5px; /* Barra muy fina */
+    }
+
+    #avistamiento-form::-webkit-scrollbar-track {
+        background: transparent; 
+    }
+
+    #avistamiento-form::-webkit-scrollbar-thumb {
+        background: rgba(83, 83, 83, 0.24);
+        border-radius: 10px;
+    }
+
+    #avistamiento-form::-webkit-scrollbar-thumb:hover {
+        background-color: var(--secondary);
+    }
+
+    /* Inputs del formulario */
     .pet-avistamiento-inputs {
         display: flex;
         flex-direction: column; 
@@ -154,6 +176,7 @@ avistamiento-creation-form {
         resize: vertical;
     }
 
+    /* Input para las fotos*/
     .foto-div {
         display: flex;
         flex-direction: column;
@@ -195,6 +218,7 @@ avistamiento-creation-form {
         border-radius: var(--radius-sm);
     }
 
+    /* Botones */
     .avistamiento-buttons {
         width: auto;
         display: flex;
@@ -219,6 +243,7 @@ avistamiento-creation-form {
         margin-top: 5px;
     }
 
+    /* Marcador de privacidad */
     .privacy-input {
         display: flex;
         margin-top: 10px;
@@ -241,6 +266,7 @@ avistamiento-creation-form {
         display: flex;
         gap: 10px;
     }
+
 
     /* --------Tablets y móviles--------- */
     @media (max-width: 600px) {

@@ -1,12 +1,5 @@
 export const petCardHTML = `
     <div class="pet-card">
-        <div class="card-overlay">
-            <button class="button-primary" id="btn-ver">Ver detalles</button>
-            <button class="button-primary" id="btn-edit">Editar anuncio</button>
-            <button class="button-primary button-success" id="btn-recuperar">¡Recuperada!</button>
-            <button class="button-primary button-danger" id="btn-delete">Eliminar</button>
-        </div>
-
         <img src="" id="card-pet-img" alt="">
 
         <div class="badge" id="pet-badge">
@@ -15,18 +8,26 @@ export const petCardHTML = `
 
         <div class="pet-card-title"></div>
 
-        <div class="pet-card-info">
-            <div>
-                <img src="../assets/icons/streamline-plump--pet-paw.png" alt="Icono raza">
-                <p id="card-pet-raza"></p>
+        <div class="pet-card-body">
+            <div class="pet-card-info">
+                <div class="info-item">
+                    <img src="../assets/icons/streamline-plump--pet-paw.svg" alt="Icono raza">
+                    <p id="card-pet-raza"></p>
+                </div>
+                <div class="info-item">
+                    <img src="../assets/icons/tdesign--location.svg" alt="Icono ubicación">
+                    <p id="card-pet-loc"></p>
+                </div>
+                <div class="info-item">
+                    <img src="../assets/icons/solar--calendar-linear.svg" alt="Icono fecha">
+                    <p id="card-pet-date"></p>
+                </div>
             </div>
-            <div>
-                <img src="../assets/icons/mdi--location.png" alt="Icono ubicación">
-                <p id="card-pet-loc"></p>
-            </div>
-            <div>
-                <img src="../assets/icons/solar--calendar-linear.png" alt="Icono fecha">
-                <p id="card-pet-date"></p>
+            
+            <div class="pet-card-actions">
+                <button class="button-secondary" id="btn-edit">Editar</button>
+                <button class="button-success" id="btn-recover">Recuperada</button>
+                <button class="button-danger" id="btn-delete">Eliminar</button>
             </div>
         </div>
     </div> 
@@ -34,37 +35,45 @@ export const petCardHTML = `
 
 export const petCardCSS = `
     .pet-card {
-        position: relative;
-        background-color: var(--inputbackground);
-        border-radius: var(--radius-sm);
         overflow: hidden;
-        box-shadow: var(--shadow-soft);
-        transition: box-shadow 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        padding: 20px 10px;
+        position: relative;
+
         width: 100%;
         box-sizing: border-box;
         min-width: 300px;
         max-width: 350px;
+        padding: 2rem 1rem 1rem 1rem;
         margin: 0;
+
+        background-color: var(--inputbackground);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-soft);
+        
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        
         cursor: pointer;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;;
     }
 
+    .pet-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-sharp)
+    }
+    
     /* Imagen de la mascota */
     #card-pet-img {
         width: 95%;
-        height: auto;
         max-height: 200px;
         border-radius: var(--radius-sm);
         object-fit: cover;
         transition: transform 0.3s ease;
     }
 
-    /* Contenido de la tarjeta (Nombres y Datos) */
+    /* Título de la tarjeta */
     .pet-card h3 {
         text-align: center;
         font-size: var(--text-lg);
@@ -79,75 +88,85 @@ export const petCardCSS = `
         font-size: var(--text-lg)
     }
 
+
+    /* Contenido de la tarjeta */
+    .pet-card-body {
+        display: grid;
+        grid-template-areas: "stack";
+        align-items: start;
+        min-height: 100px;
+    }
+    
+    /* Colocamos ambos divs superpuestos */
+    .pet-card-info, .pet-card-actions {
+        grid-area: stack;
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;    }
+
     /* Sección de Detalles (Raza, Ubicación, Fecha) */
     .pet-card-info {
-        padding: 10px 0px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 1rem;
+        padding: 1rem 0;
+
+        /* Estado inicial */
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+
     }
         /* Filas de iconos y texto */
         .pet-card-info > div {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-weight: none;
         }
 
-        .pet-card-info img {
+        .pet-card-info > div img {
             width: 18px;
             height: 18px;
         }
 
-        .pet-card-info p {
+        .pet-card-info > p  {
+            font-weight: none;
             margin: 0;
             font-size: var(--text-md);
             word-break: break-word;
         }
 
-    /* Overlay con degradado - Menú */
-    .card-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        
-        
-        background: linear-gradient(180deg, rgba(255,107,0,0.0) 0%, var(--primary) 60%, var(--secondary) 100%);
-        
+
+    /* Botones de acción */
+    .pet-card-actions {
+        overflow: hidden;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
-        align-items: center;
-        padding: 20px;
-        gap: 10px;
-        box-sizing: border-box;
-        
-        /* Oculto por defecto */
+        gap: 0.75rem;
+        padding: 1rem;
+
+        /* Estado inicial */
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        z-index: 10;
+        pointer-events: none; /* No clickable mientras está oculto */
     }
 
-    /* Solo si la tarjeta tiene la clase 'is-owner', 
-    permitimos que el hover active el overlay */
-    .pet-card.is-owner:hover .card-overlay {
+    .pet-card-actions button {
+        padding: 5px;
+    }
+
+    /* EFECTO DEL HOVER (si el usuario logeado es el dueño) */
+    .pet-card.is-owner:hover .pet-card-info {
+        
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px)
+    }
+
+    .pet-card.is-owner:hover .pet-card-actions {
         opacity: 1;
         visibility: visible;
+        pointer-events: auto;
     }
 
-    /* Estilo para visitantes */
-    .pet-card:not(.is-owner) {
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .pet-card:not(.is-owner):hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-sharp)
-    }
 
     /* Badges */
     .badge {
@@ -166,7 +185,7 @@ export const petCardCSS = `
 
     .badge-perdido { background-color: var(--danger); }
     .badge-encontrado { background-color: var(--warning); }
-    .badge-recuperado {background-color: var(--success);}
+    .badge-recuperado {background-color: var(--success); }
 
     /* ------- Tablet y móvil ---------- */
     @media (max-width: 768px) {
@@ -185,10 +204,6 @@ export const petCardCSS = `
             font-size: var(--text-xs);
             padding: 5px 14px;
             top: 180px;
-        }
-
-        .card-overlay button {
-            width: 100%;
         }
     }
 
@@ -213,10 +228,6 @@ export const petCardCSS = `
             font-size: 0.65rem;
             padding: 4px 10px;
             top: 150px;
-        }
-
-        .card-overlay {
-            padding: 10px;
         }
 
         .card-overlay button {

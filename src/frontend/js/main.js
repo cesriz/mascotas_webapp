@@ -8,7 +8,7 @@
 // IMPORTACIÓN DE SERVICIOS
 import { Auth } from './auth.js';
 import { API } from './api.js';
-import { adminConfig } from './admin-utils.js';
+import { renderAdminPanel, adminConfig } from './admin-utils.js';
 
 // IMPORTACIÓN DE COMPONENTES
 // Importamos los componentes para que se ejecute el customElements.define() de cada uno
@@ -20,6 +20,8 @@ import './components/authLogin.js';
 import './components/authReset.js';
 import './components/avistamientoCard.js';
 import './components/avistamientoCreationForm.js';
+import './components/avistamientoList.js';
+import './components/faq.js';
 import './components/heroSection.js';
 import './components/http-cat.js';
 import './components/notificationCenter.js';
@@ -48,16 +50,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = await Auth.syncUser();
 
     if (Auth.isLoggedIn() && !user) {
-        // Si había token pero syncUser devolvió null (token caducado)
-        window.location.href = 'login.html';
-        return; // Detenemos la ejecución
+        console.warn("Token detectado pero no válido..");
+
+        // Si había token pero syncUser devolvió null (token caducado) limpiamos sesión
+        Auth.clearSession();
+        // Redireccionamos a la vista de login
+        if (!window.location.pathname.includes('login.html')) {
+            window.location.href = 'login.html';
+        }
     }
 
-    if (user) {
-        console.log("Sesión confirmada para:", user.nombre);
-    }
 
-    // Detectamos la ruta del navegador para seleccionar el tipo de datos a renderizar
+    // petCard.js --> Detectamos la ruta del navegador para seleccionar el tipo de datos a renderizar
     console.log("Ruta detectada por el navegador:", window.location.pathname);
 
     if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
@@ -76,6 +80,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (situacion) {
             situacion.classList.add('hidden');
         }
+    }
+    
+    // perfil.html --> Mostramos el panel de "mis mascotas" por defecto
+    if (window.location.pathname.includes('/perfil')) {
+        // Extraemos los parámetros de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const panelActivo = urlParams.get('panel');
+    const publishState = urlParams.get('estado'); // Aquí capturamos 'perdida' o 'encontrada'
+    console.log(publishState);
+
+    const editId = urlParams.get('editar');
+    console.log(editId);
+
+    if (panelActivo) {
+        loadPanel(panelActivo);
+
+        // Si la url incluye el estado de la mascota
+        if (panelActivo === 'publicar' && publishState) {
+            // Buscamos el componente que acaba de crear loadPanel
+            const form = document.querySelector('pet-creation-form');
+            if (form) {
+                // Le pasamos el estado directamente al componente
+                form.setAttribute('data-initial-state', publishState);
+            }
+        }
+    } else {
+        loadPanel('mascotas');
+    }
     }
 });
 
@@ -238,74 +270,136 @@ if (filtersComponent) {
     });
 }
 
-// petDetail.js - Pasar el filtro para mostrar los datos de la mascota
-const peDetailComponent = this.querySelector('pet-details');
-
-
-// adminTable.js - Función para insertar la información del panel de administración
-async function renderAdminPanel(apiMethod, columns) {
-    try {
-        const adminTable = document.querySelector('admin-table');
-        if (!adminTable) return;
-
-        // Llamamos al método pasado por parámetro
-        const response = await apiMethod();
-        
-        // Guardamos la respuesta
-        const datos = response.data || [];
-
-        // Insertamos en la tabla
-        adminTable.config = {
-            columns: columns,
-            data: datos
-        };
-    } catch (error) {
-        console.error("Error al cargar el panel admin:", error);
-        showHttpError(error);
-    }
-}
-
 
 // appAside.js - Función para renderizar componentes según el panel seleccionado
 const mainContent = document.querySelector('#main-content');
 
 async function loadPanel(panel) {
+    // Seleccionamos el contenedor principal
     const mainContent = document.querySelector('#main-content');
     mainContent.innerHTML = '';
 
     let component;
 
+    // Actualizamos la URL sin recargar la página
+    // Esto permite que al actualizar la página, el main.js sepa qué panel cargar.
+    const nuevaUrl = `${window.location.pathname}?panel=${panel}`;
+    window.history.pushState({ panel }, '', nuevaUrl)
+
     switch(panel) {
         // --- Vistas de usuario ---
         case 'mascotas':
             component = document.createElement('pet-list');
+            const petTitle = document.createElement('h1');
+            petTitle.textContent = 'MIS MASCOTAS';
+            petTitle.classList.add('dashboard-wrapper-title');
+            currentCards = 'propias';
+
+            // Añadimos al contenedor
+            mainContent.appendChild(petTitle);
+            mainContent.appendChild(component);
+
+            // Inyectamos los datos de las mascotas
+            await renderPets('propias'); 
             break;
-        case 'perfil':
+        case 'avistamientos':
+            component = document.createElement('avistamiento-list');
+            break;
+        case 'notificaciones':
+            component = document.createElement('notification-center');
+            const notifTitle = document.createElement('h1');
+            notifTitle.textContent = 'CENTRO DE NOTIFICACIONES';
+            notifTitle.classList.add('dashboard-wrapper-title');
+
+            // Añadimos al contenedor
+            mainContent.appendChild(notifTitle);
+            mainContent.appendChild(component);
+            break;
+        case 'miperfil':
             component = document.createElement('user-profile');
+            const pTitle = document.createElement('h1');
+            pTitle.textContent = 'MI PERFIL';
+            pTitle.classList.add('dashboard-wrapper-title');
+
+            // Añadimos al contenedor
+            mainContent.appendChild(pTitle);
+            mainContent.appendChild(component);
             break;
-        
+
+        case 'publicar':
+            component = document.createElement('pet-creation-form');
+            const publishTitle = document.createElement('h1');
+            
+            publishTitle.classList.add('dashboard-wrapper-title');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const estadoInicial = urlParams.get('estado'); // 'perdida' o 'encontrada'
+            const editMode = urlParams.get('editar');
+
+            if (estadoInicial) {
+                // Pasamos el dato al componente
+                component.setStatus(estadoInicial);
+            }
+
+            if (editMode) {
+                publishTitle.textContent = 'EDITAR ANUNCIO';
+            } else {
+                publishTitle.textContent = 'PUBLICAR ANUNCIO';
+            }
+
+
+
+            // Añadimos al contenedor
+            mainContent.appendChild(publishTitle);
+            mainContent.appendChild(component);
+            break;
+
         // --- Vistas de administrador ---
         // Usamos admin-utils.js
         case 'admin-usuarios':
             component = document.createElement('admin-table');
+            const adUserTitle = document.createElement('h1');
+            adUserTitle.textContent = 'GESTIÓN DE USUARIOS';
+            adUserTitle.classList.add('dashboard-wrapper-title');
+
+            // Añadimos al contenedor y renderizamos datos de la tabla
+            mainContent.appendChild(adUserTitle);
             mainContent.appendChild(component);
             await renderAdminPanel(adminConfig.usuarios.method, adminConfig.usuarios.columns);
             break;
 
         case 'admin-anuncios':
             component = document.createElement('admin-table');
+            const adAnnTitle = document.createElement('h1');
+            adAnnTitle.textContent = 'MODERACIÓN DE ANUNCIOS';
+            adAnnTitle.classList.add('dashboard-wrapper-title');
+
+            // Añadimos al contenedor y renderizamos datos de la tabla
+            mainContent.appendChild(adAnnTitle);
             mainContent.appendChild(component);
             await renderAdminPanel(adminConfig.anuncios.method, adminConfig.anuncios.columns);
             break;
 
         case 'admin-reportes':
             component = document.createElement('admin-table');
+            const adRepTitle = document.createElement('h1');
+            adRepTitle.textContent = 'ANUNCIOS REPORTADOS';
+            adRepTitle.classList.add('dashboard-wrapper-title');
+
+            // Añadimos al contenedor y renderizamos datos de la tabla
+            mainContent.appendChild(adRepTitle);
             mainContent.appendChild(component);
             await renderAdminPanel(adminConfig.reportes.method, adminConfig.reportes.columns);
             break;
 
         case 'admin-soporte':
             component = document.createElement('admin-table');
+            const adSupTitle = document.createElement('h1');
+            adSupTitle.textContent = 'SOLICITUDES DE SOPORTE';
+            adSupTitle.classList.add('dashboard-wrapper-title');
+
+            // Añadimos al contenedor y renderizamos datos de la tabla
+            mainContent.appendChild(adSupTitle);
             mainContent.appendChild(component);
             await renderAdminPanel(adminConfig.soporte.method, adminConfig.soporte.columns);
             break;
@@ -329,7 +423,7 @@ document.addEventListener('click', (e) => {
     if (link) {
         const panel = link.getAttribute('data-panel');
         
-        // Manejo especial de Logout
+        // Logout
         if (panel === 'logout') {
             API.logout();
             Auth.clearSession();

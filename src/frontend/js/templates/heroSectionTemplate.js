@@ -11,8 +11,8 @@ export const heroSectionHTML = `
             <h2>Juntos los traemos de vuelta a casa</h2>
 
             <div class="hero-buttons">
-                <a href="publicar.html?estado=perdida" class="button-primary">HE PERDIDO A MI MASCOTA</a>
-                <a href="publicar.html?estado=encontrada" class="button-primary">HE ENCONTRADO UNA MASCOTA</a>
+                <button class="button-primary" id="lost-btn">HE PERDIDO A MI MASCOTA</button>
+                <button class="button-primary" id="found-btn">HE ENCONTRADO UNA MASCOTA</button>
             </div>
         </div>        
     </section>
@@ -87,12 +87,6 @@ export const heroSectionCSS = `
         gap: 20px;
         justify-content: center;
     }
-
-    a {
-        text-decoration: none;
-        font-weight: bold;
-    }
-
 
     /* --------Tablets y móviles--------- */
     @media (max-width: 768px) {

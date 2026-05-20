@@ -4,6 +4,7 @@ import { showSuccess, showHttpError } from "../main.js";
 
 import { createTemplate } from "../ui-utils.js";
 import { petCreationHTML, petCreationCSS } from "../templates/petCreationFormTemplate.js";
+import { addressAutocomplete } from "../ui-utils.js";
 
 // Importamos plantilla (HTML y CSS)
 const template = createTemplate(petCreationHTML, petCreationCSS);
@@ -21,11 +22,53 @@ export class PetCreationForm extends HTMLElement {
     }
 
     async connectedCallback() {
-        this.render();
-        // Cargamos los datos de los selects después de renderizar el esqueleto
-        await this.loadSelectOptions();
-        // Lógica de eventos
+        console.log('creationRender');
+this.render();
+
+    // 1. Cargamos las opciones de los selects primero
+    await this.loadSelectOptions();
+
+    // 2. Revisamos si hay un ID en la URL para entrar en modo edición
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('editar');
+
+    if (editId) {
+        console.log("Modo edición detectado para ID:", editId);
+        setTimeout(async () => {
+            await this.loadPetDataForEdit(editId);
+        }, 100); 
+    
+    } else {
+        // Si no hay edición, comprobamos si hay un estado inicial (perdida/encontrada)
+        const estadoInicial = this.getAttribute('data-initial-state');
+        if (estadoInicial) {
+            this.applyInitialState(estadoInicial);
+        }
+    }
+
+    // 3. Inicializamos el resto de utilidades
+    setTimeout(() => {
+        this.initAutocomplete();
         this.setupEventListeners();
+    }, 0);
+    }
+
+// Lógica para establecer un estado inicial al formulario (para los botones de heroSection)
+    applyInitialState(estado) {
+        // Seleccionamos elementos del DOM
+        const checkbox = this.querySelector('#pet-create-estado');
+        const textLabel = this.querySelector('#switch-text');
+        console.log(estado);
+        if (!checkbox) return;
+
+        // Marcamos el switch según el estado que le pasemos
+        if (estado === 'encontrada') {
+            checkbox.checked = true;
+            if (textLabel) textLabel.textContent = 'He encontrado una mascota';
+        } else {
+            checkbox.checked = false;
+            if (textLabel) textLabel.textContent = 'He perdido a mi mascota';
+        }
     }
 
 // Lógica de los campos select del formulario
@@ -119,12 +162,65 @@ export class PetCreationForm extends HTMLElement {
 
         this.fillSelect('#pet-create-data-form-raza', razasFiltered);
     }
+    
+// Lógica para el autocompletado de direcciones (Usamos la API Nominatim con el método de ui-utils.js)
+initAutocomplete() {
+    const inputLoc = this.querySelector('#pet-create-data-form-loc');
+    const resultsContainer = this.querySelector('#loc-autocomplete');
+    const mapComponent = this.querySelector('pet-create-data-map');
 
-// Actualizar mascota: Método para mostrar los datos de una mascota existente en el formulario.
+    if (!inputLoc || !resultsContainer) {
+        console.warn("No se encontraron los elementos para el autocompletado");
+        return;
+    }
+
+    // Invocamos la utilidad de ui-utils.js
+    addressAutocomplete(inputLoc, resultsContainer, (data) => {
+        // Guardamos los detalles para el envío posterior
+        this._currentLocationDetails = data; 
+        
+        // Actualizamos el mapa si existe
+        if (mapComponent && mapComponent.map) {
+            const latlng = [data.lat, data.lon];
+            mapComponent.map.setView(latlng, 16);
+            if (mapComponent.marker) {
+                mapComponent.marker.setLatLng(latlng);
+            }
+        }
+        inputLoc.value = data.address;
+        resultsContainer.innerHTML = ''; // Limpiamos sugerencias
+    });
+}
+
+// ACTUALIZAR MASCOTA: Método para mostrar los datos de una mascota existente en el formulario.
+// Nuevo método para obtener los datos de la API
+async loadPetDataForEdit(id) {
+    try {
+        // Asegúrate de que API.getMascota existe en tu servicio api.js
+        const response = await API.getMascota(id); 
+        console.log(response);
+        
+        // Dependiendo de cómo responda tu API, puede ser response o response.data
+        const pet = response.data || response;
+        
+        if (pet) {
+            // Un pequeño delay asegura que el navegador haya renderizado las opciones de los selects
+            setTimeout(() => {
+                this.setPetData(pet);
+            }, 100)
+        }
+    } catch (error) {
+        console.error("Error al obtener los datos de la mascota:", error);
+        showHttpError(error, this);
+    }
+}
+
     async setPetData(pet) {
         this._petId = pet.id;
         this._isEditMode = true;
         this._petStatus = pet.estado;
+
+        console.log("Rellenando formulario con:", pet);
 
         // Ocultamos el switch de estado
         const stateSwitch = this.querySelector('#pet-create-estado');
@@ -182,9 +278,16 @@ export class PetCreationForm extends HTMLElement {
         this.querySelector('#pet-create-data-lng-input').value = pet.longitud;
 
         // Centrar mapa si ya está listo
+        // Dentro de setPetData, busca la parte del mapa al final:
         const mapComponent = this.querySelector('#pet-create-data-map');
-        if (mapComponent.map) {
+        if (mapComponent && mapComponent.map) {
+            // Si el mapa ya está listo, renderizamos
             mapComponent.renderMarkers(pet.latitud, pet.longitud);
+        } else if (mapComponent) {
+            // Si no está listo, esperamos al evento 'ready' o usamos un pequeño delay
+            mapComponent.addEventListener('map-ready', () => {
+                mapComponent.renderMarkers(pet.latitud, pet.longitud);
+            }, { once: true });
         }
     }
 

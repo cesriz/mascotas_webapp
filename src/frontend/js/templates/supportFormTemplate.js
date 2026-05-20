@@ -2,7 +2,7 @@ export const supportFormHTML = `
     <div class="panel-overlay" id="panel-overlay"></div>
     <div class="support-form">
         <div class="support-title">
-            <img src="../assets/icons/material-symbols--privacy-tip-outline.png">
+            <img src="../assets/icons/material-symbols--privacy-tip-outline-rounded.svg" src="Icono seguridad">
             <h3>Contactar con soporte técnico</h3>
         </div>
 

@@ -3,7 +3,7 @@ export const userProfileHTML = `
     
     <form class="profile-section" id="profile-data-form">
         <div class="profile-data-title">
-            <img src="../assets/icons/mdi--user-outline.png">
+            <img src="../assets/icons/mdi--user-outline.svg">
             <h3>Datos personales</h3>
         </div>
 
@@ -48,24 +48,24 @@ export const userProfileHTML = `
 
     <form class="profile-section" id="profile-security-form">
         <div class="profile-data-title">
-            <img src="../assets/icons/mdi--secure-outline.png">
+            <img src="../assets/icons/mdi--secure-outline.svg">
             <h3>Seguridad</h3>
         </div>
 
         <div class="profile-data-inputs">
             <div>            
                 <label for="profile-pass">Contraseña actual</label>
-                <input type="text" id="profile-old-pass" required>
+                <input type="password" id="profile-old-pass" required>
             </div>
 
             <div>            
                 <label for="profile-newpass">Nueva contraseña</label>
-                <input type="text" id="profile-new-pass">
+                <input type="password" id="profile-new-pass">
             </div>
 
             <div>            
                 <label for="profile-repeat-pass">Repite la contraseña</label>
-                <input type="text" id="profile-confirm-pass" required>
+                <input type="password" id="profile-confirm-pass" required>
             </div>
         </div>
 
@@ -80,7 +80,7 @@ export const userProfileHTML = `
 
     <div class="profile-section" id="profile-delete">
         <div class="profile-data-title">
-            <img src="../assets/icons/material-symbols--delete-outline.png">
+            <img src="../assets/icons/iconamoon--trash.svg" alt="Icono papelera">
             <h3>Eliminar cuenta</h3>
         </div>
         <p>Perderás todos tus anuncios publicados, mensajes y fotos de mascotas de forma permanente</p>
@@ -101,6 +101,11 @@ export const userProfileCSS = `
         justify-content: center;
         align-items: center;
         gap: 10px;
+        width: 50%;
+        align-self: center;
+        justify-self: center;
+        margin-bottom: 1.5rem;
+
     }
 
     /* Títulos */

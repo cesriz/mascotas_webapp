@@ -7,17 +7,9 @@ const template = createTemplate(appAsideHTML, appAsideCSS);
 export class AppAside extends HTMLElement {
     constructor() {
         super();
-        // Estado interno: 'USER' (por defecto) o 'ADMIN'
-        this._mode = 'USER';
     }
 
     connectedCallback() {
-        this.render();
-    }
-
-    // Cambiamos entre modo Usuario y modo Admin si el usuario tiene rol de administrador
-    toggleModo() {
-        this._mode = (this._mode === 'USER') ? 'ADMIN' : 'USER';
         this.render();
     }
 
@@ -25,9 +17,9 @@ export class AppAside extends HTMLElement {
         this.innerHTML = '';
         this.appendChild(template.content.cloneNode(true));
 
-        // Configuramos el botón para colapsar el aside
+        // Logica del botón para colapsar el asidei
         const colapseBtn = this.querySelector('#aside-btn');
-        const asideElement = this.querySelector('app-aside');
+        const asideElement = this.querySelector('#aside');
 
         colapseBtn.onclick = () => {
             asideElement.classList.toggle('aside-collapsed');
@@ -38,54 +30,47 @@ export class AppAside extends HTMLElement {
         };
 
         // Comprobamos el rol del usuario (auth.js)
-        const isAdminRole = Auth.isAdmin();
-        const isAdminVisible = isAdminRole && this._mode === 'ADMIN';
-
-        // Si el panel está en modo "Admin", mostramos el título
-        const titleEl = this.querySelector('#aside-title');
-        if (isAdminVisible) {
-            titleEl.classList.remove('hidden');
+        const isAdminRole = Auth.isAdmin()
+        console.log(isAdminRole);
+        const adminPanel = this.querySelector('#admin-links');
+        // Si el usuario tiene el rol de admin, mostramos el panel de administrador
+        if (isAdminRole) {
+            adminPanel.classList.remove('hidden');
         } else {
-            titleEl.classList.add('hidden');
+            adminPanel.classList.add('hidden');
         }
 
-        // Mostramos unos enlaces u otros según el modo
-        const linksContainer = this.querySelector('#aside-links');
-        linksContainer.innerHTML = isAdminVisible ? this.getAdminLinks() : this.getUserLinks();
+        // Escuchamos clics para actualizar el resaltado de los links sin recargar
+        this.addEventListener('click', (e) => {
+            const link = e.target.closest('[data-panel]');
+            if (link) {
+                // Delay para que la URL cambie antes de comprobarla
+                setTimeout(() => {
+                    this.highlightActiveLink();
+                }, 20);
+            }
+        });
 
-        // Lógica del botón
-        const actionBtn = this.querySelector('#aside-action-btn');
-        if (!isAdminRole) {
-            // Usuario normal: siempre "Publicar"
-            actionBtn.textContent = 'PUBLICAR ANUNCIO';
-            actionBtn.dataset.panel = 'publicar';
-        } else {
-            // Administrador: toggle entre vistas
-            actionBtn.textContent = isAdminVisible ? 'VISTA USUARIO' : 'VISTA ADMINISTRADOR';
-            actionBtn.onclick = () => this.toggleModo();
+        // Resaltamos el link actual al cargar
+        this.highlightActiveLink();
+    }
+
+    // Función para gestionar el resaltado de los links
+    highlightActiveLink() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPanel = urlParams.get('panel');
+
+        // Quitamos la clase de todos los links
+        this.querySelectorAll('.aside-a').forEach(link => {
+            link.classList.remove('aside-a-active');
+        });
+
+        if (urlPanel) {
+            const activeLink = this.querySelector(`[data-panel="${urlPanel}"]`);
+            if (activeLink) {
+                activeLink.classList.add('aside-a-active');
+            }
         }
-    }
-
-    // Método para mostrar los links en modo usuario
-    getUserLinks() {
-        return `
-            <a data-panel="mascotas">MIS MASCOTAS</a>
-            <a data-panel="avistamientos">MIS AVISTAMIENTOS</a>
-            <a data-panel="notificaciones">NOTIFICACIONES</a>
-            <a data-panel="perfil">MI PERFIL</a>
-            <a data-panel="logout">CERRAR SESIÓN</a>
-        `;
-    }
-
-    // Método para mostrar los links en modo admin
-    getAdminLinks() {
-        return `
-            <a data-panel="admin-anuncios">MODERACIÓN DE ANUNCIOS</a>
-            <a data-panel="admin-usuarios">GESTIÓN DE USUARIOS</a>
-            <a data-panel="admin-reportes">REPORTES Y DENUNCIAS</a>
-            <a data-panel="admin-ajustes">AJUSTES DEL SISTEMA</a>
-            <a data-panel="logout">CERRAR SESIÓN</a>
-        `;
     }
 }
 

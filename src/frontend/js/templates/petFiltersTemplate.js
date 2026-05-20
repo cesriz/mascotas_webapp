@@ -4,7 +4,7 @@ export const petFiltersHTML = `
 
         <div class="pet-filters-panel">
             <div class="filters-title">
-                <img src="../assets/icons/material-symbols--search.png">
+                <img src="../assets/icons/ic--outline-search.svg" alt="Icono lupa">
                 <h3>Buscador de mascotas</h3>
             </div>
 
@@ -55,7 +55,7 @@ export const petFiltersHTML = `
 
         <div class="pet-filters-panel" id="more-pet-filters">
             <div class="filters-title">
-                <img src="../assets/icons/material-symbols--search.png">
+                <img src="../assets/icons/ic--outline-search.svg">
                 <h3>Buscador de mascotas</h3>
             </div>
 

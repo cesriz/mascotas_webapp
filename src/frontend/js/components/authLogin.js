@@ -20,7 +20,8 @@ export class AuthLogin extends HTMLElement {
     }
 
     render() {
-        this.innerHTML = template.innerHTML;
+        this.innerHTML = '';
+        this.appendChild(template.content.cloneNode(true));
     }
 
     initLogic() {
@@ -95,6 +96,7 @@ export class AuthLogin extends HTMLElement {
         // Inicio de sesión
         const loginForm = this.querySelector('#init');
         loginForm.addEventListener('submit', async (e) => {
+            console.log('clic boton');
             e.preventDefault();
             const credentials = {
                 correo: this.querySelector('#auth-correo').value,
@@ -102,8 +104,9 @@ export class AuthLogin extends HTMLElement {
             };
 
             try {
+                console.log('try');
                 const data = await API.login(credentials);
-
+console.log("Respuesta completa de API:", data);
                 // Se guarda el token en localStorage
                 Auth.setSession(data.token, data.usuario);
                 loginForm.reset();

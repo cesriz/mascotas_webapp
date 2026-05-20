@@ -1,4 +1,6 @@
 export const petDetailsHTML = `
+    <div class="pet-details-title"></div>
+
     <div class="pet-det-container">
         <div class="pet-det-images">
             <button class="carrousel-btn btn-prev" id="prev-btn">&#10094;</button>
@@ -9,16 +11,16 @@ export const petDetailsHTML = `
 
         <div class="pet-det-event" id="pet-det-event">
             <div>
-                <img src="../assets/icons/mdi--location.png" alt="Icono ubicación">
-                <h3 id="pet-det-loc"></h3>
+                <img src="../assets/icons/tdesign--location.svg" alt="Icono ubicación">
+                <p id="pet-det-loc"></p>
             </div>
             <div>
-                <img src="../assets/icons/solar--calendar-linear.png" alt="Icono fecha">
-                <h3 id="pet-det-date"></h3>
+                <img src="../assets/icons/solar--calendar-linear.svg" alt="Icono fecha">
+                <p id="pet-det-date"></p>
             </div>
             <div class = "pet-det-reward-div">
-                <img src="../assets/icons/tabler--tax-euro.png" alt="Icono recompensa">
-                <h3 id="pet-det-reward">¡Ofrecemos recompensa!</h3>
+                <img src="../assets/icons/tabler--tax-euro.svg" alt="Icono recompensa">
+                <p id="pet-det-reward">¡Ofrecemos recompensa!</p>
             </div>
         </div>
 
@@ -31,12 +33,13 @@ export const petDetailsHTML = `
                 <img src="https://img.icons8.com/?size=100&id=32323&format=png&color=000000" alt="X icon" id="twitter">
                 <img src="https://img.icons8.com/?size=100&id=cMRBi0rI3iwb&format=png&color=000000" alt="Instagram icon" id="instagram">
                 <img src="https://img.icons8.com/?size=100&id=16713&format=png&color=000000" alt="Whatsapp icon" id="whastapp">
-                <img src="https://img.icons8.com/?size=100&id=63306&format=png&color=000000" alt="Telegram icon" id="telegram">        </div>
+                <img src="https://img.icons8.com/?size=100&id=63306&format=png&color=000000" alt="Telegram icon" id="telegram">        
+            </div>
         </div>
         
         <div class="pet-det-data">
             <div class="pet-det-data-title">
-                <img src="../assets/icons/streamline-plump--pet-paw.png" alt="icon">
+                <img src="../assets/icons/streamline-plump--pet-paw.svg" alt="icon">
                 <h3 id="pet-name">Datos de la mascota</h3>
             </div>
 
@@ -63,6 +66,19 @@ export const petDetailsCSS = `
     :host  {
             display: block;
         }
+
+        .pet-details-title {
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+            color: black;
+            font-size: 3rem;
+            font-weight: 900;
+        }
+
+        #pet-details-name {
+            color: var(--primary);
+        }
         
         .pet-det-container {
             display: grid;
@@ -81,7 +97,7 @@ export const petDetailsCSS = `
             flex-direction: column;
             align-items: stretch;
             gap: 10px;
-            padding: 2rem;
+            padding: 2rem 4rem;
             background-color: var(--backgroundblue);
             border-radius: var(--radius-md);
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -174,13 +190,13 @@ export const petDetailsCSS = `
         }
 
         .pet-det-event img {
-            min-width: 18px;
-            max-width: 30px;
-            min-height: 18px;
-            max-height: 30px;
+            min-width: 15px;
+            max-width: 20px;
+            min-height: 15px;
+            max-height: 20px;
         }
 
-        .pet-det-event h3{
+        .pet-det-event p{
             font-weight: 500;
         }
 
@@ -274,6 +290,7 @@ export const petDetailsCSS = `
         .pet-det-event {
             grid-column: 1;
             grid-row: auto;
+            font-size: var(--text-md);
         }
 
         .pet-det-description {
@@ -286,28 +303,29 @@ export const petDetailsCSS = `
             grid-column: 1;
             grid-row: 5;
             padding: 1.5rem;
+            font-size: var(--text-md);
         }
     }
 
     @media (max-width: 480px) {
         .pet-det-container {
-            padding: 1rem; /* MODIFICADO */
-            gap: 15px; /* MODIFICADO */
+            padding: 2rem;
+            gap: 15px;
         }
 
         .pet-det-data,
         .pet-det-description,
         .social-media {
-            padding: 1rem;
+            padding: 1.7rem;
         }
 
         .pet-det-data-title {
-            font-size: var(--text-md);
+            font-size: var(--text-lg);
         }
 
         .pet-det-list {
             font-size: var(--text-md);
-            padding: 0.8rem;
+            padding: 1rem;
         }
 
         .carrousel-btn {

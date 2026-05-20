@@ -12,6 +12,7 @@ export class Notification extends HTMLElement {
     }
 
     async connectedCallback() {
+        this.appendChild(template.content.cloneNode(true));
         await this.showNotifications();
         this.addEvents();
     }
@@ -68,22 +69,46 @@ export class Notification extends HTMLElement {
                 try {
                     if (tipo === 'contacto') {
                         await API.leerContacto(id);
+                        // Actualizamos contador de contactos
+                        this.data.resumen.contactos_no_leidos--;
                     } else {
                         await API.leerAvistamiento(id);
+                        // Actualizamos contador de avistamientos
+                        this.data.resumen.avistamientos_no_leidos--;
+                    }
+                    
+                    // Actualizamos contador general
+                    this.data.resumen.total_no_leidas--;
+                    
+                    // Buscamos la notificación y la marcamos como leída
+                    const notificacionInterna = this.notificacionesCompletas.find(n => n.id == id && n.tipo === tipo);
+                    if (notificacionInterna) {
+                        if (tipo == 'contacto') notificacionInterna.leido_destinatario = 1;
+                        else notificacionInterna.leido_propietario = 1;
                     }
 
-                    item.classList.remove('unread'); // Eliminamos estilos de las notificaciones no-leídas
-                    e.target.remove(); // Eliminamos el botón tras marcar
-
+                    this.render();
                 } catch (err) {
+                    console.error("Detalle del error al marcar como leída:", err);
                     alert("No se pudo marcar como leída");
                 }
             }
 
             // Al hacer clic en tarjeta de avistamiento, redireccionamos a los detalles de la mascota
-            if (e.target.closest('.notification-item') && e.target.dataset.tipo === 'avistamiento') {
-                const mascotaId = e.target.closest('.notification-item').dataset.mascotaId;
-                window.location.hash = `/mascotas/${mascotaId}`;
+            const item = e.target.closest('.notification-item');
+
+            if (item) {
+                const { id, tipo, mascotaId } = item.dataset;
+
+                // Si el clic no ha sido en el botón de marcar como leído, y es de tipo avistamiento, redireccionamos
+                if (!e.target.matches('.button-primary') && tipo === 'avistamiento') {
+                    // Verificamos que tengamos el ID de la mascota
+                    if (mascotaId && mascotaId !== "undefined") {
+                            window.location.href = `detalles?id=${mascotaId}`;
+                    } else {
+                        console.log("No se encontró el id de la mascota");
+                    }
+                }
             }
         });
     }

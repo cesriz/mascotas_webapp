@@ -1,22 +1,22 @@
 export const avistamientoCardHTML = `
-    <div class="pet-card avistamiento-card">
+    <div class="avistamiento-card">
         <img src="" id="card-avistamiento-img" alt="Foto del avistamiento">
 
         <div class="badge" id="avistamiento-badge">
             <p id="badge-text"></p>
         </div>
 
-        <div class="pet-card-title">
+        <div class="avistamiento-card-title">
             <h3>Avistamiento de <span id="card-avistamiento-pet-name"></span></h3>
         </div>
 
-        <div class="pet-card-info">
+        <div class="avistamiento-card-info">
             <div>
-                <img src="../assets/icons/mdi--location.png" alt="Ubicación">
+                <img src="../assets/icons/tdesign--location.svg" alt="Icono ubicación">
                 <p id="card-avistamiento-loc"></p>
             </div>
             <div>
-                <img src="../assets/icons/solar--calendar-linear.png" alt="Fecha">
+                <img src="../assets/icons/solar--calendar-linear.svg" alt="Fecha">
                 <p id="card-avistamiento-date"></p>
             </div>
             <div class="avistamiento-desc">
@@ -27,7 +27,7 @@ export const avistamientoCardHTML = `
 `;
 
 export const avistamientoCardCSS = `
-    .pet-card {
+    .avistamiento-card {
         position: relative;
         background-color: var(--inputbackground);
         border-radius: var(--radius-sm);
@@ -41,13 +41,15 @@ export const avistamientoCardCSS = `
         gap: 10px;
         padding: 20px 10px;
         width: 100%;
-        max-width: 300px;
-        margin: 0 auto; 
+        box-sizing: border-box;
+        min-width: 300px;
+        max-width: 350px;
+        margin: 0;
         cursor: pointer;
     }
 
     /* Imagen de la mascota */
-    .pet-card > img:first-child {
+    .avistamiento-card > img:first-child {
         width: 95%;
         height: auto;
         max-height: 200px;
@@ -57,11 +59,12 @@ export const avistamientoCardCSS = `
     }
 
     /* Contenido de la tarjeta (Nombres y Datos) */
-    .pet-card h3 {
+    .avistamiento-card h3 {
         text-align: center;
         font-size: var(--text-lg);
         align-items: center;
         color: black;
+        margin-top: 1rem;
     }
 
     #card-pet-name {
@@ -71,30 +74,59 @@ export const avistamientoCardCSS = `
     }
 
     /* Sección de Detalles (Raza, Ubicación, Fecha) */
-    .pet-card-info {
-        padding: 10px 0px;
+    .avistamiento-card-info {
+        padding: 0 1rem;
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
         /* Filas de iconos y texto */
-        .pet-card-info > div {
+        .avistamiento-card-info > div {
             display: flex;
-            align-items: center;
+            align-items: start;
+            
             gap: 8px;
             font-weight: none;
         }
 
-        .pet-card-info img {
+        .avistamiento-card-info img {
             width: 18px;
             height: 18px;
         }
 
-        .pet-card-info p {
+        .avistamiento-card-info p {
             margin: 0;
             font-size: var(--text-sm);
         }
 
+        .avistamiento-desc {
+            padding: 1rem;
+            text-align: start;
+            font-size: var(--text-sm);
+            font-style: italic;
+        }
+
+    /* Badges */
+    .badge {
+        padding: 5px 20px;
+        border-radius: var(--radius-xs);
+        box-shadow: var(--shadow-button);
+        font-size: var(--text-sm);
+        color: white;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+        font-weight: bold;
+        text-transform: uppercase;
+        position: absolute;
+        top: 200px;
+        z-index: 5;
+    }
+
+    .badge-perdido { background-color: var(--danger); }
+    .badge-encontrado { background-color: var(--warning); }
+    .badge-recuperado {background-color: var(--success); }
+
+
+    
     /* Overlay con degradado - Menú */
     .card-overlay {
         position: absolute;
@@ -139,30 +171,6 @@ export const avistamientoCardCSS = `
         box-shadow: var(--shadow-sharp)
     }
 
-    /* Badges */
-    .badge {
-        padding: 5px 15px;
-        border-style: solid black;
-        border-radius: var(--radius-xs);
-        box-shadow: var(--shadow-button);
-        font-size: var(--text-xs);
-        color: white;
-        text-transform: uppercase;
-    }
-
-    .badge-perdido { background-color: var(--danger); }
-    .badge-encontrado { background-color: var(--warning); }
-    .badge-recuperado {background-color: var(--success);}
-
-            
-    .avistamiento-card .avistamiento-desc {
-        padding-top: 10px;
-        font-size: var(--text-sm);
-        color: var(--text-color-muted);
-        font-style: italic;
-    }
-    
-    .badge-avistamiento { background-color: var(--primary); }
 
     /* ------- Tablet y móvil ---------- */
     @media (max-width: 768px) {

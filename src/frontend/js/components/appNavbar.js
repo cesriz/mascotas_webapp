@@ -44,12 +44,13 @@ export class AppNavbar extends HTMLElement {
 
 
         // Lógica para el botón publicar
-        const publicarBtn = this.querySelector('#btn-publicar');
-        publicarBtn.addEventListener('click', () => {
+        const publishBtn = this.querySelector('#btn-publish');
+        publishBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita cualquier recarga accidental
             if (isLoggedIn) {
-                window.location.href = 'Usuario.html'; //MODIFICAR ESTO PARA QUE APAREZCA EN LA VENTANA DE PUBLICARR
+                window.location.href = 'perfil?panel=publicar';
             } else {
-                window.location.href = 'Auth.html';
+                window.location.href = 'login.html';
             }
         });
 
@@ -76,7 +77,7 @@ export class AppNavbar extends HTMLElement {
             btn.textContent = isLoggedIn ? 'MI PERFIL' : 'INICIAR SESIÓN';
 
             btn.onclick = () => {
-                window.location.href = isLoggedIn ? 'Usuario.html' : 'Auth.html';
+                window.location.href = isLoggedIn ? 'perfil.html' : 'login.html';
             };
         }
     

@@ -1,5 +1,7 @@
 import { Auth } from '../auth.js'; // Importante para la lógica de dueño
 import { API } from '../api.js';
+import { DeleteConfirm } from './deleteConfirm.js';
+import { RecoverConfirm } from './recoverConfirm.js';
 import { createTemplate } from "../ui-utils.js";
 import { petCardHTML, petCardCSS } from "../templates/petCardTemplate.js";
 import { showSuccess, showHttpError } from "../main.js";
@@ -49,6 +51,7 @@ export class PetCard extends HTMLElement {
 
         if (isOwner) {
             card.classList.add('is-owner');
+            this.classList.add('is-owner');
 
             // Botones
             const btnEdit = this.querySelector('#btn-edit');
@@ -58,45 +61,36 @@ export class PetCard extends HTMLElement {
             // Editar anuncio de mascota
             btnEdit.onclick = (e) => {
                 e.stopPropagation();
+                
                 if (btnEdit) {
                     const petId = this._petData.id;
-                    console.log (petId);
                     if (petId) {
-                        window.location.href = 'perfil?panel=publicar&editar=' + petId;
+                        window.location.href = `perfil?panel=publicar&editar=${petId}`
                     } else 
-                        window.location.href = 'index.html';
+                        window.location.href = `perfil?panel=mascotas`;
                 }
             };
 
             // Borrar anuncio de mascota
             btnDelete.onclick = async (e) => {
                 e.stopPropagation();
-                if (!confirm('¿Estás seguro de que quieres borrar este anuncio? Esta acción no se puede deshacer')) return;
 
-                try {
-                    console.log(pet.id);
-                    await API.deleteMascota(pet.id);
+                const confirmPanel = this.querySelector('#delete-confirm');
 
-                    showSuccess('Anuncio eliminado correctamente');
-                    console.log('Borrado con éxito');
-                    this.remove();
-
-                    window.location.reload();
-                } catch (error) {
-                    console.log(error);
-                    showHttpError(error, this);
+                if (confirmPanel) {
+                    confirmPanel.open(pet.id);
                 }
+
             };
 
             // Marcar como recuperada
             btnRecover.onclick = async (e) => {
                 e.stopPropagation();
-                try {
-                    await API.marcarRecuperada(pet.id);
 
-window.location.reload();
-                } catch (error) {
-                   console.log(error);
+                const confirmRPanel = this.querySelector('#recover-confirm');
+
+                if (confirmRPanel) {
+                    confirmRPanel.open(pet.id);
                 }
             };
 

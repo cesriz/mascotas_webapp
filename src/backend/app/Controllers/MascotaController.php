@@ -427,7 +427,7 @@ class MascotaController
 
             Response::json([
                 'success' => false,
-                'message' => 'Error al eliminar la mascota y sus datos relacionados',
+                'message' => $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }

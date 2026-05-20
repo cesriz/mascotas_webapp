@@ -48,6 +48,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Intentamos sincronizar los datos del usuario. 
     // Hacemos petición a la API, actualizamos localstorage o borramos si hay error.
     const user = await Auth.syncUser();
+    console.log(user);
+
+    const mainUser = Auth.getUserData();
+    console.log('main uesr: ', mainUser);
+
 
     if (Auth.isLoggedIn() && !user) {
         console.warn("Token detectado pero no válido..");
@@ -85,29 +90,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // perfil.html --> Mostramos el panel de "mis mascotas" por defecto
     if (window.location.pathname.includes('/perfil')) {
         // Extraemos los parámetros de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const panelActivo = urlParams.get('panel');
-    const publishState = urlParams.get('estado'); // Aquí capturamos 'perdida' o 'encontrada'
-    console.log(publishState);
+        const urlParams = new URLSearchParams(window.location.search);
+        const panelActivo = urlParams.get('panel');
 
-    const editId = urlParams.get('editar');
-    console.log(editId);
-
-    if (panelActivo) {
-        loadPanel(panelActivo);
-
-        // Si la url incluye el estado de la mascota
-        if (panelActivo === 'publicar' && publishState) {
-            // Buscamos el componente que acaba de crear loadPanel
-            const form = document.querySelector('pet-creation-form');
-            if (form) {
-                // Le pasamos el estado directamente al componente
-                form.setAttribute('data-initial-state', publishState);
-            }
+        if (panelActivo) {
+            loadPanel(panelActivo);
+        } else {
+            loadPanel('mascotas');
         }
-    } else {
-        loadPanel('mascotas');
-    }
     }
 });
 
@@ -278,13 +268,24 @@ async function loadPanel(panel) {
     // Seleccionamos el contenedor principal
     const mainContent = document.querySelector('#main-content');
     mainContent.innerHTML = '';
+    
+    // Obtenemos datos de la URL
+    const params = new URLSearchParams(window.location.search);
 
-    let component;
+    const editPetId = params.get('editar');
+    const initiaState = params.get('estado');
+    console.log(editPetId + ' | ' + initiaState);
 
     // Actualizamos la URL sin recargar la página
-    // Esto permite que al actualizar la página, el main.js sepa qué panel cargar.
-    const nuevaUrl = `${window.location.pathname}?panel=${panel}`;
-    window.history.pushState({ panel }, '', nuevaUrl)
+    // Esto permite actualizar la página manteniendo el panel actual, en lugar de cargar el panel por defecto
+    let newUrl = `${window.location.pathname}?panel=${panel}`;
+    if (editPetId && panel === 'publicar') newUrl += `&editar=${editPetId}`;
+    if (initiaState && panel === 'publicar') newUrl += `&estado=${initiaState}`;
+
+    // Actualizamos la barra de direcciones sin recargar
+    window.history.pushState({ panel }, '', newUrl);
+
+    let component;
 
     switch(panel) {
         // --- Vistas de usuario ---
@@ -328,26 +329,29 @@ async function loadPanel(panel) {
 
         case 'publicar':
             component = document.createElement('pet-creation-form');
-            const publishTitle = document.createElement('h1');
-            
-            publishTitle.classList.add('dashboard-wrapper-title');
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const estadoInicial = urlParams.get('estado'); // 'perdida' o 'encontrada'
-            const editMode = urlParams.get('editar');
-
-            if (estadoInicial) {
-                // Pasamos el dato al componente
-                component.setStatus(estadoInicial);
-            }
-
-            if (editMode) {
-                publishTitle.textContent = 'EDITAR ANUNCIO';
+            if (editPetId) {
+                // MODO EDICIÓN
+                const title = document.createElement('h1');
+                title.textContent = 'EDITAR ANUNCIO';
+                title.classList.add('dashboard-wrapper-title');
+                mainContent.appendChild(title);
+                component.loadPetDataForEdit(editPetId);
+                
+                // Si tu componente tiene un método para cargar datos:
+                // component.loadPetData(petId); 
             } else {
-                publishTitle.textContent = 'PUBLICAR ANUNCIO';
+                // MODO CREACIÓN
+                const title = document.createElement('h1');
+                title.textContent = 'PUBLICAR ANUNCIO';
+                title.classList.add('dashboard-wrapper-title');
+                mainContent.appendChild(title);
+                
+                if (initiaState) {
+                    component.setAttribute('data-initial-state', initiaState);
+                }
             }
-
-
+            break;
 
             // Añadimos al contenedor
             mainContent.appendChild(publishTitle);
@@ -409,7 +413,7 @@ async function loadPanel(panel) {
             return;
     }
 
-    // Si el componente no fue añadido en el switch (vistas usuario), lo añadimos aquí
+    // Si el componente no fue añadido en el switch, lo añadimos aquí
     if (component && !mainContent.contains(component)) {
         mainContent.appendChild(component);
     }

@@ -22,21 +22,21 @@ export class PetCreationForm extends HTMLElement {
     }
 
     async connectedCallback() {
-        console.log('creationRender');
-this.render();
+    this.render();
+console.log('cRender');
+        // Cargamos las opciones de los selects primero
+        await this.loadSelectOptions();
+console.log('clogseloop');
 
-    // 1. Cargamos las opciones de los selects primero
-    await this.loadSelectOptions();
+        // Revisamos si hay un ID en la URL para entrar en modo edición
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get('editar');
 
-    // 2. Revisamos si hay un ID en la URL para entrar en modo edición
-    const params = new URLSearchParams(window.location.search);
-    const editId = params.get('editar');
-
-    if (editId) {
-        console.log("Modo edición detectado para ID:", editId);
-        setTimeout(async () => {
-            await this.loadPetDataForEdit(editId);
-        }, 100); 
+        if (editId) {
+            console.log("Modo edición detectado para ID:", editId);
+            setTimeout(async () => {
+                await this.loadPetDataForEdit(editId);
+            }, 100); 
     
     } else {
         // Si no hay edición, comprobamos si hay un estado inicial (perdida/encontrada)
@@ -197,7 +197,7 @@ initAutocomplete() {
 async loadPetDataForEdit(id) {
     try {
         // Asegúrate de que API.getMascota existe en tu servicio api.js
-        const response = await API.getMascota(id); 
+        const response = await API.getMascotaById(id); 
         console.log(response);
         
         // Dependiendo de cómo responda tu API, puede ser response o response.data
@@ -259,7 +259,7 @@ async loadPetDataForEdit(id) {
         // Recompensa
         if (pet.recompensa > 0) {
             this.querySelector('#reward-check').checked = true;
-            this.querySelector('#reward-price-container').style.display = 'flex';
+            this.querySelector('#reward-price-container').style.display = 'block';
             this.querySelector('#reward-price').value = pet.recompensa;
         }
 

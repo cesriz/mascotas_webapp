@@ -27,6 +27,7 @@ class MascotaModel extends BaseModel
         $sql = "
             SELECT
                 am.id,
+                am.usuario_id,
                 am.nombre,
                 am.estado,
                 am.sexo,
@@ -265,6 +266,7 @@ class MascotaModel extends BaseModel
         $sql = "
             SELECT
                 am.id,
+                am.usuario_id,
                 am.nombre,
                 am.estado,
                 r.nombre AS raza_nombre,
@@ -308,6 +310,7 @@ class MascotaModel extends BaseModel
         $sql = "
             SELECT
                 am.id,
+                am.usuario_id,
                 am.nombre,
                 am.estado,
                 r.nombre AS raza_nombre,

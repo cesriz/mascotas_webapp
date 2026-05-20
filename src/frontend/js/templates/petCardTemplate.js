@@ -1,4 +1,7 @@
 export const petCardHTML = `
+    <delete-confirm id="delete-confirm"></delete-confirm>
+    <recover-confirm id="recover-confirm"></recover-confirm>
+
     <div class="pet-card">
         <img src="" id="card-pet-img" alt="">
 
@@ -30,7 +33,7 @@ export const petCardHTML = `
                 <button class="button-danger" id="btn-delete">Eliminar</button>
             </div>
         </div>
-    </div> 
+    </div>
 `;
 
 export const petCardCSS = `
@@ -91,6 +94,7 @@ export const petCardCSS = `
 
     /* Contenido de la tarjeta */
     .pet-card-body {
+        width: 60%;
         display: grid;
         grid-template-areas: "stack";
         align-items: start;
@@ -106,8 +110,9 @@ export const petCardCSS = `
     .pet-card-info {
         display: flex;
         flex-direction: column;
+        justify-content: start;
         gap: 1rem;
-        padding: 1rem 0;
+        padding: 0.5rem 0;
 
         /* Estado inicial */
         opacity: 1;
@@ -127,7 +132,7 @@ export const petCardCSS = `
             height: 18px;
         }
 
-        .pet-card-info > p  {
+        .pet-card-info > div p  {
             font-weight: none;
             margin: 0;
             font-size: var(--text-md);
@@ -141,7 +146,7 @@ export const petCardCSS = `
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        padding: 1rem;
+        padding: 0.5rem;
 
         /* Estado inicial */
         opacity: 0;

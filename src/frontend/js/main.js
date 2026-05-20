@@ -268,19 +268,36 @@ async function loadPanel(panel) {
     // Seleccionamos el contenedor principal
     const mainContent = document.querySelector('#main-content');
     mainContent.innerHTML = '';
-    
-    // Obtenemos datos de la URL
+
+    // Si el panel NO es 'publicar', eliminamos los parámetros de edición y estado
+    const publishLink = document.querySelector('[data-panel="publicar"]');
+    if (panel !== 'publicar') {
+        const url = new URL(window.location);
+        url.searchParams.delete('editar');
+        url.searchParams.delete('estado');
+        window.history.pushState({}, '', url);
+    }
+
+    // Si el parámetro SÍ es 'publicar', obtenemos datos de la URL
     const params = new URLSearchParams(window.location.search);
-
     const editPetId = params.get('editar');
-    const initiaState = params.get('estado');
-    console.log(editPetId + ' | ' + initiaState);
+    const initialState = params.get('estado');
+    console.log(editPetId + ' | ' + initialState);
 
-    // Actualizamos la URL sin recargar la página
-    // Esto permite actualizar la página manteniendo el panel actual, en lugar de cargar el panel por defecto
+    // ASIDE: el texto del link de "PUBLICAR" cambia según los parámetros de la url (Modo publicar / Modo editar)
+    if (publishLink) {
+        if (editPetId && panel === 'publicar') {
+            publishLink.innerHTML = '<img src="../assets/icons/tabler--edit.svg"> EDITAR ANUNCIO';
+        } else {
+            publishLink.innerHTML = '<img src="../assets/icons/mingcute--announcement-line.svg"> PUBLICAR ANUNCIO';
+        }
+    }
+
+    // Lógica para cambiar la URL del navegador sin recargar la página.
+    // Permite mostrar el panel según el enlace del Aside marcado sin tener que recargar.
     let newUrl = `${window.location.pathname}?panel=${panel}`;
     if (editPetId && panel === 'publicar') newUrl += `&editar=${editPetId}`;
-    if (initiaState && panel === 'publicar') newUrl += `&estado=${initiaState}`;
+    if (initialState && panel === 'publicar') newUrl += `&estado=${initialState}`;
 
     // Actualizamos la barra de direcciones sin recargar
     window.history.pushState({ panel }, '', newUrl);
@@ -338,8 +355,6 @@ async function loadPanel(panel) {
                 mainContent.appendChild(title);
                 component.loadPetDataForEdit(editPetId);
                 
-                // Si tu componente tiene un método para cargar datos:
-                // component.loadPetData(petId); 
             } else {
                 // MODO CREACIÓN
                 const title = document.createElement('h1');
@@ -347,8 +362,8 @@ async function loadPanel(panel) {
                 title.classList.add('dashboard-wrapper-title');
                 mainContent.appendChild(title);
                 
-                if (initiaState) {
-                    component.setAttribute('data-initial-state', initiaState);
+                if (initialState) {
+                    component.setAttribute('data-initial-state', initialState);
                 }
             }
             break;

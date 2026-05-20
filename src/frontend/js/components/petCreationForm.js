@@ -41,6 +41,7 @@ console.log('clogseloop');
     } else {
         // Si no hay edición, comprobamos si hay un estado inicial (perdida/encontrada)
         const estadoInicial = this.getAttribute('data-initial-state');
+
         if (estadoInicial) {
             this.applyInitialState(estadoInicial);
         }
@@ -62,7 +63,7 @@ console.log('clogseloop');
         if (!checkbox) return;
 
         // Marcamos el switch según el estado que le pasemos
-        if (estado === 'encontrada') {
+        if (estado === 'encontrada' || estado === 'ENCONTRADA') {
             checkbox.checked = true;
             if (textLabel) textLabel.textContent = 'He encontrado una mascota';
         } else {
@@ -223,7 +224,7 @@ async loadPetDataForEdit(id) {
         console.log("Rellenando formulario con:", pet);
 
         // Ocultamos el switch de estado
-        const stateSwitch = this.querySelector('#pet-create-estado');
+        const stateSwitch = this.querySelector('.switch-div');
         if (stateSwitch) stateSwitch.style.display = 'none';
 
         // Cambiamos el texto del botón "submit"
@@ -259,7 +260,7 @@ async loadPetDataForEdit(id) {
         // Recompensa
         if (pet.recompensa > 0) {
             this.querySelector('#reward-check').checked = true;
-            this.querySelector('#reward-price-container').style.display = 'block';
+            //this.querySelector('#reward-price-container').style.display = '';
             this.querySelector('#reward-price').value = pet.recompensa;
         }
 

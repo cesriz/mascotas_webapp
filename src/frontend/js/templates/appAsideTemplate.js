@@ -11,7 +11,7 @@ export const appAsideHTML = `
                 <a class="aside-a" data-panel="avistamientos"><img src="../assets/icons/iconamoon--eye-black.svg"> Mis avistamientos</a>
                 <a class="aside-a" data-panel="notificaciones"><img src="../assets/icons/mi--notification-black.svg"> Notificaciones</a>
                 <a class="aside-a" data-panel="miperfil"><img src="../assets/icons/mdi--user-outline-black.svg"> Mi perfil</a>
-                <a class="aside-a" data-panel="publicar"><img src="../assets/icons/mingcute--announcement-line.svg"> PUBLICAR ANUNCIO</a>
+                <a class="aside-a" data-panel="publicar" id="aside-publish"></a>
             </div>
 
             <div class="aside-links" id="admin-links">

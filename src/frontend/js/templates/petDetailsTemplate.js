@@ -1,4 +1,7 @@
 export const petDetailsHTML = `
+    <delete-confirm id="delete-confirm"></delete-confirm>
+    <recover-confirm id="recover-confirm"></recover-confirm>
+
     <div class="pet-details-title"></div>
 
     <div class="pet-det-container">
@@ -51,8 +54,11 @@ export const petDetailsHTML = `
             <div class="pet-det-buttons">
                 <button class="button-primary" id="btn-contact">CONTACTAR</button>
                 <button class="button-primary" id="btn-avistamiento">REGISTRAR AVISTAMIENTO</button>
-                <button class="button-secondary" id="btn-qr">GENERAR QR</button>
+                <button class="button-primary" id="btn-qr">GENERAR QR</button>
                 <button class="button-secondary" id="btn-report">REPORTAR ANUNCIO</button>
+                <button class="button-secondary hidden" id="btn-edit">EDITAR</button>
+                <button class="button-success hidden" id="btn-recover">RECUPERADA</button>
+                <button class="button-danger hidden" id="btn-delete">ELIMINAR</button>
             </div>
         </div>
 

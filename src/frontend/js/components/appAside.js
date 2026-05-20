@@ -29,6 +29,9 @@ export class AppAside extends HTMLElement {
                 asideElement.classList.contains('aside-collapsed') ? 'rotate(180deg)' : 'rotate(0deg)';
         };
 
+        // Lógica para mostrar "publicar" o "editar" según el modo del formulario
+        const publishLink = this.querySelector('#aside-publish');
+
         // Comprobamos el rol del usuario (auth.js)
         const isAdminRole = Auth.isAdmin()
         console.log(isAdminRole);

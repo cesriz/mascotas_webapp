@@ -195,15 +195,12 @@ export class PetDetail extends HTMLElement {
         }
 
         // Botón de reporte
-        // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
         const repBtn = this.querySelector('#btn-report');
         const contcBtn = this.querySelector('#btn-contact');
-
+        
+        // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
         const currentUser = Auth.getUserData(); 
-        console.log(currentUser);
-
         const isOwner = currentUser && currentUser.id === pet.usuario_id;
-        console.log(isOwner);
 
         if (isOwner) {
             avBtn.classList.add('hidden');
@@ -213,6 +210,58 @@ export class PetDetail extends HTMLElement {
             repBtn.classList.remove('hidden');
             contcBtn.classList.remove('hidden');
             avBtn.classList.remove('hidden');
+        }
+
+        // Botones de edición (están ocultos por defecto)
+        const btnEdit = this.querySelector('#btn-edit');
+        const btnRecover = this.querySelector('#btn-recover');
+        const btnDelete = this.querySelector('#btn-delete');
+
+        if (isOwner) {
+            // Mostramos botones
+            btnEdit.classList.remove('hidden');
+            btnRecover.classList.remove('hidden');
+            btnDelete.classList.remove('hidden');
+
+            // Editar anuncio de mascota
+            btnEdit.onclick = (e) => {
+                e.stopPropagation();
+                
+                if (btnEdit) {
+                    const petId = this.petData.id;
+                    if (petId) {
+                        window.location.href = `perfil?panel=publicar&editar=${petId}`
+                    } else 
+                        window.location.href = `perfil?panel=mascotas`;
+                }
+            };
+
+            // Borrar anuncio de mascota
+            btnDelete.onclick = async (e) => {
+                e.stopPropagation();
+
+                const confirmPanel = this.querySelector('#delete-confirm');
+
+                if (confirmPanel) {
+                    confirmPanel.open(this.petData.id);
+                }
+
+            };
+
+            // Marcar como recuperada
+            btnRecover.onclick = async (e) => {
+                e.stopPropagation();
+
+                const confirmRPanel = this.querySelector('#recover-confirm');
+
+                if (confirmRPanel) {
+                    confirmRPanel.open(this.petData.id);
+                }
+            };
+
+        } if (isOwner && est == 'recuperada') {
+            // Ocultamos el botón de 'recuperada'
+            btnRecover.classList.add('hidden');
         }
 
     }

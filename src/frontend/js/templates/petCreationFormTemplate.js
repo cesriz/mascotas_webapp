@@ -10,7 +10,7 @@ export const petCreationHTML = `
 
             <div class="pet-create-data-section">
                 <div class="pet-create-title">
-                    <img src="../assets/icons/streamline-plump--pet-paw.png">
+                    <img src="../assets/icons/streamline-plump--pet-paw.svg" alt="Icono mascota">
                     <h3>Datos de la mascota</h3>
                 </div>
 
@@ -68,13 +68,13 @@ export const petCreationHTML = `
 
             <div class="pet-create-data-section">
                 <div class="pet-create-title">
-                    <img src="../assets/icons/solar--camera-linear.png">
+                    <img src="../assets/icons/solar--camera-linear.svg" alt="Icono cámara">
                     <h3>Fotos de la mascota</h3>
                 </div>
 
                 <label for="pet-create-data-foto">Sube las mejores fotos de tu mascota para que sea más fácil reconocerla</label>
                 <div class="pet-create-foto-div">            
-                    <img src="../assets/icons/proicons--photo.png" alt="Subir foto" id="create-form-upload-icon">
+                    <img src="../assets/icons/proicons--photo.svg" alt="Subir foto" id="create-form-upload-icon">
                     <span id="pet-create-filename-label">Haz clic para seleccionar o arrastra una imagen</span>
                     <input type="file" id="pet-create-data-foto" accept="image/*" multiple>
                     <div id="pet-create-preview-div"></div>
@@ -83,7 +83,7 @@ export const petCreationHTML = `
 
             <div class="pet-create-data-section">
                 <div class="pet-create-title">
-                    <img src="../assets/icons/iconoir--post.png">
+                    <img src="../assets/icons/iconoir--post.svg" alt="Icono anuncio">
                     <h3>Detalles del suceso</h3>
                 </div>
 
@@ -95,8 +95,11 @@ export const petCreationHTML = `
 
                     <div class="pet-create-data-location">            
                         <label for="pet-create-data-form-loc">¿Dónde has visto a tu mascota por última vez?</label>
-                        <input type="" id="pet-create-data-form-loc" placeholder="Escribe una dirección">
-                        <button class="button-primary" type="button" id="pet-create-data-search-btn">Buscar en mapa</button>
+                        <div style="position:relative">
+                            <input type="" id="pet-create-data-form-loc" placeholder="Escribe una dirección">
+                            <div id="loc-autocomplete" class="loc-autocomplete"></div>
+                        </div>
+                        <button class="button-primary" type="button" id="pet-create-data-search-btn">Buscar</button>
                     </div>
                     <div><pet-map id="pet-create-data-map"></pet-map></div>
                     <input type="hidden" name="latitud" id="pet-create-data-lat-input" required>
@@ -135,6 +138,7 @@ export const petCreationCSS = `
         align-items: center;
         gap: 5px;
     }
+        
     .switch {
         position: relative;
         display: inline-block;

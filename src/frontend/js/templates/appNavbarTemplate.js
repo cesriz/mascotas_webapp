@@ -10,12 +10,12 @@ export const navBarHTML = `
 
             <div class="nav-btn" id="desktop-btn">
                 <button class="button-secondary" id="btn-auth"></button>
-                <button class="button-primary" id="btn-publicar"> PUBLICAR ANUNCIO </button>
+                <button class="button-primary" id="btn-publish"> PUBLICAR ANUNCIO </button>
             </div>
 
             <!-- Botón hamburguesa -->
             <button class="hamburger-btn" id="hamburger-btn">
-                <img src="../assets/icons/material-symbols--menu.png" alt="Menu burger">
+                <img src="../assets/icons/material-symbols--menu-rounded.svg" alt="Menu burger">
             </button>
         </div>
         <nav class="navbar" id="navbar">
@@ -170,6 +170,7 @@ export const navBarCSS = `
             transition: all 0.5s ease;
             gap: 1rem;
         }
+
         .navbar.active {
             height: auto;
             padding: 1rem 0;

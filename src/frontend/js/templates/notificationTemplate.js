@@ -17,13 +17,77 @@ export const notificationHTML = `
 
         <section class="contacts-section">
             <ul class="notification-list" id="notification-list"></ul>
-    </section>
+        </section>
 `;
 
+// Plantilla para Contacto
+export const templateContacto = (contacto) => {
+    // Ruta de la foto placeholder por defecto
+    const placeholder = '../assets/placeholder.png';
+
+    // Si foto_mascota_url es null, undefined o vacío, usará el placeholder
+    const photo = contacto.foto_mascota_url || placeholder;
+    
+    
+    return`
+    <li class="notification-item ${contacto.leido_destinatario ? '' : 'unread'}" 
+        data-id="${contacto.id}" data-tipo="contacto">
+        
+        <img src="${photo}"  alt="Foto de ${contacto.mascota_nombre}" class="notification-img">
+        
+        <div class="content">
+            <h4>Mensaje de ${contacto.nombre} sobre <strong>${contacto.mascota_nombre}</strong></h4>
+            <p class="message-body">"${contacto.mensaje}"</p>
+            <small>Recibido el: ${contacto.fecha_creacion}</small>
+            <div class="imp-info">
+                <p class="info-item"><img src="../assets/icons/mingcute--phone-line.svg" alt="Icono telefono">${contacto.telefono}</p>
+                <p class="info-item"><img src="../assets/icons/material-symbols--mail-outline-rounded-orange.svg" alt="Icono email">${contacto.correo}</p>
+            </div>
+        </div>
+        
+        ${!contacto.leido_destinatario ? `
+        <div class="action-area">
+            <button class="button-primary">✓ Marcar como leído</button>
+        </div>` : ''}
+    </li>`;
+}
+
+// Plantilla para Avistamiento
+export const templateAvistamiento = (avistamiento) => {
+    // Ruta de la foto placeholder por defecto
+    const placeholder = '../assets/placeholder.png';
+
+    // Si foto_avistamiento_url es null, undefined o vacío, usará el placeholder
+    const photo = avistamiento.foto_avistamiento_url || placeholder;
+
+    return `
+    <li class="notification-item ${avistamiento.leido_propietario ? '' : 'unread'}" 
+        data-id="${avistamiento.id}" data-tipo="avistamiento" data-mascota-id="${avistamiento.mascota_id}">
+        
+        <img src="${photo}" alt="Foto del avistamiento" class="notification-img" 
+             onerror="this.onerror=null; this.src='${placeholder}';">
+        
+        <div class="content">
+            <h4>Avistamiento de <strong>${avistamiento.mascota_nombre}</strong></h4>
+            <p class="message-body">"${avistamiento.descripcion}"</p>
+            <div class="imp-info">
+            <p class="info-item"><img src="../assets/icons/tdesign--location.svg" alt="Icono ubicacion">${avistamiento.direccion_formateada}, ${avistamiento.municipio}</p>
+            <p class="info-item"><img src="../assets/icons/solar--calendar-linear.svg" alt="Icono fecha">${avistamiento.fecha_hora}</p>
+            </div>
+        </div>
+        
+        ${!avistamiento.leido_propietario ? `
+        <div class="action-area">
+            <button class="button-primary">✓ Marcar como leído</button>
+        </div>` : ''}
+    </li>`;
+};
+
+    
 export const notificationCSS = `
     /* Estilos Generales */
     .notification-center {
-        max-width: 800px;
+        max-width: 1200px;
         margin: 2rem auto;
     }
 
@@ -94,13 +158,21 @@ export const notificationCSS = `
         font-style: italic; 
     }
 
-    .location { 
+    .info-item { 
+        display:flex;
+        align-items:center;
         margin: 0.25rem 0; 
         font-size: 0.9rem; }
 
-    .contact-info { 
+    .info-item > img {
+        width:20px;
+        height:20px;
+        margin-right: 8px;
+    }
+
+    .imp-info { 
         margin-top: 0.5rem; 
-        font-size: 0.85rem; 
+        font-size: var(--text-sm); 
         display:flex;
         flex-direction:column;
         align-items:start;
@@ -122,7 +194,7 @@ export const notificationCSS = `
     }
 
 
-    /* Tablets y móviles */
+    /* ------------Tablets y móviles------------ */
     @media (max-width: 768px) {
         .notification-summary {
             flex-wrap: wrap;
@@ -181,46 +253,3 @@ export const notificationCSS = `
         }
     }
 `;
-
-// Plantilla para Contacto
-export const templateContacto = (contacto) => `
-    <li class="notification-item ${contacto.leido_destinatario ? '' : 'unread'}" 
-        data-id="${contacto.id}" data-tipo="contacto">
-        
-        <img src="${contacto.foto_mascota_url}" alt="Foto de ${contacto.mascota_nombre}" class="notification-img">
-        
-        <div class="content">
-            <h4>Mensaje de ${contacto.nombre} sobre <strong>${contacto.mascota_nombre}</strong></h4>
-            <p class="message-body">"${contacto.mensaje}"</p>
-            <small>Recibido el: ${contacto.fecha_creacion}</small>
-            <div class="contact-info">
-                <img src="../assets/icons/line-md--phone.png" alt="Teléfono"><span>${contacto.telefono}</span>
-                <img src="../assets/icons/material-symbols--mail-outline.png" alt="Teléfono"><span>${contacto.correo}</span>
-            </div>
-        </div>
-        
-        ${!contacto.leido_destinatario ? `
-        <div class="action-area">
-            <button class="button-primary">✓ Marcar como leído</button>
-        </div>` : ''}
-    </li>`;
-
-// Plantilla para Avistamiento
-export const templateAvistamiento = (avistamiento) => `
-    <li class="notification-item ${avistamiento.leido_propietario ? '' : 'unread'}" 
-        data-id="${avistamiento.id}" data-tipo="avistamiento" data-mascota-id="${avistamiento.mascota_id}">
-        
-        <img src="${avistamiento.foto_avistamiento_url}" alt="Foto del avistamiento" class="notification-img">
-        
-        <div class="content">
-            <h4>Avistamiento de <strong>${avistamiento.mascota_nombre}</strong></h4>
-            <p class="message-body">"${avistamiento.descripcion}"</p>
-            <p class="location"><strong>Lugar:</strong> ${avistamiento.direccion_formateada}, ${avistamiento.municipio}</p>
-            <small>Fecha: ${avistamiento.fecha_hora}</small>
-        </div>
-        
-        ${!avistamiento.leido_propietario ? `
-        <div class="action-area">
-            <button class="button-primary">✓ Marcar como leído</button>
-        </div>` : ''}
-    </li>`;

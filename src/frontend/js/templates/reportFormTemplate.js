@@ -2,7 +2,7 @@ export const reportFormHTML = `
     <div class="panel-overlay" id="panel-overlay"></div>
     <div class="report-form">
         <div class="report-title">
-            <img src="../assets/icons/material-symbols--report-outline.png">
+            <img src="../assets/icons/mingcute--alert-line.svg">
             <h3>Reportar anuncio</h3>
         </div>
 
@@ -14,10 +14,6 @@ export const reportFormHTML = `
                 <div>            
                     <label for="report-subject">Asunto</label>
                     <input type="text" id="report-subject" required>
-                </div>
-                <div>            
-                    <label for="report-reason">Motivo</label>
-                    <input type="text" id="report-reason" required>
                 </div>
                 <div>            
                     <label for="report-msg">Mensaje</label>

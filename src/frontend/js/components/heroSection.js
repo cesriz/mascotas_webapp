@@ -1,5 +1,6 @@
 import { createTemplate } from "../ui-utils.js";
 import { heroSectionHTML, heroSectionCSS } from "../templates/heroSectionTemplate.js";
+import { Auth } from '../auth.js';
 
 // Importamos plantilla (HTML y CSS)
 const template = createTemplate(heroSectionHTML, heroSectionCSS);
@@ -41,6 +42,33 @@ class HeroSection extends HTMLElement {
     // Limpiamos e inyectamos el contenido del template
     this.innerHTML = '';
     this.appendChild(template.content.cloneNode(true));
+
+    // Comprobamos si el usuario está autenticado
+    const isLoggedIn = Auth.isLoggedIn();
+    const user = Auth.getUserData();
+
+    // Lógica para el botón de mascota perdida
+    const publishLostBtn = this.querySelector('#lost-btn');
+    publishLostBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (isLoggedIn) {
+            window.location.href = 'perfil?panel=publicar&estado=perdida';
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    // Lógica para el botón de mascota encontrada
+    const publishFoundBtn = this.querySelector('#found-btn');
+    publishFoundBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (isLoggedIn) {
+            window.location.href = 'perfil?panel=publicar&estado=encontrada';
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
   }
 }
 

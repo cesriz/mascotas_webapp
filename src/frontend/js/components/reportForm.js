@@ -55,7 +55,6 @@ export class ReportForm extends HTMLElement {
 
         const data = {
             asunto: this.querySelector('#report-subject').value,
-            motivo: this.querySelector('#report-report').value,
             mensaje: this.querySelector('#report-msg').value,
             nombre: this.querySelector('#report-name').value,
             correo: this.querySelector('#report-correo').value,

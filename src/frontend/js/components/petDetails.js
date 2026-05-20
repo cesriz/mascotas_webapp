@@ -1,4 +1,5 @@
 import { API } from '../api.js';
+import { Auth } from '../auth.js';
 import { PetContactForm } from './petContactForm.js';
 import { AvistamientoCreationForm } from './avistamientoCreationForm.js';
 import { showHttpError, showSuccess } from '../main.js';
@@ -23,9 +24,7 @@ export class PetDetail extends HTMLElement {
         const petId = this.getAttribute('pet-id') || new URLSearchParams(window.location.search).get('id');
 
         if (petId) {
-            console.log('recibiendo id');
             await this.fetchPetData(petId);
-            console.log(' id recibido');
         } else {
             return;
         }
@@ -39,8 +38,9 @@ export class PetDetail extends HTMLElement {
 
         try {
             // Utilizamos el método getMascotaById(id) de api.js
-            console.log('fetch');
             this.petData = await API.getMascotaById(id);
+
+            console.log(this.petData);
             this.render();
         } catch (error) {
             console.error("Error cargando mascota:", error);
@@ -52,6 +52,9 @@ export class PetDetail extends HTMLElement {
     render() {
         this.innerHTML = '';
         this.appendChild(template.content.cloneNode(true));
+
+        // Título
+            this.applyTitle(this.petData);
 
         // Imágenes
             const carrousel = this.querySelector('#carrousel');
@@ -150,9 +153,68 @@ export class PetDetail extends HTMLElement {
             });
 
    
-        // Ejecutamo funciones definidas abajo
+        // Ejecutamos funciones definidas abajo
         this.initCarouselEvents();
         this.buttonEvents();
+        this.applyButtons(this.petData);
+    }
+
+    // Lógica para mostrar el título del anuncio de forma dinámica según el estado
+    applyTitle(pet) {
+        const container = this.querySelector('.pet-details-title');
+        if (!container) return;
+
+        const est = pet.estado ? pet.estado.toLowerCase() : '';
+        let htmlContent = '';
+
+        if (est === 'perdida') {
+            htmlContent = '<h3>SE BUSCA A <span id="pet-details-name">' + pet.nombre.toUpperCase() + '</span></h3>';
+        } 
+        else if (est === 'encontrada') {
+            htmlContent = '<h3>SE HA ENCONTRADO ' + pet.especie_nombre.toUpperCase() || 'animal ' + '</h3>';
+        } 
+        else if (est === 'recuperada') {
+            htmlContent = '<h3>¡<span id="pet-details-name">' + pet.nombre.toUpperCase() + '</span> HA VUELTO A CASA!</h3>';
+        }
+
+        container.innerHTML = htmlContent;
+    }
+
+    // Lógica para mostrar los botones del anuncio de forma dinámica según el estado y el propietario
+    applyButtons(pet) {
+        // Botón de avistamiento
+        const avBtn = this.querySelector('#btn-avistamiento');
+        if (!avBtn) return;
+
+        const est = pet.estado ? pet.estado.toLowerCase() : '';
+
+        if (est === 'encontrada' || est === 'recuperada') {
+            avBtn.classList.add('hidden');
+        }  else {
+            avBtn.classList.remove('hidden');
+        }
+
+        // Botón de reporte
+        // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
+        const repBtn = this.querySelector('#btn-report');
+        const contcBtn = this.querySelector('#btn-contact');
+
+        const currentUser = Auth.getUserData(); 
+        console.log(currentUser);
+
+        const isOwner = currentUser && currentUser.id === pet.usuario_id;
+        console.log(isOwner);
+
+        if (isOwner) {
+            avBtn.classList.add('hidden');
+            repBtn.classList.add('hidden');
+            contcBtn.classList.add('hidden');
+        }  else {
+            repBtn.classList.remove('hidden');
+            contcBtn.classList.remove('hidden');
+            avBtn.classList.remove('hidden');
+        }
+
     }
 
     // Lógica para mover el carrousel de imágenes

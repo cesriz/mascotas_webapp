@@ -3,6 +3,7 @@
  *  - Guarda, lee o borra el token y los datos de usuario
  *  - Valida o bloquea el acceso según los permisos de usuario
  */
+import { API } from "./api.js";
 
 export const Auth = {
     // Guarda los datos de sesión tras un login con éxito
@@ -10,14 +11,14 @@ export const Auth = {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
         // Guardamos el rol siempre en minúsculas para evitar errores de comparación
-        localStorage.setItem('role', user.rol.toLowerCase()); 
+        localStorage.setItem('rol', user.rol.toLowerCase()); 
     },
     
     // Borra los datos de la sesión
     clearSession() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        localStorage.removeItem('role');
+        localStorage.removeItem('rol');
     },
 
     // Comprueba si el usuario tiene un token
@@ -27,7 +28,7 @@ export const Auth = {
 
     // Indica el rol del usuario actual ('admin' o 'user')
     getRole() {
-        return localStorage.getItem('role');
+        return localStorage.getItem('rol');
     },
 
     // Comprueba si el usuario es adminsitrador
@@ -54,18 +55,19 @@ export const Auth = {
 
         try {
             // Obtenemos los datos del usuario logeado
-            const response = await API.getMe(); 
-            const user = response.data;
+            const user = await API.getMe(); 
+
+            if (!user) throw new Error("No se encontraron datos de usuario");
 
             // Actualizamos el localStorage con los datos del servidor
-            // Usamos setSession para actualizar token, user y role
+            // Usamos setSession para actualizar token, user y rol
             this.setSession(token, user);
 
             return user; // Devolvemos el usuario actualizado
         } catch (error) {
             // Si el servidor da error, la sesión ya no es válida
-            console.error("Sesión expirada o inválida");
-            this.clearSession(); 
+            console.error("Error en syncUser:", error.message);
+            this.clearSession();
             return null;
         }
     }

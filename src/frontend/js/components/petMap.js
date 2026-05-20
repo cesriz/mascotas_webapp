@@ -18,8 +18,23 @@ export class PetMap extends HTMLElement {
         this.markers = L.layerGroup(); // Pin de avistamientos
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         this.initMap();
+        this.markers.addTo(this.map);
+
+        // Verificar si estamos en una página de detalles
+        const petId = new URLSearchParams(window.location.search).get('id');
+        
+        // Verificar si el componente tiene un atributo "mode" (<pet-map mode="select">)
+        const mode = this.getAttribute('mode');
+
+        if (petId && mode !== 'select') {
+            // PetDetail: cargamos avistamientos
+            await this.setData(petId);
+        } else if (mode === 'select') {
+            // avistamientoCreationForm: activamos el marcador para formularios
+            this.initRegistrationMode();
+        }
     }
 
     // Seleccionamos la plantilla y le adjuntamos el mapa de Leaflet
@@ -35,9 +50,6 @@ export class PetMap extends HTMLElement {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(this.map);
-
-        // Añadimos marcadores al mapa
-        this.markers.addTo(this.map);
     }
 
     // Setter para añadir los datos de la mascota y sus avistamientos
@@ -45,13 +57,12 @@ export class PetMap extends HTMLElement {
         try {
             // Obtenemos los datos de la mascota (ubicación del anuncio)
             this._petData = await API.getMascotaById(id);
-            
             // Obtenemos los datos de los avistamientos
             this._avistamientos = await API.getAvistamientosMascota(id);
-
             this.renderMarkers(); // Mostramos marcadores en el mapa
         } catch (error) {
-             showHttpError(error);
+            console.error("Error al cargar datos del mapa:", error);
+            showHttpError(error);
         }
     }
 
@@ -62,9 +73,10 @@ export class PetMap extends HTMLElement {
         // Limpiamos marcas anteriores
         this.markers.clearLayers();
         const bounds = [];
+        if (!Array.isArray(this._avistamientos)) return;
 
         // Marcador con ubicación original del anuncio (color naranja)
-        if (this._petData.latitud && this._petData.longitud) {
+        if (this._petData && this._petData.latitud && this._petData.longitud) {
             const posAnuncio = [this._petData.latitud, this._petData.longitud];
 
             // Creamos tarjeta popup
@@ -132,8 +144,7 @@ export class PetMap extends HTMLElement {
         // Lógica de Seguridad. Comprobamos si quien está viendo el mapa es el dueño del anuncio
         const currentUser = Auth.getUserData();
         // El ID del dueño está en this._petData.dueno.id (siempre es el mismo para todos los pines de esa mascota)
-        const isOwner = currentUser && this._petData && currentUser.id === this._petData.dueno.id;
-
+        const isOwner = currentUser && this._petData && (this._petData.usuario_id === currentUser.id || (this._petData.dueno && this._petData.dueno.id === currentUser.id));
         // Creamos el contenedor principal
         const popupCard = document.createElement('div');
         popupCard.className = 'map-popup-card';
@@ -150,16 +161,9 @@ export class PetMap extends HTMLElement {
 
             ${(!isPet && isOwner) ? '<button class="button-primary" id="map-popup-button">Contactar testigo</button>' : ''}
 
-            <div class="map-popup-contact" style="display: none;">
-                <div>
-                    <img src="../../assets/icons/material-symbols--mail-outline.png" alt="Icono mail">
-                    <p>${data.correo || 'No disponible'}</p>
-                </div>
-
-                <div>
-                    <img src="../../assets/icons/line-md--phone.png" alt="Icono mail">
-                    <p>${data.telefono || 'No disponible'}</p>
-                </div>
+            <div class="map-popup-contact">
+                <p> <img src="../../assets/icons/material-symbols--mail-outline-rounded-orange.svg" alt="Icono mail"> ${data.correo || 'No disponible'}</p>
+                <p> <img src="../../assets/icons/mingcute--phone-line.svg" alt="Icono teléfono"> ${data.telefono || 'No disponible'}</p>
             </div>
         `;
 
@@ -172,10 +176,16 @@ export class PetMap extends HTMLElement {
                 e.preventDefault();
 
                 // Verificamos el estado actual
-                const isHidden = contactDiv.style.display === 'none';
-                contactDiv.style.display = isHidden ? 'block' : 'none';
-                // Cambiamos el texto según el estado
-                popupBtn.textContent = isHidden ? 'Cerrar' : 'Contactar testigo';
+                const isOpen = contactDiv.classList.contains('open');
+                
+                // Según estado, mostramos u ocultamos
+                if (isOpen) {
+                    contactDiv.classList.remove('open');
+                    popupBtn.textContent = 'Contactar testigo';
+                } else {
+                    contactDiv.classList.add('open');
+                    popupBtn.textContent = 'Cerrar';
+                }
             };
         }
         

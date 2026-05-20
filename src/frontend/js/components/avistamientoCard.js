@@ -43,6 +43,25 @@ export class AvistamientoCard extends HTMLElement {
         imgElement.src = avistamiento.foto_avistamiento_url || '../assets/placeholder.png';
         imgElement.onerror = () => { imgElement.src = '../assets/placeholder.png'; };
 
+        // Al hacer click en la tarjeta redirecciona a pet-detail
+        const card = this.querySelector('.avistamiento-card');
+
+        if (!card) {
+            console.error('No existe la tarjeta');
+
+        }
+        
+        card.addEventListener('click', () => {
+            const id = this._avistamientoData.mascota_id;
+            console.log(id);
+            
+            if (id) {
+                window.location.href = `detalles?id=${id}`;
+            } else {
+                console.error("Error: La mascota no tiene ID", this._avistamientoData);
+            }
+        });
+
         // Badge de estado de la mascota en el momento del avistamiento
         this.applyBadge(avistamiento.estado_mascota);
         // Fotografía

@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
+// Validador encargado de revisar y normalizar datos de mascotas
+// antes de que lleguen al modelo o a la base de datos.
 class MascotaValidator
 {
-    // Valida y normaliza los filtros del listado.
+    // Valida los filtros recibidos en el listado público de mascotas.
+    // También aplica valores por defecto para paginación y ordenación.
     public static function validateIndexFilters(array $data): array
     {
         $errors = [];
 
+        // Valores permitidos para evitar filtros inválidos.
         $estadosValidos = ['PERDIDA', 'ENCONTRADA', 'RECUPERADA'];
         $sexosValidos = ['MACHO', 'HEMBRA', 'DESCONOCIDO'];
         $tamanosValidos = ['PEQUENO', 'MEDIANO', 'GRANDE', 'DESCONOCIDO'];
@@ -54,6 +58,7 @@ class MascotaValidator
             ? trim((string) $data['fecha_hasta'])
             : null;
 
+        // Normaliza booleanos opcionales de filtros.
         $tieneChip = self::normalizeNullableBool($data['tiene_chip'] ?? null);
         $conFotos = self::normalizeNullableBool($data['con_fotos'] ?? null);
 
@@ -69,8 +74,10 @@ class MascotaValidator
             ? (int) $data['limit']
             : 12;
 
+        // Permite filtrar por uno o varios colores.
         $colorIds = self::normalizeColorIds($data['color_ids'] ?? null);
 
+        // Validaciones de filtros.
         if ($estado !== null && !in_array($estado, $estadosValidos, true)) {
             $errors[] = 'estado no válido';
         }
@@ -115,6 +122,7 @@ class MascotaValidator
             $errors[] = 'limit debe ser mayor que 0';
         }
 
+        // Límite máximo para evitar consultas demasiado grandes.
         if ($limit > 50) {
             $limit = 50;
         }
@@ -126,6 +134,7 @@ class MascotaValidator
             ];
         }
 
+        // Devuelve filtros ya limpios y normalizados.
         return [
             'errors' => [],
             'data' => [
@@ -149,15 +158,18 @@ class MascotaValidator
         ];
     }
 
-    // Valida los datos al crear una mascota.
+    // Valida los datos necesarios para crear una mascota/anuncio.
+    // También normaliza campos como colores, booleanos, fechas y ubicación.
     public static function validateStore(array $data): array
     {
         $errors = [];
 
+        // Si solo llega un color, lo convierte en array para tratarlo igual.
         if (isset($data['colores']) && !is_array($data['colores'])) {
             $data['colores'] = [$data['colores']];
         }
 
+        // Campos obligatorios principales.
         if (empty($data['nombre'])) {
             $errors[] = 'nombre es obligatorio';
         }
@@ -182,6 +194,7 @@ class MascotaValidator
             $errors[] = 'estado es obligatorio';
         }
 
+        // Normaliza y valida los colores asociados a la mascota.
         if (empty($data['colores']) || !is_array($data['colores'])) {
             $errors[] = 'colores es obligatorio y debe ser un array';
         } else {
@@ -207,6 +220,7 @@ class MascotaValidator
         $sexosValidos = ['MACHO', 'HEMBRA', 'DESCONOCIDO'];
         $tamanosValidos = ['PEQUENO', 'MEDIANO', 'GRANDE', 'DESCONOCIDO'];
 
+        // Valida que los campos tipo catálogo usen valores permitidos.
         if (!empty($data['estado']) && !in_array($data['estado'], $estadosValidos, true)) {
             $errors[] = 'estado no válido';
         }
@@ -223,6 +237,7 @@ class MascotaValidator
         $fechaEncontrada = null;
         $fechaRecuperada = null;
 
+        // Cada estado requiere su fecha correspondiente.
         if (($data['estado'] ?? null) === 'PERDIDA') {
             if (empty($data['fecha_perdida'])) {
                 $errors[] = 'fecha_perdida es obligatoria si el estado es PERDIDA';
@@ -247,6 +262,7 @@ class MascotaValidator
             }
         }
 
+        // La ubicación es obligatoria para situar el anuncio en el mapa/listado.
         if (empty($data['ubicacion']) || !is_array($data['ubicacion'])) {
             $errors[] = 'ubicacion es obligatoria';
         } else {
@@ -280,6 +296,7 @@ class MascotaValidator
             ];
         }
 
+        // Normaliza colores una vez validado todo.
         $colores = array_filter(
             $data['colores'],
             fn($color) => $color !== null && $color !== ''
@@ -289,6 +306,7 @@ class MascotaValidator
         $colores = array_filter($colores, fn($color) => $color > 0);
         $colores = array_values(array_unique($colores));
 
+        // Devuelve los datos finales listos para service/model.
         return [
             'errors' => [],
             'data' => [
@@ -339,13 +357,13 @@ class MascotaValidator
         ];
     }
 
-    // Reutiliza la validación de crear para actualizar.
+    // Reutiliza la validación de creación para actualizar mascotas.
     public static function validateUpdate(array $data): array
     {
         return self::validateStore($data);
     }
 
-    // Convierte color_ids a array de enteros.
+    // Convierte color_ids en un array limpio de IDs enteros únicos.
     private static function normalizeColorIds(mixed $value): array
     {
         if ($value === null || $value === '') {
@@ -364,7 +382,7 @@ class MascotaValidator
         return array_values(array_unique($value));
     }
 
-    // Convierte varios formatos a 1, 0 o null.
+    // Convierte distintos formatos de booleano a 1, 0 o null.
     private static function normalizeNullableBool(mixed $value): ?int
     {
         if ($value === null || $value === '') {
@@ -384,7 +402,7 @@ class MascotaValidator
         return null;
     }
 
-    // Comprueba si una fecha tiene formato Y-m-d.
+    // Comprueba si una fecha tiene formato válido YYYY-MM-DD.
     private static function isValidDate(string $date): bool
     {
         $parsed = DateTime::createFromFormat('Y-m-d', $date);

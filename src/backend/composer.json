@@ -3,7 +3,8 @@
   "description": "Backend PHP del proyecto Mascotas WebApp",
   "type": "project",
   "require": {
-    "firebase/php-jwt": "^7.0"
+    "firebase/php-jwt": "^7.0",
+    "cloudinary/cloudinary_php": "*"
   },
   "autoload": {
     "classmap": [

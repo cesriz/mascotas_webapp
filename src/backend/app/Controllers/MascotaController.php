@@ -12,6 +12,7 @@ require_once __DIR__ . '/../Services/MascotaService.php';
 require_once __DIR__ . '/../Validators/MascotaValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
+require_once __DIR__ . '/../Helpers/FileHelper.php';
 
 /**
  * Controlador de mascotas.
@@ -378,14 +379,8 @@ class MascotaController
         $mascotaFotos = $this->fotoModel->getByMascotaId($id);
         $avistamientos = $this->avistamientoModel->getByMascotaId($id);
 
-        $fileUrlsToDelete = [];
+        $fotosToDelete = $mascotaFotos;
         $ubicacionesAvistamientosIds = [];
-
-        foreach ($mascotaFotos as $foto) {
-            if (!empty($foto['url'])) {
-                $fileUrlsToDelete[] = $foto['url'];
-            }
-        }
 
         foreach ($avistamientos as $avistamiento) {
             $avistamientoId = (int) $avistamiento['id'];
@@ -393,11 +388,7 @@ class MascotaController
 
             $fotosAvistamiento = $this->fotoModel->getByAvistamientoId($avistamientoId);
 
-            foreach ($fotosAvistamiento as $foto) {
-                if (!empty($foto['url'])) {
-                    $fileUrlsToDelete[] = $foto['url'];
-                }
-            }
+            $fotosToDelete = array_merge($fotosToDelete, $fotosAvistamiento);
         }
 
         try {
@@ -420,7 +411,7 @@ class MascotaController
 
             $this->mascotaModel->commit();
 
-            $this->deletePhysicalFiles($fileUrlsToDelete);
+            FileHelper::destroyImages($fotosToDelete);
 
             Response::json([
                 'success' => true,
@@ -428,7 +419,7 @@ class MascotaController
                 'data' => [
                     'id' => $id,
                     'avistamientos_eliminados' => count($avistamientos),
-                    'fotos_eliminadas' => count($fileUrlsToDelete)
+                    'fotos_eliminadas' => count($fotosToDelete)
                 ]
             ]);
         } catch (Throwable $e) {
@@ -490,19 +481,4 @@ class MascotaController
         }
     }
 
-    /**
-     * Elimina físicamente los archivos borrados en base de datos.
-     */
-    private function deletePhysicalFiles(array $urls): void
-    {
-        $uniqueUrls = array_values(array_unique(array_filter($urls)));
-
-        foreach ($uniqueUrls as $url) {
-            $path = __DIR__ . '/../../public' . $url;
-
-            if (is_file($path)) {
-                @unlink($path);
-            }
-        }
-    }
 }

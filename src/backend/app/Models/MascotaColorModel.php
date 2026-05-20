@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
 
+// Modelo encargado de gestionar la relación entre mascotas y colores.
 class MascotaColorModel extends BaseModel
 {
+    // Asocia un color a una mascota.
     public function create(int $mascotaId, int $colorId): bool
     {
         $sql = "
@@ -23,6 +25,7 @@ class MascotaColorModel extends BaseModel
         ]);
     }
 
+    // Elimina todos los colores asociados a una mascota.
     public function deleteByMascotaId(int $mascotaId): bool
     {
         $sql = "
@@ -35,6 +38,7 @@ class MascotaColorModel extends BaseModel
         ]);
     }
 
+    // Sincroniza los colores de una mascota: elimina los anteriores y guarda los nuevos.
     public function syncColors(int $mascotaId, array $colores): void
     {
         $this->deleteByMascotaId($mascotaId);
@@ -44,6 +48,7 @@ class MascotaColorModel extends BaseModel
         }
     }
 
+    // Obtiene todos los colores asociados a una mascota.
     public function getByMascotaId(int $mascotaId): array
     {
         $sql = "

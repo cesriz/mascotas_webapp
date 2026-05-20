@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
 
+// Modelo encargado de gestionar los mensajes de soporte.
 class SoporteModel extends BaseModel
 {
+    // Crea un nuevo mensaje de soporte.
     public function create(array $data): int
     {
         $sql = "
@@ -41,6 +43,7 @@ class SoporteModel extends BaseModel
         ]);
     }
 
+    // Obtiene todos los mensajes de soporte junto con los datos del usuario.
     public function getAllWithRelations(): array
     {
         $sql = "
@@ -68,6 +71,7 @@ class SoporteModel extends BaseModel
         return $this->fetchAll($sql);
     }
 
+    // Actualiza el estado del mensaje y registra datos de cierre si aplica.
     public function updateEstado(int $id, string $estado, ?int $cerradoPor, ?string $notasAdmin = null): bool
     {
         $sql = "

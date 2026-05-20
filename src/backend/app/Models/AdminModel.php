@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
 
+/**
+ * Modelo encargado de la gestión administrativa:
+ * moderación de anuncios y gestión de usuarios.
+ */
 class AdminModel extends BaseModel
 {
+    /**
+     * Obtiene el listado de anuncios para moderación.
+     */
     public function getAnunciosModeracion(): array
     {
         $sql = "
@@ -23,6 +30,9 @@ class AdminModel extends BaseModel
         return $this->fetchAll($sql);
     }
 
+    /**
+     * Cambia el estado de publicación de un anuncio.
+     */
     public function changeEstadoPublicacionAnuncio(int $id, string $estado): bool
     {
         $sql = "
@@ -37,12 +47,19 @@ class AdminModel extends BaseModel
         ]);
     }
 
+    /**
+     * Elimina un anuncio por su ID.
+     */
     public function deleteAnuncio(int $id): bool
     {
         $sql = "DELETE FROM anuncio_mascotas WHERE id = :id";
+
         return $this->executeQuery($sql, ['id' => $id]);
     }
 
+    /**
+     * Obtiene el listado de usuarios para administración.
+     */
     public function getUsuariosGestion(): array
     {
         $sql = "
@@ -63,6 +80,9 @@ class AdminModel extends BaseModel
         return $this->fetchAll($sql);
     }
 
+    /**
+     * Activa o desactiva un usuario.
+     */
     public function changeEstadoUsuario(int $id, int $activo): bool
     {
         $sql = "

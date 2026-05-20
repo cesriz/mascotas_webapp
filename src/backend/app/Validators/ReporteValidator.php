@@ -2,12 +2,17 @@
 
 declare(strict_types=1);
 
+// Validador encargado de revisar y limpiar
+// los datos recibidos al crear un reporte.
 class ReporteValidator
 {
+    // Valida los campos obligatorios del reporte
+    // y devuelve los datos ya normalizados.
     public static function validateStore(array $data): array
     {
         $errors = [];
 
+        // Campos mínimos necesarios para poder crear el reporte.
         if (empty($data['asunto'])) {
             $errors[] = 'asunto es obligatorio';
         }
@@ -33,6 +38,7 @@ class ReporteValidator
             ];
         }
 
+        // Devuelve los datos limpios para que el controlador/modelo los use.
         return [
             'errors' => [],
             'data' => [

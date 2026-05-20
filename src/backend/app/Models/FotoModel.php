@@ -3,8 +3,15 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
 
+/**
+ * Modelo encargado de gestionar las fotos
+ * de anuncios y avistamientos.
+ */
 class FotoModel extends BaseModel
 {
+    /**
+     * Obtiene las fotos asociadas a una mascota.
+     */
     public function getByMascotaId(int $mascotaId): array
     {
         $sql = "
@@ -26,6 +33,9 @@ class FotoModel extends BaseModel
         ]);
     }
 
+    /**
+     * Obtiene las fotos asociadas a un avistamiento.
+     */
     public function getByAvistamientoId(int $avistamientoId): array
     {
         $sql = "
@@ -47,6 +57,9 @@ class FotoModel extends BaseModel
         ]);
     }
 
+    /**
+     * Guarda una foto asociada a una mascota.
+     */
     public function createForMascota(int $mascotaId, array $foto): int
     {
         $sql = "
@@ -74,6 +87,9 @@ class FotoModel extends BaseModel
         ]);
     }
 
+    /**
+     * Guarda una foto asociada a un avistamiento.
+     */
     public function createForAvistamiento(int $avistamientoId, array $foto): int
     {
         $sql = "
@@ -101,7 +117,9 @@ class FotoModel extends BaseModel
         ]);
     }
 
-    // Borra todos los registros de fotos asociados a una mascota.
+    /**
+     * Elimina todas las fotos asociadas a una mascota.
+     */
     public function deleteByMascotaId(int $mascotaId): bool
     {
         $sql = "
@@ -114,7 +132,9 @@ class FotoModel extends BaseModel
         ]);
     }
 
-    // Borra todos los registros de fotos asociados a un avistamiento.
+    /**
+     * Elimina todas las fotos asociadas a un avistamiento.
+     */
     public function deleteByAvistamientoId(int $avistamientoId): bool
     {
         $sql = "

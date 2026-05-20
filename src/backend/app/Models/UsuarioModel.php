@@ -208,8 +208,7 @@ class UsuarioModel extends BaseModel
         ]);
     }
 
-    // "Eliminar cuenta" de forma segura para este proyecto:
-    // desactiva al usuario y limpia el token.
+    // "Eliminar cuenta" de forma segura para este proyecto: desactiva al usuario y limpia el token.
     public function deactivateAccountById(int $id): bool
     {
         $sql = "

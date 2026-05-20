@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
 
+// Modelo encargado de gestionar los reportes de anuncios.
 class ReporteModel extends BaseModel
 {
+    // Crea un nuevo reporte asociado a una mascota/anuncio.
     public function create(array $data): int
     {
         $sql = "
@@ -44,6 +46,7 @@ class ReporteModel extends BaseModel
         ]);
     }
 
+    // Obtiene todos los reportes junto con los datos de mascota, propietario y usuario reportante.
     public function getAllWithRelations(): array
     {
         $sql = "
@@ -77,6 +80,7 @@ class ReporteModel extends BaseModel
         return $this->fetchAll($sql);
     }
 
+    // Busca un reporte concreto por su ID.
     public function getById(int $id): ?array
     {
         $sql = "
@@ -89,6 +93,7 @@ class ReporteModel extends BaseModel
         return $this->fetchOne($sql, ['id' => $id]);
     }
 
+    // Actualiza el estado de revisión del reporte y guarda notas del admin.
     public function updateEstado(int $id, string $estado, ?int $revisadoPor, ?string $notasAdmin = null): bool
     {
         $sql = "

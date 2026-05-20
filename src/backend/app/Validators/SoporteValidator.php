@@ -2,12 +2,17 @@
 
 declare(strict_types=1);
 
+// Validador encargado de revisar y limpiar
+// los datos enviados en formularios de soporte.
 class SoporteValidator
 {
+    // Valida los campos obligatorios y devuelve
+    // los datos normalizados listos para guardar.
     public static function validateStore(array $data): array
     {
         $errors = [];
 
+        // Campos mínimos requeridos para crear el ticket.
         if (empty($data['asunto'])) {
             $errors[] = 'asunto es obligatorio';
         }
@@ -33,16 +38,24 @@ class SoporteValidator
             ];
         }
 
+        // Devuelve datos ya limpios y con valores por defecto.
         return [
             'errors' => [],
             'data' => [
                 'usuario_id' => $data['usuario_id'] ?? null,
                 'asunto' => trim((string) $data['asunto']),
-                'categoria' => !empty($data['categoria']) ? trim((string) $data['categoria']) : 'GENERAL',
+
+                // Si no se indica categoría, se asigna GENERAL.
+                'categoria' => !empty($data['categoria'])
+                    ? trim((string) $data['categoria'])
+                    : 'GENERAL',
+
                 'mensaje' => trim((string) $data['mensaje']),
                 'nombre' => trim((string) $data['nombre']),
                 'correo' => trim((string) $data['correo']),
-                'telefono' => isset($data['telefono']) ? trim((string) $data['telefono']) : null,
+                'telefono' => isset($data['telefono'])
+                    ? trim((string) $data['telefono'])
+                    : null,
             ]
         ];
     }

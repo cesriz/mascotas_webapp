@@ -87,6 +87,7 @@ export const adminConfig = {
     reportes: {
         method: () => API.getAdminReportes(),
         columns: [
+<<<<<<< HEAD
                     { label: 'Nombre de la mascota', key: 'mascota_nombre' },
                     { label: 'Usuario reportante', key: 'nombre' },
                     { label: 'Email', key: 'correo' },
@@ -126,6 +127,18 @@ export const adminConfig = {
                         }
                     },
                     { label: 'Notas', key: 'notas_admin' },
+=======
+            { label: 'ID mascota', key: 'mascota_id' },
+            { label: 'Usuario reportante', key: 'usuario_reportante_id' },
+            { label: 'Usuario propietario', key: 'usuario_propietario_id' },
+            { label: 'Asunto', key: 'asunto' },                                  
+            { label: 'Mensaje', key: 'mensaje' },
+            { label: 'Nombre', key: 'nombre' },
+            { label: 'Email', key: 'correo' },
+            { label: 'Teléfono', key: 'telefono' },
+            { label: 'Estado', key: 'estado' },
+            { label: 'Notas', key: 'notas_admin' },
+>>>>>>> cbebfb4b6ca2304e77e0d183057b9e567ebdafd9
             { 
                 label: 'Acción',
                 render: (rep) => {

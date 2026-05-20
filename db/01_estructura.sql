@@ -2,6 +2,9 @@
 -- 01_estructura.sql
 -- Proyecto mascotas_webapp
 -- =====================================
+-- ***IMPORTANTE***: Si es necesario reejecutar el SCRIPT para regenerar la BD, hay que eliminar la carpeta
+-- \mascotas_webapp\mysql_data para evitar errores de índices duplicados y Luego levantar Docker otra vez
+-- =========================================
 
 CREATE DATABASE IF NOT EXISTS mascotas_webapp
 CHARACTER SET utf8mb4
@@ -89,7 +92,14 @@ CREATE TABLE IF NOT EXISTS ubicaciones (
     descripcion TEXT NULL,
     codigo_postal VARCHAR(10) NULL,
     latitud DECIMAL(10,7) NULL,
-    longitud DECIMAL(10,7) NULL
+    longitud DECIMAL(10,7) NULL,
+
+    CONSTRAINT chk_ubicaciones_latitud
+        CHECK (latitud IS NULL OR latitud BETWEEN -90 AND 90),
+
+    CONSTRAINT chk_ubicaciones_longitud
+        CHECK (longitud IS NULL OR longitud BETWEEN -180 AND 180)
+
 ) ENGINE=InnoDB;
 
 -- =========================================
@@ -132,7 +142,20 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
         FOREIGN KEY (ubicaciones_perdida_id)
         REFERENCES ubicaciones(id)
         ON DELETE RESTRICT
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    
+    CONSTRAINT chk_anuncio_peso
+        CHECK (peso IS NULL OR peso >= 0),
+
+    CONSTRAINT chk_anuncio_recompensa
+        CHECK (recompensa IS NULL OR recompensa >= 0),
+    
+    CONSTRAINT chk_anuncio_fecha_estado
+        CHECK (
+            (estado = 'PERDIDA' AND fecha_perdida IS NOT NULL) OR
+            (estado = 'ENCONTRADA' AND fecha_encontrada IS NOT NULL) OR
+            (estado = 'RECUPERADA' AND fecha_recuperada IS NOT NULL)
+        )
 ) ENGINE=InnoDB;
 
 -- =========================================
@@ -278,7 +301,6 @@ CREATE TABLE IF NOT EXISTS reportes_anuncios (
     usuario_propietario_id INT UNSIGNED NOT NULL,
 
     asunto VARCHAR(150) NOT NULL,
-    motivo VARCHAR(100) NOT NULL,
     mensaje TEXT NOT NULL,
 
     nombre VARCHAR(100) NOT NULL,
@@ -350,14 +372,26 @@ CREATE TABLE IF NOT EXISTS mensajes_soporte (
         ON DELETE SET NULL
         ON UPDATE CASCADE
 ) ENGINE=InnoDB;
-);
 
 -- =========================================
 -- INDICES
 -- =========================================
+-- TABLA: PASSWORD_RESETS
 CREATE INDEX idx_password_resets_usuario_id
 ON password_resets(usuario_id);
 
+-- TABLA: USUARIOS
+CREATE INDEX idx_usuarios_email_verificado
+ON usuarios(email_verificado);
+
+CREATE INDEX idx_usuarios_activo
+ON usuarios(activo);
+
+-- TABLA: RAZAS
+CREATE INDEX idx_razas_especies_id
+ON razas(especies_id);
+
+-- TABLA: ANUNCIO_MASCOTAS
 CREATE INDEX idx_anuncio_usuario_id
 ON anuncio_mascotas(usuario_id);
 
@@ -370,6 +404,17 @@ ON anuncio_mascotas(ubicaciones_perdida_id);
 CREATE INDEX idx_anuncio_estado
 ON anuncio_mascotas(estado);
 
+CREATE INDEX idx_anuncio_publicacion_estado_fecha
+ON anuncio_mascotas(estado_publicacion, estado, fecha_registro);
+
+CREATE INDEX idx_anuncio_usuario_fecha
+ON anuncio_mascotas(usuario_id, fecha_registro);
+
+-- TABLA: MASCOTAS_COLORES
+CREATE INDEX idx_mascotas_colores_color_id
+ON mascotas_colores(color_id);
+
+-- TABLA: AVISTAMIENTOS
 CREATE INDEX idx_avistamientos_mascota_id
 ON avistamientos(mascota_id);
 
@@ -385,15 +430,24 @@ ON avistamientos(fecha_hora);
 CREATE INDEX idx_avistamientos_leido_propietario
 ON avistamientos(leido_propietario);
 
+CREATE INDEX idx_avistamientos_usuario_leido
+ON avistamientos(usuario_id, leido_propietario, fecha_hora);
+
+-- TABLA: FOTOS_ANUNCIOS
 CREATE INDEX idx_fotos_anuncios_mascota_orden
 ON fotos_anuncios(mascota_id, orden);
 
+CREATE INDEX idx_fotos_anuncios_mascota_principal
+ON fotos_anuncios(mascota_id, es_principal);
+
+-- TABLA: FOTOS_AVISTAMIENTOS
 CREATE INDEX idx_fotos_avistamientos_avistamiento_orden
 ON fotos_avistamientos(avistamiento_id, orden);
 
-CREATE INDEX idx_mascotas_colores_color_id
-ON mascotas_colores(color_id);
+CREATE INDEX idx_fotos_avistamientos_avistamiento_principal
+ON fotos_avistamientos(avistamiento_id, es_principal);
 
+-- TABLA: UBICACIONES
 CREATE INDEX idx_ubicaciones_codigo_postal
 ON ubicaciones(codigo_postal);
 
@@ -403,14 +457,44 @@ ON ubicaciones(municipio);
 CREATE INDEX idx_ubicaciones_provincia
 ON ubicaciones(provincia);
 
+-- TABLA: MENSAJES_CONTACTO
+CREATE INDEX idx_mensajes_contacto_mascota
+ON mensajes_contacto(mascota_id);
+
 CREATE INDEX idx_mensajes_contacto_usuario_destinatario
 ON mensajes_contacto(usuario_destinatario_id);
 
-CREATE INDEX idx_mensajes_contacto_mascota
-ON mensajes_contacto(mascota_id);
+CREATE INDEX idx_mensajes_contacto_usuario_remitente
+ON mensajes_contacto(usuario_remitente_id);
 
 CREATE INDEX idx_mensajes_contacto_leido_destinatario
 ON mensajes_contacto(leido_destinatario);
 
 CREATE INDEX idx_mensajes_contacto_fecha_creacion
 ON mensajes_contacto(fecha_creacion);
+
+CREATE INDEX idx_mensajes_contacto_destinatario_leido_fecha
+ON mensajes_contacto(usuario_destinatario_id, leido_destinatario, fecha_creacion);
+
+-- TABLA: REPORTES_ANUNCIOS
+CREATE INDEX idx_reportes_anuncios_mascota
+ON reportes_anuncios(mascota_id);
+
+CREATE INDEX idx_reportes_anuncios_usuario_reportante
+ON reportes_anuncios(usuario_reportante_id);
+
+CREATE INDEX idx_reportes_anuncios_usuario_propietario
+ON reportes_anuncios(usuario_propietario_id);
+
+CREATE INDEX idx_reportes_estado_fecha
+ON reportes_anuncios(estado, fecha_creacion);
+
+-- TABLA: MENSAJES_SOPORTE
+CREATE INDEX idx_mensajes_soporte_usuario
+ON mensajes_soporte(usuario_id);
+
+CREATE INDEX idx_mensajes_soporte_categoria
+ON mensajes_soporte(categoria);
+
+CREATE INDEX idx_soporte_estado_fecha
+ON mensajes_soporte(estado, fecha_creacion);

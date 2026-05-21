@@ -43,8 +43,25 @@ export class PetContactForm extends HTMLElement {
             e.preventDefault();
             await this.sendMsg();
         };
+
+
+        this.loadUserData();
     }
 
+    // Lógica para cargar los datos del usuario autenticado en el formulario
+    async loadUserData() {
+        const user = Auth.getUserData();
+        console.log(user);
+
+        if (user) {
+            this.querySelector('#contact-name').value = `${user.nombre} ${user.apellidos}` || '';
+            this.querySelector('#contact-correo').value = user.correo || '';
+            this.querySelector('#contact-phone').value = user.telefono || '';
+        }
+    }
+        
+
+    // Lógica para enviar el mensaje
     async sendMsg() {
         // Limpiamos posibles errores previos
         const httpCat = document.querySelector('http-cat');

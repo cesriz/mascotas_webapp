@@ -61,18 +61,19 @@ export class ResetPassword extends HTMLElement {
             try {
                 // Llamada a la API
                 const response = await API.resetPassword(payload);
+                
+                console.log('Exito al cambiar la contraseña.');
 
-                if (response.success) {
-                    alert('¡Contraseña actualizada! Ya puedes iniciar sesión.');
-                    window.location.href = 'login.html'; // Redirigimos al login
-                } else {
-                    alert(response.message || 'Error al restablecer');
+                // SUCCESS -----> 
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 5000);
+
+                } catch (error) {
+                    // Si hay un error de red o el servidor se cae
+                    console.error('Error al cambiar la contraseña', error);
                 }
 
-            } catch (error) {
-                console.error('Error fatal:', error);
-                alert('Hubo un problema con la conexión al servidor');
-            }
         });
     }
 }

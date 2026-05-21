@@ -161,7 +161,7 @@ class AuthService
     {
         $config = require __DIR__ . '/../Config/app.php';
 
-        $baseUrl = rtrim($config['frontend_url'] ?? 'http://localhost:3000', '/');
+        $baseUrl = rtrim($config['frontend_url'] ?? 'http://localhost:4200', '/');
 
         return $baseUrl . '/reset-password?token=' . urlencode($plainToken);
     }

@@ -32,6 +32,7 @@ import './components/petDetails.js';
 import './components/petFilters.js';
 import './components/petList.js';
 import './components/petMap.js';
+import './components/qr.js';
 import './components/reportForm.js';
 import './components/resetPassword.js';
 import './components/supportForm.js';

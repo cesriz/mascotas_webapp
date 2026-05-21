@@ -2,6 +2,7 @@ import { API } from '../api.js';
 import { Auth } from '../auth.js';
 import { PetContactForm } from './petContactForm.js';
 import { AvistamientoCreationForm } from './avistamientoCreationForm.js';
+import { QRCodeComponent } from './qr.js';
 import { showHttpError, showSuccess } from '../main.js';
 
 import { createTemplate } from "../ui-utils.js";
@@ -187,11 +188,12 @@ export class PetDetail extends HTMLElement {
         if (!avBtn) return;
 
         const est = pet.estado ? pet.estado.toLowerCase() : '';
-
         if (est === 'encontrada' || est === 'recuperada') {
             avBtn.classList.add('hidden');
+            avBtn.style.display = 'none';        
         }  else {
             avBtn.classList.remove('hidden');
+            avBtn.style.display = 'block';
         }
 
         // Botón de reporte
@@ -315,15 +317,11 @@ export class PetDetail extends HTMLElement {
             };
         };
 
-        /*PENDIENTE IMPLEMENTAR QR  
         const QRBtn = this.querySelector('#btn-qr');
-                const QR = this.querySelector('#qr');
-                QRBtn.addEventListener('click', () => {
-                    if (this.petData && this.petData.id) {
-                        QR.open(this.petData.id);
-                    }
-                });
-        */
+        const QR = this.querySelector('#qr');
+        QRBtn.addEventListener('click', () => {
+           QR.open();
+        });
 
         // Botón reportar
         const reporteBtn = this.querySelector('#btn-report');

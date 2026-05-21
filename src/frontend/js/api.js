@@ -74,9 +74,8 @@ export const API = {
 
     // Restablecer contraseña con token de recuperación
     resetPassword(data) {
-        return this.call('/api/auth/reset-password', { method: 'POST', body: JSON.stringify(data)
-    });
-},
+        return this.call('/api/auth/reset-password', { method: 'POST', body: JSON.stringify(data) });
+    },
 
     // Ver listado de usuarios
     getUsuarios() { 

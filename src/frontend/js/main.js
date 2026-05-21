@@ -33,8 +33,10 @@ import './components/petFilters.js';
 import './components/petList.js';
 import './components/petMap.js';
 import './components/reportForm.js';
+import './components/resetPassword.js';
 import './components/supportForm.js';
 import './components/userProfile.js';
+
 
 
 

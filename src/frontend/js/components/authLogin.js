@@ -106,7 +106,7 @@ export class AuthLogin extends HTMLElement {
             try {
                 console.log('try');
                 const data = await API.login(credentials);
-console.log("Respuesta completa de API:", data);
+                
                 // Se guarda el token en localStorage
                 Auth.setSession(data.token, data.usuario);
                 loginForm.reset();
@@ -159,6 +159,7 @@ console.log("Respuesta completa de API:", data);
                 const data = await API.forgotPassword(email);
 
                 showSuccess("Se ha procesado la solicitud. Revisa tu correo electrónico.")
+                console.log(data);
             } catch (error) {
                 showHttpError(error, this);
             }

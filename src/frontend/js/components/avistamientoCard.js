@@ -86,7 +86,7 @@ export class AvistamientoCard extends HTMLElement {
                     } else {
                         // Si es una ruta relativa que empieza por "/" (ej: /uploads/...)
                         const cleanPath = fotoPath.startsWith('/') ? fotoPath : `/${fotoPath}`;
-                        finalUrl = cleanPath;
+                        finalUrl = BASE_URL + cleanPath;
                     }
                 }
 

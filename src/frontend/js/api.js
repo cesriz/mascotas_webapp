@@ -235,11 +235,11 @@ export const API = {
     },
 
     // Enviar un mensaje de soporte 
-    crearSoporte(idUsuario, data) {
-        return this.call(`/api/mascotas/${idUsuario}/soporte`, { 
+    crearSoporte(data) {
+        return this.call(`/api/soporte`, { 
             method: 'POST', 
             headers: this.getHeaders(), 
-            body: JSON.stringify(data) 
+            body: JSON.stringify(data),
         });
     },
 

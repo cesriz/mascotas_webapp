@@ -51,8 +51,10 @@ export const avisCreationFormHTML = `
                 <div class="foto-div">            
                     <img src="../assets/icons/proicons--photo.svg" alt="Icono subir foto" id="upload-icon">
                     <span id="file-name-label">Haz clic para seleccionar o arrastra una imagen</span>
-                    <input type="file" id="avistamiento-foto" accept="image/*">
-                    <img id="preview-img">
+                    
+                    <input type="file" id="avistamiento-fotos" name = "fotos[]" accept="image/*" multiple>
+                    
+                    <div id="preview-container">
                 </div>
             </div>
 
@@ -75,6 +77,7 @@ export const avisCreationFormCSS = `
     }
 
     avistamiento-creation-form.is-visible {
+        display: block !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -83,7 +86,7 @@ export const avisCreationFormCSS = `
         display: flex !important;
         align-items: center;
         justify-content: center;
-        z-index: 1000;
+        z-index: 1001;
     }
 
     .avistamiento-creation {
@@ -203,41 +206,52 @@ export const avisCreationFormCSS = `
         opacity: 0.7;
     }
 
-    #avistamiento-foto { 
+    #avistamiento-fotos { 
         display: none; 
     }
 
-    #preview-img {
-        display:none; 
+    #preview-container {
         width: 100%;
-        min-height: 200px;
-        max-height: 180px; 
-        object-fit: contain; 
-        margin-top: 10px;
+        min-height: 100px;
+        max-height: auto; 
+        margin-top: 1rem;
+        padding: 0.5rem;
+        gap: 0.3rem;
         background-color: var(--inputbackground);
         border-radius: var(--radius-sm);
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        flex-wrap: wrap;
+    }
+
+    #preview-container img {
+        max-width: 100px;
+        height: auto;
+        object-fit: cover;
+        border-radius: var(--radius-xs);
+        border: 1p solid var(--secondary500);
     }
 
     /* Botones */
-    .avistamiento-buttons {
-        width: auto;
-        display: flex;
-        flex-direction: row;
+.avistamiento-buttons {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important; /* Forzamos fila */
         align-items: center;
         justify-content: center;
-        padding-top: 10px;
-        margin-bottom: 10px;
-        flex-shrink: 0;
-        gap: 10px;
+        gap: 20px; /* Espacio entre botones */
+        margin-top: 20px;
     }
     
     .avistamiento-buttons button {
-        flex: 1;
-        max-width: 150px;
+        flex: 0 1 150px; /* No crecen, pueden encogerse, base de 150px */
+        width: 150px;
         padding: 10px;
+        white-space: nowrap; /* Evita que el texto del botón se parta */
     }
 
-    #avistamiento-search-btn{
+    #avistamiento-search-btn {
         max-width: 150px;
         align-self: flex-end;
         margin-top: 5px;

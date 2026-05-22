@@ -7,7 +7,6 @@ import { API } from './api.js';
 import { Auth } from './auth.js';
 import { showSuccess, showHttpError } from './main.js';
 
-
 // Función para insertar la información del panel de administración
 export async function renderAdminPanel(apiMethod, columns) {
     try {
@@ -32,13 +31,32 @@ export async function renderAdminPanel(apiMethod, columns) {
     }
 }
 
+// Lógica para el formateo de fechas
+export function formatDate(dateValue) {
+    const fecha = new Date(dateValue);
+
+    return fecha.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
 export const adminConfig = {
     anuncios: {
         method: () => API.getAdminAnuncios(),
         columns: [
             { label: 'Nombre de la mascota', key: 'mascota' },
             { label: 'Usuario', key: 'usuario' },
-            { label: 'Fecha de publicación', key: 'fecha' },
+            { label: 'Fecha de publicación', key: 'fecha',
+                render: (row) => {
+                    const span = document.createElement('span');
+                    span.textContent = formatDate(row.fecha);
+                    return span;
+                }                
+             },
             { label: 'Visibilidad', key: 'estado' },
             { 
                 label: 'Acciones',
@@ -92,38 +110,20 @@ export const adminConfig = {
                     { label: 'Email', key: 'correo' },
                     { label: 'Asunto', key: 'asunto' },
                     { label: 'Mensaje', key: 'mensaje' },
-                    { label: 'Fecha del reporte', key: 'fecha_creacion',
-                        // Función para mostrar la fecha con un formato amigable
+                    { label: 'Fecha', key: 'fecha_creacion',
                         render: (row) => {
                             const span = document.createElement('span');
-                            const fecha = new Date(row.fecha_creacion);
-                            span.textContent = fecha.toLocaleDateString('es-ES', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: '2-digit',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        });
-
+                            span.textContent = formatDate(row.fecha_creacion);
                             return span;
                         }
                      },
-                    { label: 'Estado del reporte', key: 'estado' },
-                    { label: 'Fecha de revisión', key: 'fecha_revision',
-                                              // Función para mostrar la fecha con un formato amigable
+                    { label: 'Estado', key: 'estado' },
+                    { label: 'Revisión', key: 'fecha_revision',
                         render: (row) => {
-                            const span = document.createElement('span');
-                            const fecha = new Date(row.fecha_creacion);
-                            span.textContent = fecha.toLocaleDateString('es-ES', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: '2-digit',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        });
-
-                            return span;
-                        }
+                                const span = document.createElement('span');
+                                span.textContent = formatDate(row.fecha_revision);
+                                return span;
+                            }
                     },
                     { label: 'Notas', key: 'notas_admin' },
             { 
@@ -200,9 +200,21 @@ export const adminConfig = {
                 { label: 'Email', key: 'correo' },
                 { label: 'Asunto', key: 'asunto' },
                 { label: 'Mensaje', key: 'mensaje' },
-                { label: 'Fecha del reporte', key: 'fecha_creacion' },
-                { label: 'Estado del reporte', key: 'estado' },
-                { label: 'Fecha de revisión', key: 'fecha_cierre' },
+                { label: 'Fecha', key: 'fecha_creacion',
+                    render: (row) => {
+                        const span = document.createElement('span');
+                        span.textContent = formatDate(row.fecha_creacion);
+                        return span;
+                    }
+                },
+                { label: 'Estado', key: 'estado' },
+                { label: 'Revisión', key: 'fecha_cierre',
+                    render: (row) => {
+                        const span = document.createElement('span');
+                        span.textContent = formatDate(row.fecha_cierre);
+                        return span;
+                    }
+                 },
                 { label: 'Notas', key: 'notas_admin' },
             { 
                 label: 'Acción',

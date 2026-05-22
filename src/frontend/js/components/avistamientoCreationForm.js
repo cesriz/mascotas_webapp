@@ -32,9 +32,7 @@ export class AvistamientoCreationForm extends HTMLElement {
         this.innerHTML = '';
         this.appendChild(template.content.cloneNode(true));
 
-        const overlay = this.querySelector('#a-panel-overlay');
         const form = this.querySelector('#avistamiento-form');
-        const btnReset = this.querySelector('#avistamiento-btn-reset');
 
         // Lógica para regisrar ubicaciones en el formulario
             const mapComponentForm = document.querySelector('#avistamiento-form-map');
@@ -129,40 +127,58 @@ export class AvistamientoCreationForm extends HTMLElement {
                 console.log("Dirección seleccionada:", data.address);
             });
 
-        // Lógica para registrar fotografías
+        // Lógica para registrar fotografías y previsualizarlas
             const fotoDiv = this.querySelector('.foto-div');
-            const fotoInput = this.querySelector('#avistamiento-foto');
-            const previewImg = this.querySelector('#preview-img');
+            const fotoInput = this.querySelector('#avistamiento-fotos');
+            const previewContainer = this.querySelector('#preview-container');
             const fileNameLabel = this.querySelector('#file-name-label');
+            const icon = this.querySelector('#upload-icon');
 
             fotoDiv.addEventListener('click', () => {
                 fotoInput.click();
             });
 
-            // Ver fotografía antes de enviarla (vista previa)
-            fotoInput.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                        previewImg.src = URL.createObjectURL(file);
-                        previewImg.style.display = 'block';
-                        
-                        // Cambiar el texto para dar feedback al usuario
-                        fileNameLabel.textContent = `Archivo seleccionado: ${file.name}`;
-                        
-                        // Ocultar el icono y el texto original para que se vea mejor la foto
-                        this.querySelector('#upload-icon').style.display = 'none';
+            if (fotoInput) {
+                fotoInput.onchange = (e) => {
+                    const files = e.target.files;
+                    previewContainer.innerHTML = '';
+
+                    if (files.length > 0) {
+                        // Ocultamos el icono y actualizamos el texto
+                        if (icon) icon.style.display = 'none';
+                        fileNameLabel.textContent = `${files.length} archivos seleccionados`;
+
+                        // Creamos la miniatura de cada archivo
+                        Array.from(files).forEach(file => {
+                            const reader = new FileReader();
+                            
+                            // Creamos un elemento imagen para cada archivo
+                            const img = document.createElement('img');
+                            img.style.width = '100px';
+                            img.style.height = '100px';
+                            img.style.objectFit = 'cover';
+                            img.style.borderRadius = 'var(--radius-sm';
+                            img.style.border = '1px solid var(--secondary500)';
+
+                            img.src = URL.createObjectURL(file);
+                            
+                            // Añadimos la imagen al contenedor
+                            previewContainer.appendChild(img);
+                        });
+                    } else {
+                        // Si el usuario cancela o no elige nada, restauramos el estado inicial
+                        if (icon) icon.style.display = 'block';
+                        fileNameLabel.textContent = "Haz clic para seleccionar o arrastra imágenes";
                     }
                 };
-                
-                // Evitar que el clic en el input se propague (bucle infinito=
-                fotoInput.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
+            }
 
         // Cerrar formulario al pinchar fuera (overlay)
+        const overlay = this.querySelector('#a-panel-overlay');
         overlay.onclick = () => this.close();
 
         // Limpiar campos
+        const btnReset = this.querySelector('#avistamiento-btn-reset');
         btnReset.onclick = () => {
                 form.reset();
                 previewImg.style.display = 'none';
@@ -229,25 +245,28 @@ export class AvistamientoCreationForm extends HTMLElement {
             formData.append('fecha_hora', fecha_hora); // La variable que calculamos antes
 
             // Campos de ubicación
-            formData.append('latitud', this._currentLocationDetails.latitud);
-            formData.append('longitud', this._currentLocationDetails.longitud);
-            formData.append('direccion_formateada', this._currentLocationDetails.direccion_formateada);
-            formData.append('municipio', this._currentLocationDetails.municipio);
-            formData.append('provincia', this._currentLocationDetails.provincia);
-            formData.append('codigo_postal', this._currentLocationDetails.codigo_postal);
-            formData.append('pais', this._currentLocationDetails.pais);
-            formData.append('ubicacion_descripcion', "Ubicación confirmada por el usuario");
-
-            // Añadimos foto
-            const fotoFile = this.querySelector('#avistamiento-foto').files[0];
-            if (fotoFile) {
-                formData.append('fotos', fotoFile);
-                console.log("Archivo adjuntado:", fotoFile.name);
+            if (this._currentLocationDetails) {
+                formData.append('latitud', this._currentLocationDetails.latitud);
+                formData.append('longitud', this._currentLocationDetails.longitud);
+                formData.append('direccion_formateada', this._currentLocationDetails.direccion_formateada);
+                formData.append('municipio', this._currentLocationDetails.municipio);
+                formData.append('provincia', this._currentLocationDetails.provincia);
+                formData.append('codigo_postal', this._currentLocationDetails.codigo_postal);
+                formData.append('pais', this._currentLocationDetails.pais);
+                formData.append('ubicacion_descripcion', "Ubicación confirmada por el usuario");
+            }
+            // Añadimos fotos
+            const fileInput = this.querySelector('#avistamiento-fotos');
+            const fileInputFiles = fileInput.files;
+            if (fileInput && fileInputFiles.length > 0) {
+                for (let i = 0; i < fileInputFiles.length; i++) {
+                        formData.append('fotos', fileInput.files[i]); 
+                    }
             }
 
             try {
                 // Llamamos a la API pasando el FormData directamente
-                await API.crearAvistamiento(this._petId, formData);
+                const response = await API.crearAvistamiento(this._petId, formData);
                 showSuccess("¡Avistamiento registrado con éxito!");
                 setTimeout(() => this.close(), 2000); // Se cierra automáticamente tras 2s
                 

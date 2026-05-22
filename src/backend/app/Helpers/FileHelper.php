@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 use Cloudinary\Cloudinary;
 
 // Helper encargado de validar, subir y eliminar imágenes en Cloudinary.

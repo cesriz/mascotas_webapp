@@ -20,10 +20,9 @@ export const navBarHTML = `
         </div>
         <nav class="navbar" id="navbar">
             <a href="index.html">Inicio</a>
-            <a href="tablon.html">Tablón de anuncios</a>
-            <a href="felices.html">Finales felices</a>
-            <a href="faq.html">FaQ</a>
-            <a href="soporte.html">Contacto</a>
+            <a href="tablon">Tablón de anuncios</a>
+            <a href="felices">Finales felices</a>
+            <a href="faq">FaQ</a>
 
             <div class="nav-btn" id="mobile-btn">
                 <button class="button-secondary" id="mobile-btn-auth"></button>

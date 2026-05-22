@@ -1,4 +1,5 @@
 import { API } from '../api.js';
+import { Auth } from '../auth.js';
 import { showHttpError, showSuccess } from '../main.js';
 import { createTemplate } from "../ui-utils.js";
 import { supportFormCSS, supportFormHTML } from '../templates/supportFormTemplate.js';
@@ -29,13 +30,30 @@ export class SupportForm extends HTMLElement {
             e.preventDefault();
             await this.sendSupportMsg();
         };
+
+        this.loadUserData();
     }
 
+    // Lógica para cargar los datos del usuario autenticado en el formulario
+    async loadUserData() {
+        const user = Auth.getUserData();
+        console.log(user);
+
+        if (user) {
+            this.querySelector('#support-user-id').value = user.id || '';
+            this.querySelector('#support-name').value = `${user.nombre} ${user.apellidos}` || '';
+            this.querySelector('#support-correo').value = user.correo || '';
+            this.querySelector('#support-phone').value = user.telefono || '';
+        }
+    }
+
+    // Lógica para enviar el mensaje de soporte
     async sendSupportMsg() {
         const httpCat = this.querySelector('http-cat');
         if (httpCat) httpCat.style.display = 'none';
 
         const data = {
+            usuario_id:this.querySelector('#support-user-id').value,
             asunto: this.querySelector('#support-subject').value,
             categoria: this.querySelector('#support-category').value,
             mensaje: this.querySelector('#support-msg').value,

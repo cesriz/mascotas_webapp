@@ -1,6 +1,7 @@
 export const petDetailsHTML = `
     <delete-confirm id="delete-confirm"></delete-confirm>
     <recover-confirm id="recover-confirm"></recover-confirm>
+    <qr-code id="qr"></qr-code>
 
     <div class="pet-details-title"></div>
 

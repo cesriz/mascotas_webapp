@@ -1,4 +1,5 @@
 import { API } from '../api.js';
+import { Auth } from '../auth.js';
 import { PetMap } from './petMap.js';
 import { showHttpError, showSuccess } from '../main.js';
 
@@ -49,16 +50,47 @@ export class AvistamientoCreationForm extends HTMLElement {
             });
 
             // Si el usuario mueve el marcador, obtenemos coordenadas
-            mapComponentForm.addEventListener('location-selected', (e) => {
-                latInput.value = e.detail.lat;
-                lngInput.value = e.detail.lng;
-                // Si el usuario mueve el marcador manualmente, actualizamos el objeto
-                this._currentLocationDetails = {
-                    latitud: e.detail.lat,
-                    longitud: e.detail.lng,
-                    direccion_formateada: "Seleccionado manualmente en el mapa"
-                };
-                console.log("Coordenadas capturadas:", e.detail);
+            mapComponentForm.addEventListener('location-selected', async (e) => {
+
+                const lat = e.detail.lat;
+                const lng = e.detail.lng;
+                
+                latInput.value = lat;
+                lngInput.value = lng;
+
+                try {
+                    // Llamamos a la API de Nominatim para obtener la dirección real de las coordenadas
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);                    
+                    const result = await response.json();
+
+                    if (result && result.address) {
+                        // Guardamos datos de la ubicación
+                        this._currentLocationDetails = {
+                            latitud: parseFloat(lat),
+                            longitud: parseFloat(lng),
+                            direccion_formateada: result.display_name,
+                            municipio: result.address.city || result.address.town || result.address.village || "No especificado",
+                            provincia: result.address.province || result.address.state || "No especificado",
+                            codigo_postal: result.address.postcode || "",
+                            pais: result.address.country || "España"
+                        };
+
+                        // Actualizamos el input de direcciones
+                        if (addressInput) {
+                            addressInput.value = result.display_name;
+                        }
+                        
+                        console.log("Datos de ubicación actualizados:", this._currentLocationDetails);
+                    }
+                } catch (error) {
+                    console.error("Error en geocodificación", error);
+                    // Respuesta en caso de error de red
+                    this._currentLocationDetails = {
+                        latitud: lat,
+                        longitud: lng,
+                        direccion_formateada: "Ubicación seleccionada en el mapa"
+                    };
+                }
             });
 
             // Uso del buscador por dirección (declarado en petMap.js)
@@ -142,7 +174,21 @@ export class AvistamientoCreationForm extends HTMLElement {
             e.preventDefault();
             await this.sendMsg(); // Usamos método implementado abajo
         };
+
+        this.loadUserData();
     }
+
+
+    // Lógica para cargar los datos del usuario autenticado en el formulario
+        async loadUserData() {
+            const user = Auth.getUserData();
+
+            if (user) {
+                this.querySelector('#avistamiento-form-email').value = user.correo || '';
+                this.querySelector('#avistamiento-form-telefono').value = user.telefono || '';
+            }
+        }
+           
 
     // Lógica para enviar el formulario
         async sendMsg() {
@@ -196,6 +242,7 @@ export class AvistamientoCreationForm extends HTMLElement {
             const fotoFile = this.querySelector('#avistamiento-foto').files[0];
             if (fotoFile) {
                 formData.append('fotos', fotoFile);
+                console.log("Archivo adjuntado:", fotoFile.name);
             }
 
             try {

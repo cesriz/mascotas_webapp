@@ -63,7 +63,7 @@ export class SupportForm extends HTMLElement {
         };
 
         try {
-            // Suponiendo que tienes un endpoint para soporte general
+            // Llamamos a la API
             await API.crearSoporte(data);
             showSuccess("Mensaje de soporte enviado correctamente");
             setTimeout(() => this.close(), 2000);

@@ -355,12 +355,7 @@ class MascotaController
         }
     }
 
-    /**
-     * Borra una mascota y sus datos relacionados.
-     *
-     * De momento la dejamos como está en controller porque ya tiene
-     * una lógica concreta que no querías mover todavía.
-     */
+    // Marca la mascota como eliminada con fecha de eliminacion
     public function destroy(int $id): void
     {
         $usuario = Request::user();
@@ -374,60 +369,32 @@ class MascotaController
         }
 
         $userId = (int) $usuario['id'];
-        $mascota = $this->getOwnedMascotaOrFail($id, $userId);
 
-        $mascotaFotos = $this->fotoModel->getByMascotaId($id);
-        $avistamientos = $this->avistamientoModel->getByMascotaId($id);
-
-        $fotosToDelete = $mascotaFotos;
-        $ubicacionesAvistamientosIds = [];
-
-        foreach ($avistamientos as $avistamiento) {
-            $avistamientoId = (int) $avistamiento['id'];
-            $ubicacionesAvistamientosIds[] = (int) $avistamiento['ubicacion_id'];
-
-            $fotosAvistamiento = $this->fotoModel->getByAvistamientoId($avistamientoId);
-
-            $fotosToDelete = array_merge($fotosToDelete, $fotosAvistamiento);
-        }
+        // Comprueba que existe y que pertenece al usuario.
+        $this->getOwnedMascotaOrFail($id, $userId);
 
         try {
-            $this->mascotaModel->beginTransaction();
+            $deleted = $this->mascotaModel->deletePublicById($id);
 
-            foreach ($avistamientos as $avistamiento) {
-                $this->fotoModel->deleteByAvistamientoId((int) $avistamiento['id']);
+            if (!$deleted) {
+                Response::json([
+                    'success' => false,
+                    'message' => 'No se pudo eliminar la mascota'
+                ], 500);
+                return;
             }
-
-            $this->avistamientoModel->deleteByMascotaId($id);
-
-            foreach ($ubicacionesAvistamientosIds as $ubicacionId) {
-                $this->ubicacionModel->deletePublicById($ubicacionId);
-            }
-
-            $this->fotoModel->deleteByMascotaId($id);
-            $this->mascotaColorModel->deleteByMascotaId($id);
-            $this->mascotaModel->deletePublicById($id);
-            $this->ubicacionModel->deletePublicById((int) $mascota['ubicacion_id']);
-
-            $this->mascotaModel->commit();
-
-            FileHelper::destroyImages($fotosToDelete);
 
             Response::json([
                 'success' => true,
-                'message' => 'Mascota y datos relacionados eliminados correctamente',
+                'message' => 'Mascota eliminada correctamente',
                 'data' => [
-                    'id' => $id,
-                    'avistamientos_eliminados' => count($avistamientos),
-                    'fotos_eliminadas' => count($fotosToDelete)
+                    'id' => $id
                 ]
             ]);
         } catch (Throwable $e) {
-            $this->mascotaModel->rollBack();
-
             Response::json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Error al eliminar la mascota',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -480,5 +447,4 @@ class MascotaController
             ], 500);
         }
     }
-
 }

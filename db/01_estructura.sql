@@ -81,6 +81,36 @@ CREATE TABLE IF NOT EXISTS colores (
 ) ENGINE=InnoDB;
 
 -- =========================================
+-- TABLA: PROVINCIAS
+-- Catálogo maestro de provincias españolas
+-- =========================================
+CREATE TABLE IF NOT EXISTS provincias (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    codigo_ine CHAR(2) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+-- =========================================
+-- TABLA: MUNICIPIOS
+-- Catálogo maestro de municipios españoles
+-- =========================================
+CREATE TABLE IF NOT EXISTS municipios (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    provincia_id INT UNSIGNED NOT NULL,
+    codigo_ine CHAR(5) NULL UNIQUE,
+    nombre VARCHAR(150) NOT NULL,
+
+    CONSTRAINT fk_municipio_provincia
+        FOREIGN KEY (provincia_id)
+        REFERENCES provincias(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+
+    UNIQUE KEY uk_municipio_provincia_nombre (provincia_id, nombre),
+    INDEX idx_municipios_provincia_nombre (provincia_id, nombre)
+) ENGINE=InnoDB;
+
+-- =========================================
 -- TABLA: UBICACIONES
 -- =========================================
 CREATE TABLE IF NOT EXISTS ubicaciones (
@@ -117,6 +147,7 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
     descripcion TEXT NOT NULL,
     fecha_nacimiento DATE NULL,
     fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_eliminacion DATETIME NULL DEFAULT NULL,
     fecha_perdida DATE NULL,
     fecha_encontrada DATE NULL,
     fecha_recuperada DATE NULL,
@@ -157,6 +188,9 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
             (estado = 'RECUPERADA' AND fecha_recuperada IS NOT NULL)
         )
 ) ENGINE=InnoDB;
+
+CREATE INDEX idx_anuncio_mascotas_fecha_eliminacion
+ON anuncio_mascotas(fecha_eliminacion);
 
 -- =========================================
 -- TABLA: MASCOTAS_COLORES

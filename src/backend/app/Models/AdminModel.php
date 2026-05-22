@@ -24,6 +24,7 @@ class AdminModel extends BaseModel
                 am.estado_publicacion AS estado
             FROM anuncio_mascotas am
             INNER JOIN usuarios u ON u.id = am.usuario_id
+            WHERE am.fecha_eliminacion IS NULL
             ORDER BY am.fecha_registro DESC, am.id DESC
         ";
 
@@ -48,11 +49,16 @@ class AdminModel extends BaseModel
     }
 
     /**
-     * Elimina un anuncio por su ID.
+     * Elimina un anuncio por su ID. (borrado lógico)
      */
     public function deleteAnuncio(int $id): bool
     {
-        $sql = "DELETE FROM anuncio_mascotas WHERE id = :id";
+        $sql = "
+        UPDATE anuncio_mascotas
+        SET fecha_eliminacion = NOW()
+        WHERE id = :id
+            AND fecha_eliminacion IS NULL
+    ";
 
         return $this->executeQuery($sql, ['id' => $id]);
     }

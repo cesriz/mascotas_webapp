@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
@@ -86,49 +87,55 @@ class UbicacionModel extends BaseModel
         return $this->deleteById('ubicaciones', $id);
     }
 
-    // Devuelve el catálogo de provincias existentes en ubicaciones.
+    // Devuelve el catálogo maestro de provincias.
     public function getProvincias(): array
     {
         $sql = "
-            SELECT DISTINCT provincia
-            FROM ubicaciones
-            WHERE provincia IS NOT NULL
-              AND TRIM(provincia) <> ''
-            ORDER BY provincia ASC
-        ";
+        SELECT nombre
+        FROM provincias
+        ORDER BY nombre ASC
+    ";
 
         $rows = $this->fetchAll($sql);
 
         return array_map(
-            static fn(array $row): string => $row['provincia'],
+            static fn(array $row): string => $row['nombre'],
             $rows
         );
     }
 
-    // Devuelve el catálogo de municipios.
+    // Devuelve el catálogo maestro de municipios.
     // Si se indica provincia, filtra por esa provincia.
     public function getMunicipios(?string $provincia = null): array
     {
         $sql = "
-            SELECT DISTINCT municipio
-            FROM ubicaciones
-            WHERE municipio IS NOT NULL
-              AND TRIM(municipio) <> ''
-        ";
+        SELECT m.nombre
+        FROM municipios m
+        INNER JOIN provincias p ON p.id = m.provincia_id
+        WHERE 1 = 1
+    ";
 
         $params = [];
 
         if ($provincia !== null) {
-            $sql .= " AND provincia = :provincia";
+            $sql .= "
+            AND (
+                p.nombre = :provincia
+                OR p.codigo_ine = :provincia
+            )
+        ";
+
             $params['provincia'] = $provincia;
         }
 
-        $sql .= " ORDER BY municipio ASC";
+        $sql .= "
+        ORDER BY m.nombre ASC
+    ";
 
         $rows = $this->fetchAll($sql, $params);
 
         return array_map(
-            static fn(array $row): string => $row['municipio'],
+            static fn(array $row): string => $row['nombre'],
             $rows
         );
     }

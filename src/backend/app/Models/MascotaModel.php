@@ -97,7 +97,9 @@ class MascotaModel extends BaseModel
             INNER JOIN ubicaciones u ON am.ubicaciones_perdida_id = u.id
         ";
 
-        $where = "WHERE 1 = 1 AND am.estado_publicacion = 'PUBLICADO'";
+        $where = "WHERE 1 = 1 
+            AND am.estado_publicacion = 'PUBLICADO' 
+            AND am.fecha_eliminacion IS NULL";
         $params = [];
 
         if (!empty($filters['estado'])) {
@@ -126,12 +128,12 @@ class MascotaModel extends BaseModel
         }
 
         if (!empty($filters['municipio'])) {
-            $where .= " AND u.municipio LIKE :municipio";
+            $where .= " AND u.municipio COLLATE utf8mb4_0900_ai_ci LIKE :municipio";
             $params['municipio'] = '%' . $filters['municipio'] . '%';
         }
 
         if (!empty($filters['provincia'])) {
-            $where .= " AND u.provincia LIKE :provincia";
+            $where .= " AND u.provincia COLLATE utf8mb4_0900_ai_ci LIKE :provincia";
             $params['provincia'] = '%' . $filters['provincia'] . '%';
         }
 
@@ -296,7 +298,9 @@ class MascotaModel extends BaseModel
             INNER JOIN razas r ON am.raza_id = r.id
             INNER JOIN especies e ON r.especies_id = e.id
             INNER JOIN ubicaciones u ON am.ubicaciones_perdida_id = u.id
-            WHERE am.estado IN ('PERDIDA', 'ENCONTRADA') AND am.estado_publicacion = 'PUBLICADO'
+            WHERE am.estado IN ('PERDIDA', 'ENCONTRADA')
+                AND am.estado_publicacion = 'PUBLICADO'
+                AND am.fecha_eliminacion IS NULL
             ORDER BY am.fecha_registro DESC, am.id DESC
             LIMIT {$limit}
         ";
@@ -341,6 +345,7 @@ class MascotaModel extends BaseModel
             INNER JOIN especies e ON r.especies_id = e.id
             INNER JOIN ubicaciones u ON am.ubicaciones_perdida_id = u.id
             WHERE am.usuario_id = :usuario_id
+                AND am.fecha_eliminacion IS NULL
             ORDER BY am.fecha_registro DESC, am.id DESC
         ";
 
@@ -470,6 +475,7 @@ class MascotaModel extends BaseModel
             INNER JOIN especies e ON r.especies_id = e.id
             INNER JOIN ubicaciones u ON am.ubicaciones_perdida_id = u.id
             WHERE am.id = :id
+                AND am.fecha_eliminacion IS NULL
             LIMIT 1
         ";
 
@@ -579,7 +585,16 @@ class MascotaModel extends BaseModel
     // Borra la mascota principal por id.
     public function deletePublicById(int $id): bool
     {
-        return $this->deleteById('anuncio_mascotas', $id);
+        $sql = "
+        UPDATE anuncio_mascotas
+        SET fecha_eliminacion = NOW()
+        WHERE id = :id
+          AND fecha_eliminacion IS NULL
+    ";
+
+        return $this->executeQuery($sql, [
+            'id' => $id
+        ]);
     }
 
     // Comprueba si una mascota pertenece a un usuario.

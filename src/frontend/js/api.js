@@ -36,11 +36,11 @@ export const API = {
             }
 
             const data = await response.json();
-            
+
             if (!data.success) {
                 // Si hay errores de validación, los priorizamos. 
-                throw { 
-                    code: response.status, 
+                throw {
+                    code: response.status,
                     message: data.message || "Error de validación",
                     validationErrors: data.errors || null // Array de fallos
                 };
@@ -56,67 +56,68 @@ export const API = {
             console.error("Error de red o servidor:", error);
             throw { code: 500, message: "Error de red o servidor" };;
         }
-        
+
     },
 
-// Métodos específicos
+    // Métodos específicos
 
-// Zona pública del usuario
+    // Zona pública del usuario
     // Iniciar sesión
-    login(credentials) { 
-        return this.call('/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) }); 
+    login(credentials) {
+        return this.call('/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
     },
 
     // Recuperar contraseña con email
-    forgotPassword(email) { 
-        return this.call('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify( { correo: email } ) }); 
+    forgotPassword(email) {
+        return this.call('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ correo: email }) });
     },
 
     // Restablecer contraseña con token de recuperación
     resetPassword(data) {
-        return this.call('/api/auth/reset-password', { method: 'POST', body: JSON.stringify(data)
-    });
-},
+        return this.call('/api/auth/reset-password', {
+            method: 'POST', body: JSON.stringify(data)
+        });
+    },
 
     // Ver listado de usuarios
-    getUsuarios() { 
-        return this.call('/api/usuarios', { headers: this.getHeaders() }); 
+    getUsuarios() {
+        return this.call('/api/usuarios', { headers: this.getHeaders() });
     },
 
     // Ver datos de un usuario concreto
-    getUsuarioById(id) { 
-        return this.call(`/api/usuarios/${id}`, { headers: this.getHeaders() }); 
+    getUsuarioById(id) {
+        return this.call(`/api/usuarios/${id}`, { headers: this.getHeaders() });
     },
 
     // Crear nuevo usuario / Registrarse
     registro(userData) {
         return this.call('/api/usuarios', { method: 'POST', body: JSON.stringify(userData) });
     },
-    
-// Zona privada de usuario
+
+    // Zona privada de usuario
     // Cerrar sesión
-    logout() { 
-        return this.call('/api/auth/logout', { method: 'POST', headers: this.getHeaders() }); 
+    logout() {
+        return this.call('/api/auth/logout', { method: 'POST', headers: this.getHeaders() });
     },
 
     // Ver qué usuario está logueado
-    getMe() { 
-        return this.call('/api/auth/me', { headers: this.getHeaders() }); 
+    getMe() {
+        return this.call('/api/auth/me', { headers: this.getHeaders() });
     },
 
     // Obtener los datos de perfil del usuario
-    getPerfil() { 
-        return this.call('/api/me/perfil', { headers: this.getHeaders() }); 
+    getPerfil() {
+        return this.call('/api/me/perfil', { headers: this.getHeaders() });
     },
 
     // Actualizar datos de perfil del usuario
-    updatePerfil(data) { 
-        return this.call('/api/me/perfil', { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify(data) }); 
+    updatePerfil(data) {
+        return this.call('/api/me/perfil', { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify(data) });
     },
 
     // Actualizar contraseña
-    updatePassword(data) { 
-        return this.call('/api/me/password', { method: 'PATCH', headers: this.getHeaders(), body: JSON.stringify(data) }); 
+    updatePassword(data) {
+        return this.call('/api/me/password', { method: 'PATCH', headers: this.getHeaders(), body: JSON.stringify(data) });
     },
 
     // Eliminar cuenta (desactiva la cuenta, no la borra de la base de datos)
@@ -125,60 +126,60 @@ export const API = {
     },
 
     // Ver mascotas publicadas por el usuario
-    getMisMascotas() { 
-        return this.call('/api/me/mascotas', { headers: this.getHeaders() }); 
+    getMisMascotas() {
+        return this.call('/api/me/mascotas', { headers: this.getHeaders() });
     },
 
     // Ver avistamientos creados por el usuario
     getMisAvistamientos() {
-            return this.call('/api/me/avistamientos', { headers: this.getHeaders() });
+        return this.call('/api/me/avistamientos', { headers: this.getHeaders() });
     },
 
     // Ver notificaciones
-    getNotificaciones() { 
-        return this.call('/api/me/notificaciones', { headers: this.getHeaders() }); 
+    getNotificaciones() {
+        return this.call('/api/me/notificaciones', { headers: this.getHeaders() });
     },
-    
+
     // Marcar notificaciones como leídas
-    leerContacto(id) { 
-        return this.call(`/api/me/notificaciones/contactos/${id}/leer`, { method: 'PATCH', headers: this.getHeaders() }); 
+    leerContacto(id) {
+        return this.call(`/api/me/notificaciones/contactos/${id}/leer`, { method: 'PATCH', headers: this.getHeaders() });
     },
 
-    leerAvistamiento(id) { 
-        return this.call(`/api/me/notificaciones/avistamientos/${id}/leer`, { method: 'PATCH', headers: this.getHeaders() }); 
+    leerAvistamiento(id) {
+        return this.call(`/api/me/notificaciones/avistamientos/${id}/leer`, { method: 'PATCH', headers: this.getHeaders() });
     },
 
 
-// Zona pública de mascotas
+    // Zona pública de mascotas
     // Listar mascotas publicadas
-    getMascotas(filtros = "") { 
+    getMascotas(filtros = "") {
         const query = (filtros && !filtros.startsWith('?')) ? `?${filtros}` : filtros;
-        return this.call(`/api/mascotas${filtros}`); 
+        return this.call(`/api/mascotas${filtros}`);
     },
 
     // Listar mascotas publicadas recientes
-    getMascotasRecientes(limit = 4) { 
-        return this.call(`/api/mascotas/recientes?limit=${limit}`); 
+    getMascotasRecientes(limit = 4) {
+        return this.call(`/api/mascotas/recientes?limit=${limit}`);
     },
 
     // Ver detalles de una mascota
-    getMascotaById(id) { 
-        return this.call(`/api/mascotas/${id}`); 
+    getMascotaById(id) {
+        return this.call(`/api/mascotas/${id}`);
     },
 
 
-// Zona privada de mascotas (es necesario estar autenticado)
+    // Zona privada de mascotas (es necesario estar autenticado)
     // Crear mascota
-    crearMascota(data) { 
-        return this.call('/api/mascotas', { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(data) }); 
+    crearMascota(data) {
+        return this.call('/api/mascotas', { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(data) });
     },
 
     // Subir fotos de mascota
     subirFotosMascota(id, formData) {
-        return this.call(`/api/mascotas/${id}/fotos`, { 
-            method: 'POST', 
+        return this.call(`/api/mascotas/${id}/fotos`, {
+            method: 'POST',
             headers: this.getHeaders(true), // true para quitar Content-Type JSON
-            body: formData 
+            body: formData
         });
     },
 
@@ -192,80 +193,80 @@ export const API = {
     },
 
     // Marcar mascota como recuperada
-    marcarRecuperada(id) { 
-        return this.call(`/api/mascotas/${id}/recuperar`, { method: 'PATCH', headers: this.getHeaders() }); 
+    marcarRecuperada(id) {
+        return this.call(`/api/mascotas/${id}/recuperar`, { method: 'PATCH', headers: this.getHeaders() });
     },
 
     // Eliminar mascota
-    deleteMascota(id) { 
-        return this.call(`/api/mascotas/${id}`, { method: 'DELETE', headers: this.getHeaders() }); 
+    deleteMascota(id) {
+        return this.call(`/api/mascotas/${id}`, { method: 'DELETE', headers: this.getHeaders() });
     },
 
 
-// Avistamientos y contacto
+    // Avistamientos y contacto
     // Ver los avistamientos de una mascota concreta
     getAvistamientosMascota(id) {
-        return this.call(`/api/mascotas/${id}/avistamientos`); 
+        return this.call(`/api/mascotas/${id}/avistamientos`);
     },
 
     // Registrar un avistamiento de una mascota
     crearAvistamiento(idMascota, formData) {
-        return this.call(`/api/mascotas/${idMascota}/avistamientos`, { 
-            method: 'POST', 
-            headers: this.getHeaders(true), 
-            body: formData 
+        return this.call(`/api/mascotas/${idMascota}/avistamientos`, {
+            method: 'POST',
+            headers: this.getHeaders(true),
+            body: formData
         });
     },
 
     // Enviar un mensaje al usuario que publicó la mascota
     enviarContacto(idMascota, data) {
-        return this.call(`/api/mascotas/${idMascota}/contactos`, { 
-            method: 'POST', 
-            headers: this.getHeaders(), 
-            body: JSON.stringify(data) 
+        return this.call(`/api/mascotas/${idMascota}/contactos`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify(data)
         });
     },
 
     // Enviar un mensaje de reporte sobre un anuncio de mascota
     crearReporte(idMascota, data) {
-        return this.call(`/api/mascotas/${idMascota}/reportes`, { 
-            method: 'POST', 
-            headers: this.getHeaders(), 
-            body: JSON.stringify(data) 
+        return this.call(`/api/mascotas/${idMascota}/reportes`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify(data)
         });
     },
 
     // Enviar un mensaje de soporte 
     crearSoporte(idUsuario, data) {
-        return this.call(`/api/mascotas/${idUsuario}/soporte`, { 
-            method: 'POST', 
-            headers: this.getHeaders(), 
-            body: JSON.stringify(data) 
+        return this.call(`/api/mascotas/${idUsuario}/soporte`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify(data)
         });
     },
 
-// Catálogos
+    // Catálogos
     // Listar colores disponibles
-    getColores() { 
-        return this.call('/api/colores'); 
+    getColores() {
+        return this.call('/api/colores');
     },
 
     // Obtener color concreto
     getColorById(id) {
-        return this.call('/api/colores/{id}'); 
+        return this.call('/api/colores/{id}');
     },
 
     // Listar especies disponibles
-    getEspecies() { 
-        return this.call('/api/especies'); 
+    getEspecies() {
+        return this.call('/api/especies');
     },
 
     // Listar razas disponibles - filtro por especie opcional
-    getRazas(especieId = "") { 
+    getRazas(especieId = "") {
         const query = especieId ? `?especie_id=${especieId}` : "";
-        return this.call(`/api/razas${query}`); 
+        return this.call(`/api/razas${query}`);
     },
-    
+
     // Listar provincias disponibles
     getProvincias() {
         return this.call('/api/provincias');
@@ -273,11 +274,11 @@ export const API = {
 
     // Listar los municipios disponibles - filtro por provincia opcional 
     getMunicipios(provincia = '') {
-        const query = provincia ? `?provincia=${provincia}` : "";
+        const query = provincia ? `?provincia=${encodeURIComponent(provincia)}` : "";
         return this.call(`/api/municipios${query}`);
     },
 
-// Administración y configuración
+    // Administración y configuración
     // Listar los anuncios de mascotas para moderación
     getAdminAnuncios() {
         return this.call('/api/admin/anuncios', { headers: this.getHeaders() });
@@ -293,8 +294,8 @@ export const API = {
     },
 
     // Eliminar un anuncio
-    deleteAnuncio(id) { 
-        return this.call(`/api/admin/anuncios/${id}`, { method: 'DELETE', headers: this.getHeaders() }); 
+    deleteAnuncio(id) {
+        return this.call(`/api/admin/anuncios/${id}`, { method: 'DELETE', headers: this.getHeaders() });
     },
 
     // Listar reportes de mascotas (problemas, contenido inapropiado, etc.)
@@ -337,16 +338,16 @@ export const API = {
             headers: this.getHeaders(),
             body: JSON.stringify(data)
         });
-    }, 
+    },
 
-    
+
     // Cargar datos de Cloudinary y Leaflet [NO IMPLEMENTADOS EN EL BACKEND]
-    getConfig() { 
-        return this.call('/api/config', { headers: this.getHeaders() }); 
+    getConfig() {
+        return this.call('/api/config', { headers: this.getHeaders() });
     },
 
     // Actualizar datos de configuración
-    updateConfig(data) { 
-        return this.call('/api/config', { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(data) }); 
+    updateConfig(data) {
+        return this.call('/api/config', { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(data) });
     },
 };

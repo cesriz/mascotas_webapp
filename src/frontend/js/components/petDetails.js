@@ -6,6 +6,8 @@ import { showHttpError, showSuccess } from '../main.js';
 
 import { createTemplate } from "../ui-utils.js";
 import { petDetailsHTML, petDetailsCSS } from "../templates/petDetailsTemplate.js";
+import './petPosterExporter.js';
+import './petQrModal.js';
 
 // Importamos plantilla (HTML y CSS)
 const template = createTemplate(petDetailsHTML, petDetailsCSS);
@@ -141,7 +143,7 @@ export class PetDetail extends HTMLElement {
                 `<strong>Sexo:</strong> ${(this.petData.sexo || '').toLowerCase() || 'Desconocido'}`,
                 `<strong>Edad:</strong> ${age}`,
                 `<strong>Tamaño:</strong> ${(this.petData.tamano || '').toLowerCase() || 'Desconocido'} `,
-                `<strong>Peso:</strong> ${(this.petData.peso || '') || 'Desconocido'} `,
+                `<strong>Peso:</strong> ${this.petData.peso ? `${this.petData.peso} kg` : 'Desconocido'} `,
                 `<strong>Colores:</strong> ${formatColors || 'No especificados'}`,
                 `<strong>Chip:</strong> ${(this.petData.tiene_chip ? 'Sí' : 'No').toLowerCase() || 'Desconocido '}`          
             ];
@@ -315,15 +317,15 @@ export class PetDetail extends HTMLElement {
             };
         };
 
-        /*PENDIENTE IMPLEMENTAR QR  
-        const QRBtn = this.querySelector('#btn-qr');
-                const QR = this.querySelector('#qr');
-                QRBtn.addEventListener('click', () => {
-                    if (this.petData && this.petData.id) {
-                        QR.open(this.petData.id);
-                    }
-                });
-        */
+        // Botón QR
+        const qrBtn = this.querySelector('#btn-qr');
+        const qrModal = this.querySelector('#qr-modal');
+
+        if (qrBtn && qrModal) {
+            qrBtn.onclick = async () => {
+                await qrModal.open(this.petData);
+            };
+        }
 
         // Botón reportar
         const reporteBtn = this.querySelector('#btn-report');
@@ -336,7 +338,15 @@ export class PetDetail extends HTMLElement {
             };
         };
 
-        //PENDIENTE IMPLEMENTAR BOTONES RRSS
+        // Botón descargar cartel rrss
+        const cartelBtn = this.querySelector('#btn-cartel');
+        const posterExporter = this.querySelector('#poster-exporter');
+
+        if (cartelBtn && posterExporter) {
+            cartelBtn.onclick = async () => {
+                await posterExporter.download(this.petData);
+            };
+        }
   
     }
 

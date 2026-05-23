@@ -55,6 +55,7 @@ export const petDetailsHTML = `
                 <button class="button-primary" id="btn-contact">CONTACTAR</button>
                 <button class="button-primary" id="btn-avistamiento">REGISTRAR AVISTAMIENTO</button>
                 <button class="button-primary" id="btn-qr">GENERAR QR</button>
+                <button class="button-primary" id="btn-cartel">DESCARGAR CARTEL</button>
                 <button class="button-secondary" id="btn-report">REPORTAR ANUNCIO</button>
                 <button class="button-secondary hidden" id="btn-edit">EDITAR</button>
                 <button class="button-success hidden" id="btn-recover">RECUPERADA</button>
@@ -65,6 +66,8 @@ export const petDetailsHTML = `
         <pet-contact-form id="contact-modal"></pet-contact-form>
         <avistamiento-creation-form id="avistamiento-modal"></avistamiento-creation-form>
         <report-form id="report-modal"></report-form>
+        <pet-qr-modal id="qr-modal"></pet-qr-modal>
+        <pet-poster-exporter id="poster-exporter"></pet-poster-exporter>
     </div> 
 `;
 

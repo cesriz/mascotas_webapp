@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // Maneja el CORS para que el front se pueda conectar al back
-require_once __DIR__ . '/../app/Config/Cors.php';
+require_once __DIR__ . '/../app/Config/cors.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);

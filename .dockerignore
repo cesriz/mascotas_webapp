@@ -1,0 +1,11 @@
+.git
+.gitignore
+README.md
+documentacion/
+mysql_data/
+postman/
+src/backend/vendor/
+src/frontend/node_modules/
+*.log
+.env
+.env.*

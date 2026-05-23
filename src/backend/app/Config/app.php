@@ -2,25 +2,25 @@
 
 return [
     // Nombre de la aplicación
-    'name' => 'Mascotas Perdidas WebApp',
+    'name' => getenv('APP_NAME') ?: 'Mascotas Perdidas WebApp',
 
     // Entorno de ejecución
     // local | production
-    'env' => 'local',
+    'env' => getenv('APP_ENV') ?: 'local',
 
     // Mostrar errores (true en desarrollo)
-    'debug' => true,
+    'debug' => filter_var(getenv('APP_DEBUG') ?: true, FILTER_VALIDATE_BOOLEAN),
 
     // Zona horaria
-    'timezone' => 'Europe/Madrid',
+    'timezone' => getenv('APP_TIMEZONE') ?: 'Europe/Madrid',
 
     // URL base de la aplicación
-    'base_url' => 'http://localhost',
+    'base_url' => getenv('APP_URL') ?: 'http://localhost:3000',
 
     // URL base del frontend.
     // Aquí mandaremos al usuario cuando pulse el enlace de recuperar contraseña. REVISAR!!
-    'frontend_url' => 'http://localhost:3000',
+    'frontend_url' => getenv('FRONTEND_URL') ?: getenv('APP_URL') ?: 'http://localhost:4200',
 
     // Correo que aparecerá como remitente. REVISAR !!
-    'mail_from' => 'no-reply@mascotas-webapp.local',
+    'mail_from' => getenv('MAIL_FROM') ?: 'no-reply@mascotas-webapp.local',
 ];

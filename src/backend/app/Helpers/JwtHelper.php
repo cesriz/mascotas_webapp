@@ -7,8 +7,8 @@ use Firebase\JWT\Key;
 
 class JwtHelper
 {
-    // Clave secreta para firmar el token.
-    private const SECRET_KEY = 'mascotas_webapp_clave_super_secreta_2026_token_jwt_larga_y_segura_123456789';
+    // Solo para desarrollo local. En produccion debe venir de JWT_SECRET.
+    private const DEFAULT_SECRET_KEY = 'local-development-jwt-secret-change-me';
 
     // Algoritmo usado para firmar.
     private const ALGORITHM = 'HS256';
@@ -33,13 +33,13 @@ class JwtHelper
             ]
         ];
 
-        return JWT::encode($payload, self::SECRET_KEY, self::ALGORITHM);
+        return JWT::encode($payload, self::getSecretKey(), self::ALGORITHM);
     }
 
     // Decodifica un token y devuelve su payload.
     public static function decodeToken(string $token): object
     {
-        return JWT::decode($token, new Key(self::SECRET_KEY, self::ALGORITHM));
+        return JWT::decode($token, new Key(self::getSecretKey(), self::ALGORITHM));
     }
 
     // Intenta sacar el token del header Authorization.
@@ -56,5 +56,20 @@ class JwtHelper
         }
 
         return trim($matches[1]);
+    }
+
+    private static function getSecretKey(): string
+    {
+        $secret = getenv('JWT_SECRET');
+
+        if ($secret !== false && trim($secret) !== '') {
+            return $secret;
+        }
+
+        if ((getenv('APP_ENV') ?: 'local') === 'production') {
+            throw new RuntimeException('JWT_SECRET no esta configurado');
+        }
+
+        return self::DEFAULT_SECRET_KEY;
     }
 }

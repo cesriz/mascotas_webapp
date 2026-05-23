@@ -2,10 +2,21 @@
  * api.js configura las peticiones HTTP al backend
  */
 
-const BASE_URL = 'http://localhost:3000'; // Cambia esto por tu URL real
+const DEFAULT_LOCAL_API_URL = 'http://localhost:3000';
+const isLocalFrontendServer = ['4200', '5173'].includes(window.location.port) || window.location.protocol === 'file:';
+const configuredBaseUrl = window.MASCOTAS_API_BASE_URL || (isLocalFrontendServer ? DEFAULT_LOCAL_API_URL : '');
+const BASE_URL = configuredBaseUrl.replace(/\/$/, '');
 
 
 export const API = {
+    resolveMediaUrl(path, fallback = '../assets/placeholder.png') {
+        if (!path || typeof path !== 'string') return fallback;
+        if (path.startsWith('http')) return path;
+
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        return `${BASE_URL}${cleanPath}`;
+    },
+
     // Función para no repetir el token en cada llamada.
     // Multipart = false cuando no se envían archivos. Se indica el Content-Type en los headers. Es el valor por defecto.
     // Multipart = true cuando sí se envían archivos / objetos FormData (fotografías). El navegador genera un header especial de forma autónoma.
@@ -154,7 +165,7 @@ export const API = {
     // Listar mascotas publicadas
     getMascotas(filtros = "") {
         const query = (filtros && !filtros.startsWith('?')) ? `?${filtros}` : filtros;
-        return this.call(`/api/mascotas${filtros}`);
+        return this.call(`/api/mascotas${query}`);
     },
 
     // Listar mascotas publicadas recientes

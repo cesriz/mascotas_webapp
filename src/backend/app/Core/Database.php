@@ -17,7 +17,10 @@ class Database
         $config = require __DIR__ . '/../Config/database.php';
         
         // Construimos el DSN (cadena de conexión)
-        $dsn = 'mysql:host=' . $config['host'] . ';dbname=' . $config['dbname'] . ';charset=' . $config['charset'];
+        $dsn = 'mysql:host=' . $config['host']
+            . ';port=' . ($config['port'] ?? 3306)
+            . ';dbname=' . $config['dbname']
+            . ';charset=' . $config['charset'];
 
         // Creamos la conexión PDO
         self::$pdo = new PDO($dsn,$config['user'],$config['password']);

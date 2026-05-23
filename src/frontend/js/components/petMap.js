@@ -114,20 +114,19 @@ export class PetMap extends HTMLElement {
     // Función para crear la tarjeta (Leaflet no permite utilizar templates directamente)
     _createPopupCard(data, isPet = false) {
         // Imagen
-        const BASE_URL = 'http://localhost:3000';
         let finalUrl = './assets/placeholder.png'; // Imagen por defecto
 
         if (isPet) {
             // Para la mascota, miramos en el array 'fotos'
             if (data.fotos && data.fotos.length > 0) {
                 const fotoPath = data.fotos[0].url; // Cogemos la primera foto
-                finalUrl = fotoPath.startsWith('http') ? fotoPath : `${BASE_URL}${fotoPath}`;
+                finalUrl = API.resolveMediaUrl(fotoPath, './assets/placeholder.png');
             }
         } else {
             // Para avistamientos (ajusta según si el avistamiento devuelve 'foto_url' o similar)
             if (data.fotos && data.fotos.length > 0) {
                 const fotoPath = data.fotos[0].url; // Cogemos la primera foto
-                finalUrl = fotoPath.startsWith('http') ? fotoPath : `${BASE_URL}${fotoPath}`;
+                finalUrl = API.resolveMediaUrl(fotoPath, './assets/placeholder.png');
             }
         }
 

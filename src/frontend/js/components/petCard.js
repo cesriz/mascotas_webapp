@@ -124,24 +124,10 @@ export class PetCard extends HTMLElement {
         // Función para mostrar la fotografía
         // Obtiene tanto fotos en local como procedentes de Cloudinary
         applyPhoto() {
-            const BASE_URL = 'http://localhost:3000'; // Servidor local
-
             if (!this._petData) return;
             
             const fotoPath = this._petData.foto_principal_url;
-            let finalUrl = '../assets/placeholder.png'; // Imagen por defecto
-    
-            // Verificación de seguridad
-            if (fotoPath && typeof fotoPath === 'string') {
-                // Si empieza por "http" y contiene "cloudinary" o "localhost", usamos la url tal cual.
-                if (fotoPath.startsWith('http')) {
-                        finalUrl = fotoPath;
-                    } else {
-                        // Si es una ruta relativa que empieza por "/" (ej: /uploads/...)
-                        const cleanPath = fotoPath.startsWith('/') ? fotoPath : `/${fotoPath}`;
-                        finalUrl = BASE_URL + cleanPath;
-                    }
-                }
+            const finalUrl = API.resolveMediaUrl(fotoPath);
 
             // Buscamos la imagen y asignamos la URL
             const imgElement = this.querySelector('#card-pet-img');

@@ -3,6 +3,11 @@ RewriteEngine On
 # Reenvía el header Authorization para que PHP pueda leerlo
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+# Sirve vistas estaticas sin extension: /detalles -> /detalles.html
+RewriteCond %{REQUEST_URI} !^/api(/|$)
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(.+?)/?$ $1.html [L]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]

@@ -21,7 +21,7 @@ export const petContactFormHTML = `
                 </div>
                 <div>            
                     <label for="contact-phone">Teléfono</label>
-                    <input type="tel" id="contact-phone">
+                    <input type="tel" id="contact-phone" required>
                 </div>
                 <div>            
                     <label for="contact-msg">Mensaje</label>

@@ -52,7 +52,7 @@ export const avisCreationFormHTML = `
                     <img src="../assets/icons/proicons--photo.svg" alt="Icono subir foto" id="upload-icon">
                     <span id="file-name-label">Haz clic para seleccionar o arrastra una imagen</span>
                     
-                    <input type="file" id="avistamiento-fotos" name = "fotos[]" accept="image/*" multiple>
+                    <input type="file" id="avistamiento-fotos" accept="image/*" multiple>
                     
                     <div id="preview-container">
                 </div>
@@ -234,10 +234,10 @@ export const avisCreationFormCSS = `
     }
 
     /* Botones */
-.avistamiento-buttons {
+    .avistamiento-buttons {
         width: 100% !important;
         display: flex !important;
-        flex-direction: row !important; /* Forzamos fila */
+        flex-direction: row !important;
         align-items: center;
         justify-content: center;
         gap: 20px; /* Espacio entre botones */
@@ -245,10 +245,10 @@ export const avisCreationFormCSS = `
     }
     
     .avistamiento-buttons button {
-        flex: 0 1 150px; /* No crecen, pueden encogerse, base de 150px */
+        flex: 0 1 150px; 
         width: 150px;
         padding: 10px;
-        white-space: nowrap; /* Evita que el texto del botón se parta */
+        white-space: nowrap;
     }
 
     #avistamiento-search-btn {

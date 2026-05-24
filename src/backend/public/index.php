@@ -4,11 +4,6 @@ declare(strict_types=1);
 // Maneja el CORS para que el front se pueda conectar al back
 require_once __DIR__ . '/../app/Config/Cors.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
 // Carga librerías instaladas con Composer.
 require_once __DIR__ . '/../vendor/autoload.php';
 

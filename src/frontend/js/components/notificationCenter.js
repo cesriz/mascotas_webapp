@@ -1,4 +1,5 @@
 import { API } from "../api.js";
+import { formatDate } from "../admin-utils.js";
 import { createTemplate } from "../ui-utils.js";
 import { notificationHTML, notificationCSS, templateAvistamiento, templateContacto } from "../templates/notificationTemplate.js";
 
@@ -53,7 +54,16 @@ export class Notification extends HTMLElement {
 
         list.innerHTML = this.notificacionesCompletas.map(item => {
             // Llamamos a la plantilla correspondiente según el tipo
-            return item.tipo === 'contacto' ? templateContacto(item) : templateAvistamiento(item);
+            const fecha_c = formatDate(item.fecha_creacion) ?? "no disponible";
+            const fecha_a = formatDate(item.fecha_hora) ?? "no disponible";
+            const phone = item.telefono ?? "No disponible";
+
+            const dataParaRenderizar = { ...item, fecha_creacion: fecha_c, fecha_hora: fecha_a, telefono: phone };
+
+            return item.tipo === 'contacto' 
+                ? templateContacto(dataParaRenderizar) 
+                : templateAvistamiento(dataParaRenderizar);
+
         }).join('');
 
     }

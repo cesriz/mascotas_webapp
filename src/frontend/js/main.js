@@ -53,10 +53,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = await Auth.syncUser();
     console.log(user);
 
-    const mainUser = Auth.getUserData();
-    console.log('main uesr: ', mainUser);
-
-
     if (Auth.isLoggedIn() && !user) {
         console.warn("Token detectado pero no válido..");
 

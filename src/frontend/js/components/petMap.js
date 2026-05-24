@@ -32,7 +32,7 @@ export class PetMap extends HTMLElement {
             // PetDetail: cargamos avistamientos
             await this.setData(petId);
         } else if (mode === 'select') {
-            // avistamientoCreationForm: activamos el marcador para formularios
+            // avistamientoCreationForm y petCreationForm: activamos el marcador para formularios
             this.initRegistrationMode();
         }
     }
@@ -110,8 +110,20 @@ export class PetMap extends HTMLElement {
         }
     }
 
+    // Lógica para para obtener iconos de colores de los marcadores (usamos https://github.com/pointhi/leaflet-color-markers)
+    getIcon(color) {
+        return new L.Icon({
+            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+    }  
+
     // --- Popups personalizados ---
-    // Función para crear la tarjeta (Leaflet no permite utilizar templates directamente)
+    // Lógica para crear la tarjeta (Leaflet no permite utilizar templates directamente)
     _createPopupCard(data, isPet = false) {
         // Imagen
         const BASE_URL = 'http://localhost:3000';
@@ -192,63 +204,7 @@ export class PetMap extends HTMLElement {
         return popupCard;
     }
 
-    // Método para para obtener iconos de colores de los marcadores (usamos https://github.com/pointhi/leaflet-color-markers)
-    getIcon(color) {
-        return new L.Icon({
-            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-    }  
-
-    // Método para colocar un marcador basado en una dirección específica. 
-    // Utilizamos el buscador de OpenStreetMap (Nominatim)
-    async searchAddress(address) {
-        if (!address) return;
-        try {
-            // Consultamos a Nominatim (OpenStreetMap Geocoding)
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(address)}&countrycodes=es`);
-            const data = await response.json();
-
-            if (data.length > 0) {
-                // Guardamos resultado de petición a Nominata en variables
-                const { lat, lon, display_name, address } = data[0];
-                const coords = [parseFloat(lat), parseFloat(lon)];
-
-                // Centramos el mapa
-                this.map.setView(coords, 16); // Zoom cercano
-
-                // Colocamos o movemos el marcador de registro
-                if (this.registrationMarker) {
-                    this.registrationMarker.setLatLng(coords);
-                } else {
-                    this.registrationMarker = L.marker(coords, { 
-                        draggable: true,
-                        icon: this.getIcon('red') // Usamos rojo para el nuevo avistamiento
-                    }).addTo(this.map);
-                }
-
-                this.registrationMarker.bindPopup(`<b>Ubicación encontrada:</b><br>${display_name}`).openPopup();
-
-                // Guardamos los detalles para que el formulario avistamientoCreationForm pueda pedirlos
-                this._lastAddressDetails = address;
-                this._lastDisplayName = display_name;
-
-                return { lat, lon, displayName: display_name, details: address };
-            } else {
-                alert("No se ha encontrado la ubicación. Intenta ser más específico.");
-                return null;
-            }
-        } catch (error) {
-            console.error("Error en el geocoding:", error);
-            return null;
-        }
-    }
-
-    // Método para habilitar el modo "selección" en el formulario
+    // Método para habilitar el modo "selección manual" en el formulario
     initRegistrationMode() {
         if (!this.map) return;
 
@@ -263,7 +219,7 @@ export class PetMap extends HTMLElement {
             // Evento cuando se termina de arrastrar el marcador
             this.registrationMarker.on('dragend', () => {
                 const position = this.registrationMarker.getLatLng();
-                this.dispatchLocationEvent(position.lat, position.lng);
+                this.dispatchLocationEvent(position.lat, position.lng); // Función declarada debajo
             });
 
             // También permitimos hacer click en el mapa para mover el marcador
@@ -274,16 +230,97 @@ export class PetMap extends HTMLElement {
         }
     }
 
-    // Lanza un evento que el formulario podrá escuchar
-    dispatchLocationEvent(lat, lng) {
-        this.dispatchEvent(new CustomEvent('location-selected', {
-            detail: { lat, lng },
-            bubbles: true,
-            composed: true
-        }));
+    // Método para colocar un marcador basado en una dirección específica introducida en un input
+    // Utilizamos el buscador de OpenStreetMap (Nominatim)
+    async searchAddress(address) {
+        if (!address) return;
+        try {
+            // Consultamos a Nominatim (OpenStreetMap Geocoding)
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(address)}&countrycodes=es`);
+            const data = await response.json();
+
+            if (data.length > 0) {
+                // Guardamos resultado de petición a Nominatim en variables
+                const result = data[0];
+                console.log('Pet-Map', result);
+                const addr = result.address || {};
+                const coords = [parseFloat(result.lat), parseFloat(result.lon)];
+
+                // Centramos el mapa
+                this.map.setView(coords, 16); // Zoom cercano
+
+                // Colocamos o movemos el marcador de registro
+                if (this.registrationMarker) {
+                    this.registrationMarker.setLatLng(coords);
+                } else {
+                    this.registrationMarker = L.marker(coords, { 
+                        draggable: true,
+                        icon: this.getIcon('red') // Usamos rojo para el nuevo avistamiento
+                    }).addTo(this.map);
+                }
+
+                this.registrationMarker.bindPopup(`<b>Ubicación encontrada:</b><br>${result.display_name}`).openPopup();
+
+                // Guardamos los detalles para que los formularios puedan pedirlos
+                return {
+                    latitud: parseFloat(result.lat),
+                    longitud: parseFloat(result.lon),
+                    direccion_formateada: result.display_name,
+                    municipio: addr.city || addr.town || addr.village || addr.municipality || "Desconocido",
+                    provincia: addr.province || addr.state || addr.county || "Desconocido",
+                    codigo_postal: addr.postcode || "",
+                    pais: addr.country || "España"
+                };    
+            } else {
+                alert("No se ha encontrado la ubicación. Intenta ser más específico.");
+                return null;
+            }
+        } catch (error) {
+            console.error("Error en el geocoding:", error);
+            return null;
+        }
     }
 
-    // Marcar una única posición (se utiliza en petCreationForm y petEditForm)
+    // Lógica para guardar los datos de una ubicación marcada manualmente
+    async dispatchLocationEvent(lat, lng) {
+        try {
+            // Buscamos los datos de dirección, utilizando la API de Nominatim
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+            if (!response.ok) throw new Error("Error en la geocodificación");
+
+            const data = await response.json();
+            const addr = data.address || {};
+
+            // Creamos un objeto para guardar los datos en la BD
+            const locationDetails = {
+                lat: parseFloat(lat),
+                lng: parseFloat(lng),
+                direccion_formateada: data.display_name || "Ubicación seleccionada",
+                municipio: addr.city || addr.town || addr.village || addr.municipality || "Desconocido",
+                provincia: addr.province || addr.state || addr.county || "Desconocido",
+                codigo_postal: addr.postcode || "",
+                pais: addr.country || "España"
+            };
+
+            // Creamos evento personalizado, será el que utilizarán otros componentes
+            this.dispatchEvent(new CustomEvent('location-selected', {
+                detail: locationDetails,
+                bubbles: true,
+                composed: true
+            }));
+            
+        } catch (error) {
+            console.error("Error en geocodificación inversa:", error);
+            // En caso de error, enviamos los datos mínimos necesarios
+            this.dispatchEvent(new CustomEvent('location-selected', {
+                detail: { lat, lng, direccion_formateada: "Ubicación manual", municipio: "Desconocido", provincia: "Desconocido" },
+                bubbles: true,
+                composed: true
+            }));
+        }
+    }
+
+    // Marcar una única posición (se utiliza en petCreationForm)
     setMarker(lat, lng) {
         if (!this.map) return;
         const coords = [lat, lng];

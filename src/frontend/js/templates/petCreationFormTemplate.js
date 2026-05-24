@@ -1,6 +1,6 @@
 export const petCreationHTML = `
     <div id="success-div"></div>
-    <form class="pet-create-data" id="pet-create-data-form">
+    <form class="pet-create" id="pet-create-form">
             <div class="switch-div">
                 <label class="switch">
                 <input type="checkbox" id="pet-create-estado">
@@ -8,123 +8,129 @@ export const petCreationHTML = `
                 </label><span id="switch-text">He perdido a mi mascota</span>
             </div>
 
-            <div class="pet-create-data-section">
+            <div class="pet-create-section">
                 <div class="pet-create-title">
                     <img src="../assets/icons/streamline-plump--pet-paw.svg" alt="Icono mascota">
                     <h3>Datos de la mascota</h3>
                 </div>
 
-                <div class="pet-create-data-inputs first">
+                <div class="pet-create-inputs first">
                     <div>            
-                        <label for="pet-create-data-form-name">Nombre</label>
-                        <input type="text" id="pet-create-data-form-name" required>
+                        <label for="pet-cform-name">Nombre</label>
+                        <input type="text" id="pet-cform-name" required>
                     </div>
 
                     <div>            
-                        <label for="pet-create-data-form-especie">Especie</label>
-                        <select id="pet-create-data-form-especie" required></select>
+                        <label for="pet-cform-especie">Especie</label>
+                        <select id="pet-cform-especie" required></select>
                     </div>
 
                     <div>            
-                        <label for="pet-create-data-form-raza">Raza</label>
-                        <select id="pet-create-data-form-raza" required></select>
+                        <label for="pet-cform-raza">Raza</label>
+                        <select id="pet-cform-raza" required></select>
                     </div>
 
                     <div>
-                        <label for="pet-create-data-form-sexo">Sexo</label>
-                        <select id="pet-create-data-form-sexo" required></select>
+                        <label for="pet-cform-sexo">Sexo</label>
+                        <select id="pet-cform-sexo" required></select>
                     </div>
 
                     <div>            
-                        <label for="pet-create-data-form-birth">Fecha de nacimiento</label>
-                        <input type="date" id="pet-create-data-form-birth">
+                        <label for="pet-cform-birth">Fecha de nacimiento</label>
+                        <input type="date" id="pet-cform-birth">
                     </div>
 
                     <div>           
-                        <label for="pet-create-data-form-tamano">Tamaño</label>
-                        <select id="pet-create-data-form-tamano" required></select>
+                        <label for="pet-cform-tamano">Tamaño</label>
+                        <select id="pet-cform-tamano" required></select>
                     </div>
 
                     <div>            
-                        <label for="pet-create-data-form-peso">Peso</label>
-                        <input type="number" id="pet-create-data-form-peso">
+                        <label for="pet-cform-peso">Peso</label>
+                        <input type="number" id="pet-cform-peso" step="any" placeholder="Ej: 2.5">
                     </div>
 
                     <div>           
-                        <label for="pet-create-data-form-color">Colores (elige al menos uno)</label>
-                        <div id="pet-create-data-form-color">
-                            <select id="pet-create-data-pcolor" required></select>
-                            <select id="pet-create-data-scolor"></select>
-                            <select id="pet-create-data-tcolor"></select>
+                        <label for="pet-cform-color">Colores (elige al menos uno)</label>
+                        <div id="pet-cform-color">
+                            <select id="pet-create-pcolor" required></select>
+                            <select id="pet-create-scolor"></select>
+                            <select id="pet-create-tcolor"></select>
                         </div>
                     </div>
                         
                     <div>            
-                        <label for="pet-create-data-form-chip">¿Tiene chip?</label>
-                        <select id="pet-create-data-form-chip"></select>
+                        <label for="pet-cform-chip">¿Tiene chip?</label>
+                        <select id="pet-cform-chip"></select>
                     </div>
                 </div>
             </div>
 
-            <div class="pet-create-data-section">
+            <div class="pet-create-section">
                 <div class="pet-create-title">
                     <img src="../assets/icons/solar--camera-linear.svg" alt="Icono cámara">
                     <h3>Fotos de la mascota</h3>
                 </div>
 
-                <label for="pet-create-data-foto">Sube las mejores fotos de tu mascota para que sea más fácil reconocerla</label>
-                <div class="pet-create-foto-div">            
-                    <img src="../assets/icons/proicons--photo.svg" alt="Subir foto" id="create-form-upload-icon">
-                    <span id="pet-create-filename-label">Haz clic para seleccionar o arrastra una imagen</span>
-                    <input type="file" id="pet-create-data-foto" accept="image/*" multiple>
-                    <div id="pet-create-preview-div"></div>
+                <label for="pet-create-fotos">Sube las mejores fotos de tu mascota para que sea más fácil reconocerla</label>
+                <div class="foto-div">            
+                    <img src="../assets/icons/proicons--photo.svg" alt="Icono subir foto" id="upload-icon">
+                    <span id="file-name-label">Haz clic para seleccionar o arrastra una imagen</span>
+
+                    <input type="file" id="pet-create-fotos" accept="image/*" multiple>
+
+                    <div id="preview-container"></div>
                 </div>
             </div>
 
-            <div class="pet-create-data-section">
+            <div class="pet-create-section">
                 <div class="pet-create-title">
                     <img src="../assets/icons/iconoir--post.svg" alt="Icono anuncio">
                     <h3>Detalles del suceso</h3>
                 </div>
 
-                <div class="pet-create-data-inputs">
+                <div class="pet-create-inputs">
                     <div>            
-                        <label for="pet-create-data-form-date">¿Cuándo has visto a tu mascota por última vez?</label>
-                        <input type="date" id="pet-create-data-form-date" required>
+                        <label for="pet-cform-date">¿Cuándo has visto a tu mascota por última vez?</label>
+                        <input type="date" id="pet-cform-date" required>
                     </div>
 
-                    <div class="pet-create-data-location">            
-                        <label for="pet-create-data-form-loc">¿Dónde has visto a tu mascota por última vez?</label>
+                    <div class="pet-create-location">            
+                        <label for="pet-cform-loc">¿Dónde has visto a tu mascota por última vez?</label>
                         <div style="position:relative">
-                            <input type="" id="pet-create-data-form-loc" placeholder="Escribe una dirección">
+                            <input type="text" id="pet-cform-loc" placeholder="Escribe una dirección">
                             <div id="loc-autocomplete" class="loc-autocomplete"></div>
                         </div>
-                        <button class="button-primary" type="button" id="pet-create-data-search-btn">Buscar</button>
+                        <button class="button-primary" type="button" id="pet-create-search-btn">Buscar</button>
                     </div>
-                    <div><pet-map id="pet-create-data-map"></pet-map></div>
-                    <input type="hidden" name="latitud" id="pet-create-data-lat-input" required>
-                    <input type="hidden" name="longitud" id="pet-create-data-lng-input" required>
+                    <div>
+                        <pet-map></pet-map>
+                    </div>
+                    <input type="hidden" name="latitud" id="pet-create-lat-input" required>
+                    <input type="hidden" name="longitud" id="pet-create-lng-input" required>
 
                     <div>            
-                        <label for="pet-create-data-form-descripcion">Descripción</label>
-                        <textarea id="pet-create-data-form-descripcion" required> </textarea>
+                        <label for="pet-cform-descripcion">Descripción</label>
+                        <textarea id="pet-cform-descripcion" required> </textarea>
                     </div>
                     
-                    <label class="reward-input">
-                        <input type="checkbox" id="reward-check">
-                        Ofrecer recompensa por recuperación
-                    </label>
+                    <div class="reward-input">
+                        <label class="reward-input">
+                            <input type="checkbox" id="reward-check"> Ofrecer recompensa por recuperación
+                        </label>
+                    </div>
                     <div class="reward-price-input">
                         <label for="reward-price">¿Cuánto ofreces?</label>
                         <input type="number" id="reward-price">
                     </div>
+
                 </div>
             </div>
 
 
-            <div class="pet-create-data-buttons">
-                <button type="reset" class="button-secondary" id="pet-create-data-btn-reset">Limpiar</button>
-                <button type="submit" class="button-primary" id="pet-create-data-btn-send">PUBLICAR ANUNCIO</button> 
+            <div class="pet-create-buttons">
+                <button type="reset" class="button-secondary" id="pet-create-btn-reset">Limpiar</button>
+                <button type="submit" class="button-primary" id="pet-create-btn-send">PUBLICAR ANUNCIO</button> 
             </div>
         </div>
     </form>
@@ -185,7 +191,7 @@ export const petCreationCSS = `
         }
 
     /* Contenedores */
-    .pet-create-data {
+    .pet-create {
         width: min(900px, 92vw);
         margin: 0 auto;
         padding: 2rem;
@@ -194,7 +200,7 @@ export const petCreationCSS = `
         gap: 20px;
     }
     
-    .pet-create-data-section {
+    .pet-create-section {
         background-color: var(--backgroundblue);
         border: 2px solid var(--primary);
         border-radius: var(--radius-md);
@@ -202,7 +208,7 @@ export const petCreationCSS = `
         padding: 2rem;
     }
 
-    .pet-create-data-location {
+    .pet-create-location {
         display: flex;
         flex-direction: column;
     }
@@ -225,8 +231,8 @@ export const petCreationCSS = `
     }
 
     /* Inputs */
-    
-    .pet-create-data-inputs {
+
+    .pet-create-inputs {
         display: flex;
         flex-direction: column; 
         width: 100%;
@@ -246,7 +252,7 @@ export const petCreationCSS = `
         resize: vertical;
     }
 
-    #pet-create-data-form-color {
+    #pet-cform-color {
         width: 100%;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -258,32 +264,33 @@ export const petCreationCSS = `
     .reward-input {
         display: flex;
         align-items: flex-start;
-        gap: 5px;
+        gap: 1rem;
     }
 
     .reward-price-input {
-        max-width: 200px;
-        margin-left: 20px;
-        gap: 10px;
-    }
-
-    .reward-price-input input {
         width: 100%;
-        margin-left: 10px;
-        gap: 10px;
+        margin-left: 1rem;
+        gap: 1rem;
     }
 
 
-    /* Fotografías */
-    .pet-create-foto-div {
+    #reward-price {
+        max-width: 100px;
+        margin-left: 1rem;
+        gap: 1rem;
+    }
+
+
+    /* Input para las fotos*/
+    .foto-div {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        gap: 10px;
-        margin-top: -10px;
-        margin-top:10px;
+        gap: 1rem;
+        margin-top: 1rem;
+
         padding: 20px;
         background-color: var(--inputbackground);
         border: 2px dashed var(--primary);
@@ -293,36 +300,61 @@ export const petCreationCSS = `
         cursor: pointer;
     }
         
-    .pet-create-foto-div:hover { background: rgba(0,0,0,0.05); }
+    .foto-div:hover { background: rgba(0,0,0,0.05); }
 
-    #create-form-upload-icon {
+    .foto-div img {
         width: 40px;
         height: 40px;
         opacity: 0.7;
     }
 
-    #pet-create-preview-div { 
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+    #pet-create-fotos { 
+        display: none; 
     }
 
-    .pet-create-preview-img {
-        display:block; 
-        max-width: 120px;
-        max-height: 120px;
-        object-fit: cover; 
-        margin-top: 10px;
+    #preview-container {
+        width: 100%;
+        min-height: 100px;
+        max-height: auto; 
+        margin-top: 1rem;
+        padding: 0.5rem;
+        gap: 0.3rem;
         background-color: var(--inputbackground);
         border-radius: var(--radius-sm);
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        flex-wrap: wrap;
     }
 
-    #pet-create-data-foto {
-        display:none;
+    #preview-container img {
+        max-width: 300px;
+        min-width: 100px;
+        height: auto;
+        object-fit: cover;
+        border-radius: var(--radius-xs);
+        border: 1p solid var(--secondary500);
     }
+
+    /* Visualizar fotos en el modo editar */
+    .foto-preview-item {
+        position: relative;
+    }
+
+    /* Botón para borrar fotos */
+    .btn-delete-photo {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        max-width: 22px;
+        max-height: 22px;
+        padding: 0.5rem;
+        z-index: 10;
+    }
+
 
     /* Botones */
-    .pet-create-data-buttons {
+    .pet-create-buttons {
         width: auto;
         display: flex;
         flex-direction: row;
@@ -334,15 +366,13 @@ export const petCreationCSS = `
         gap: 10px;
     }
 
-
-    #pet-create-data-search-btn{
+    #pet-create-search-btn{
         max-width: 150px;
         margin-top: 10px;
         align-self: flex-end;
     }
 
-
-    .pet-create-data-buttons button {
+    .pet-create-buttons button {
         flex: 1;
         max-width: 250px;
         padding: 10px;
@@ -364,12 +394,12 @@ export const petCreationCSS = `
     }
     @media (max-width: 768px) {
 
-        .pet-create-data {
+        .pet-create {
             width: 95vw;
             padding: 1.5rem;
         }
 
-        .pet-create-data-section {
+        .pet-create-section {
             padding: 1.2rem;
         }
 
@@ -383,18 +413,18 @@ export const petCreationCSS = `
             height: 20px;
         }
 
-        #pet-create-data-form-color {
+        #pet-cform-color {
             display: flex;
             flex-direction: column;
             flex-wrap: wrap;
         }
 
-        #pet-create-data-form-color select {
+        #pet-cform-color select {
             min-width: 150px;
             flex: 1;
         }
 
-        .pet-create-data-buttons {
+        .pet-create-buttons {
             gap: 15px;
         }
 
@@ -402,19 +432,19 @@ export const petCreationCSS = `
             padding: 15px;
         }
 
-        #preview-img {
+        #preview-container {
             max-height: 300px;
         }
     }
     
     @media (max-width: 480px) {
 
-        .pet-create-data {
+        .pet-create {
             width: 100%;
             padding: 1rem;
         }
 
-        .pet-create-data-section {
+        .pet-create-section {
             padding: 1rem;
         }
 
@@ -423,30 +453,35 @@ export const petCreationCSS = `
             margin-bottom: 15px;
         }
 
-        .pet-create-data-inputs {
+        .pet-create-inputs {
             gap: 14px;
         }
 
-        #pet-create-data-form-color {
+        #pet-cform-color {
             flex-direction: column;
         }
 
         .reward-input {
+            width: 100%;
             flex-direction: row;
             align-items: center;
             font-size: 0.85rem;
         }
 
-        .reward-price-input {
-            max-width: 100%;
+        .reward-price-input{
+            width: 100%;
         }
 
-        .pet-create-data-buttons {
+        #reward-price {
+            max-width: 100px;
+        }
+
+        .pet-create-buttons {
             flex-direction: column;
             width: 100%;
         }
 
-        .pet-create-data-buttons button {
+        .pet-create-buttons button {
             width: 100%;
             max-width: none;
         }
@@ -465,8 +500,12 @@ export const petCreationCSS = `
             height: 32px;
         }
 
-        #preview-img {
+        #preview-container {
             max-height: 220px;
+        }
+
+        .pet-create-buttons {
+            gap: 1rem;
         }
     }        
 `;

@@ -41,11 +41,8 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-    environment:
-      CLOUDINARY_CLOUD_NAME: dopb3sist
-      CLOUDINARY_API_KEY: 738199991144992
-      CLOUDINARY_API_SECRET: iLcQrFPBU8RE6L3lb3J04rMBknY
-      CLOUDINARY_FOLDER: mascotas_webapp
+    env_file:
+      - ../.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

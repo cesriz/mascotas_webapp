@@ -65,8 +65,10 @@ INSERT INTO provincias (codigo_ine, nombre) VALUES
 ('50', 'Zaragoza'),
 ('51', 'Ceuta'),
 ('52', 'Melilla')
+AS nuevas_provincias
 ON DUPLICATE KEY UPDATE
     nombre = VALUES(nombre);
+    nombre = nuevas_provincias.nombre;
 
 -- =========================================
 -- MUNICIPIOS
@@ -78,7 +80,7 @@ CREATE TEMPORARY TABLE tmp_municipios (
     cpro CHAR(2) NOT NULL,
     codigo_ine CHAR(5) NOT NULL,
     nombre VARCHAR(150) NOT NULL
-) ENGINE=Memory;
+) ENGINE=InnoDB;
 
 INSERT INTO tmp_municipios (cpro, codigo_ine, nombre) VALUES
 ('01', '01051', 'Agurain/Salvatierra'),
@@ -8241,5 +8243,7 @@ INNER JOIN provincias p ON p.codigo_ine = t.cpro
 ON DUPLICATE KEY UPDATE
     provincia_id = VALUES(provincia_id),
     nombre = VALUES(nombre);
+    provincia_id = p.id,
+    nombre = t.nombre;
 
 DROP TEMPORARY TABLE IF EXISTS tmp_municipios;

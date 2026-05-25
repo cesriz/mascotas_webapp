@@ -24,56 +24,81 @@ export class ResetPassword extends HTMLElement {
         const resetForm = this.querySelector('#reset-pss');
         const passwordInput = this.querySelector('#password');
         const passwordConfirmInput = this.querySelector('#password-confirm');
+        const resetTokenInput = this.querySelector('#reset-token');
+        const submitButton = resetForm.querySelector('button[type="submit"]');
 
-        // Extraemos el token de la URL: ejemplo.com/reset.html?token=123
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
+
+        if (!token) {
+            showHttpError({
+                code: 400,
+                message: 'El token de recuperación no es válido o no existe.'
+            });
+
+            submitButton.disabled = true;
+            passwordInput.disabled = true;
+            passwordConfirmInput.disabled = true;
+            return;
+        }
+
+        resetTokenInput.value = token;
 
         resetForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const password = passwordInput.value;
-            const passwordConfirm = passwordConfirmInput.value;
-
-            // Validaciones básicas
-            if (!token) {
-                alert('El token de recuperación no es válido o no existe.');
-                return;
-            }
+            const password = passwordInput.value.trim();
+            const passwordConfirm = passwordConfirmInput.value.trim();
 
             if (password !== passwordConfirm) {
-                alert('Las contraseñas no coinciden');
+                showHttpError({
+                    code: 422,
+                    message: 'Las contraseñas no coinciden.'
+                });
                 return;
             }
 
             if (password.length < 6) {
-                alert('La contraseña debe tener al menos 6 caracteres');
+                showHttpError({
+                    code: 422,
+                    message: 'La contraseña debe tener al menos 6 caracteres.'
+                });
                 return;
             }
 
-            // Preparamos los datos
             const payload = {
-                token: token,
-                password: password,
+                token,
+                password,
                 password_confirm: passwordConfirm
             };
 
             try {
-                // Llamada a la API
-                const response = await API.resetPassword(payload);
-                
-                console.log('Exito al cambiar la contraseña.');
+                submitButton.disabled = true;
+                passwordInput.disabled = true;
+                passwordConfirmInput.disabled = true;
+                submitButton.textContent = 'RESTABLECIENDO...';
 
-                // SUCCESS -----> 
+                await API.resetPassword(payload);
+
+                showSuccess('Contraseña actualizada correctamente. Redirigiendo al login...');
+
+                resetForm.reset();
+
+                // Quitamos el token de la URL visualmente para que no se quede expuesto.
+                window.history.replaceState({}, document.title, window.location.pathname);
+
                 setTimeout(() => {
                     window.location.href = 'login.html';
-                }, 5000);
+                }, 1800);
 
-                } catch (error) {
-                    // Si hay un error de red o el servidor se cae
-                    console.error('Error al cambiar la contraseña', error);
-                }
+            } catch (error) {
+                submitButton.disabled = false;
+                passwordInput.disabled = false;
+                passwordConfirmInput.disabled = false;
+                submitButton.textContent = 'RESTABLECER CONTRASEÑA';
 
+                showHttpError(error);
+            }
         });
     }
 }

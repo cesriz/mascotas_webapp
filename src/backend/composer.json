@@ -4,7 +4,8 @@
   "type": "project",
   "require": {
     "firebase/php-jwt": "^7.0",
-    "cloudinary/cloudinary_php": "*"
+    "cloudinary/cloudinary_php": "*",
+    "phpmailer/phpmailer": "^7.1"
   },
   "autoload": {
     "classmap": [

@@ -146,13 +146,19 @@ class AuthController
             return;
         }
 
-        // Pedimos al servicio que genere el token
-        $resetResult = $this->authService->forgotPassword($result['data']['correo']);
+        $emailSent = $this->authService->forgotPassword($result['data']['correo']);
+
+        if (!$emailSent) {
+            Response::json([
+                'success' => false,
+                'message' => 'No se pudo enviar el correo de recuperación'
+            ], 500);
+            return;
+        }
 
         Response::json([
             'success' => true,
-            'message' => 'Si el correo existe, se enviará un enlace para recuperar la contraseña',
-            'data' => $resetResult
+            'message' => 'Si el correo existe, recibirás un enlace para recuperar la contraseña.'
         ]);
     }
 

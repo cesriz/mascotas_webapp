@@ -19,6 +19,29 @@ Servicios del entorno local:
 - phpMyAdmin: `http://localhost:8081`
 - MySQL: `localhost:3306`
 
+## Configuración local mediante `.env`
+
+El backend utiliza variables de entorno para cargar credenciales privadas y configuración externa.
+
+Cada desarrollador debe crear un archivo `.env` en la raíz del proyecto a partir de `.env.example`.
+
+Variables principales:
+
+```env
+MAIL_HOST=
+MAIL_PORT=
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_FROM_ADDRESS=
+MAIL_FROM_NAME=
+FRONTEND_BASE_URL=
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_FOLDER=
+```
+
 ---
 
 ## 3. Autenticación
@@ -221,6 +244,22 @@ Si el usuario está autenticado, backend puede rellenar automáticamente nombre,
 ### Cambio de contraseña
 Cambiar la contraseña **no cierra la sesión actual automáticamente**.
 
+### Recuperación de contraseña
+
+La recuperación de contraseña se realiza mediante un enlace enviado por correo electrónico. El backend genera un token aleatorio, guarda únicamente su hash en base de datos y envía el token plano al usuario por email. De esta forma, el token no se expone directamente en la respuesta JSON.
+
+### Variables de entorno
+
+Las credenciales sensibles del proyecto, como Cloudinary y Brevo SMTP, no se almacenan directamente en el código ni en `docker-compose.yml`. Se leen desde un archivo `.env` local, que no debe subirse al repositorio.
+
+El repositorio incluye un archivo `.env.example` como plantilla para que cada desarrollador cree su propio `.env`.
+
+### Borrado lógico de mascotas
+
+El borrado de mascotas se gestiona como borrado lógico. En lugar de eliminar físicamente el registro principal, se marca como eliminado mediante un campo de fecha de eliminación. Las consultas públicas filtran estos registros para que no aparezcan en la aplicación.
+
+Esto evita errores de integridad referencial con fotos, ubicaciones o avistamientos relacionados.
+
 ### Baja de cuenta
 `DELETE /api/me/cuenta` hace una baja lógica de la cuenta. No es un borrado físico completo. La documentación de frontend debería tratarlo como desactivación.
 
@@ -351,11 +390,9 @@ No necesita body.
 
 Permite solicitar la recuperación de contraseña mediante correo electrónico.
 
-El usuario introduce su correo y el sistema genera un token temporal de recuperación, almacenándolo en la base de datos.
+El usuario introduce su correo y, si existe una cuenta activa asociada a ese correo, el backend genera un token temporal de recuperación, guarda su hash en base de datos y envía un enlace de recuperación por email.
 
-Actualmente, en entorno de desarrollo, el token y enlace de recuperación se devuelven en la respuesta JSON para facilitar pruebas.  
-
-En entorno real, este enlace debería enviarse por correo electrónico.
+Por seguridad, el token ya no se devuelve en la respuesta JSON.
 
 **Privada:** No
 
@@ -371,18 +408,16 @@ En entorno real, este enlace debería enviarse por correo electrónico.
 ```json
 {
   "success": true,
-  "message": "Solicitud procesada correctamente",
-  "data": {
-    "reset_url": "http://localhost/reset-password?token=abc123...",
-    "token": "abc123..."
-  }
+  "message": "Si el correo existe, recibirás un enlace para recuperar la contraseña."
 }
-
 ```
 **Notas**
-- No se indica si el correo existe o no por motivos de seguridad.
+- No se indica si el correo existe o no, para evitar revelar usuarios registrados.
+- El token se envía por correo mediante Brevo SMTP.
+- En base de datos no se guarda el token plano, sino su hash.
 - El token tiene caducidad temporal.
 - El token solo puede usarse una vez.
+- El enlace apunta a la página del frontend de recuperación de contraseña.
 
 
 ### POST /api/auth/reset-password
@@ -418,8 +453,10 @@ Permite establecer una nueva contraseña usando un token de recuperación válid
 
 ```
 **Notas**
-- Una vez usada la recuperación, el token queda invalidado.
-- Si el token ha expirado, será necesario solicitar uno nuevo.
+- El token recibido se compara contra el hash guardado en base de datos.
+- Si el token no existe, está caducado o ya fue usado, la operación falla.
+- Si el cambio se realiza correctamente, el token se marca como usado.
+- Al cambiar la contraseña se limpia el token de sesión del usuario.
 
 ---
 
@@ -730,7 +767,7 @@ Incluye:
 
 ---
 
-### PATCH /api/me/notificaciones/contactos/{id}/leer
+### PATCH /api/me/notificaciones/contactos/id/leer
 
 Marca un mensaje de contacto como leído.
 
@@ -754,7 +791,7 @@ No necesita body.
 
 ---
 
-### PATCH /api/me/notificaciones/avistamientos/{id}/leer
+### PATCH /api/me/notificaciones/avistamientos/id/leer
 
 Marca un avistamiento recibido como leído por el dueño de la mascota.
 
@@ -911,7 +948,7 @@ GET /api/mascotas/recientes?limit=4
 
 ---
 
-### GET /api/mascotas/{id}
+### GET /api/mascotas/id
 
 Devuelve el detalle completo de una mascota.
 
@@ -1030,7 +1067,7 @@ Crea una mascota nueva del usuario autenticado.
 
 ---
 
-### PUT /api/mascotas/{id}
+### PUT /api/mascotas/id
 
 Actualiza una mascota del usuario autenticado.
 
@@ -1067,15 +1104,29 @@ Solo puede editarla su dueño.
 
 ### POST /api/mascotas/{id}/fotos
 
-Sube fotos para una mascota ya existente.
+Sube una o varias fotos para una mascota ya existente.
 
-**Privada:** sí
+**Privada:** Sí
+
+**Permisos**
+
+Solo puede subir fotos:
+
+- el usuario propietario de la mascota;
+- un usuario administrador, si se permite desde administración.
 
 **Content-Type**
+
 `multipart/form-data`
 
 **Campo esperado**
-- `fotos`
+
+- `fotos`: para una imagen.
+- `fotos[]`: recomendado para varias imágenes.
+
+**Comportamiento**
+
+Las fotos nuevas se añaden a las fotos ya existentes. No reemplazan automáticamente la galería anterior.
 
 **Éxito**
 
@@ -1086,12 +1137,13 @@ Sube fotos para una mascota ya existente.
   "data": [
     {
       "id": 20,
-      "url": "/uploads/mascotas/abc123.jpg"
+      "mascota_id": 12,
+      "url": "https://res.cloudinary.com/...",
+      "public_id": "mascotas_webapp/..."
     }
   ]
 }
 ```
-
 **Errores comunes**
 - `401` si no hay token
 - `422` si no se envía al menos una imagen en `fotos`
@@ -1103,26 +1155,71 @@ Sube fotos para una mascota ya existente.
 
 ---
 
-### DELETE /api/mascotas/{id}
+### DELETE /api/mascotas/fotos/id
 
-Borra una mascota y sus datos relacionados.
+Elimina una foto concreta asociada a una mascota.
 
-**Privada:** sí
+**Privada:** Sí
 
-**Importante**
-Solo puede borrarla su dueño.
+**Permisos**
+
+Solo puede eliminar la foto:
+
+- el usuario propietario de la mascota;
+- un usuario administrador.
+
+**Parámetros de ruta**
+
+- `id`: ID de la foto en la tabla de fotos de anuncios/mascotas.
+
+**Body**
+
+No necesita body.
 
 **Éxito**
 
 ```json
 {
   "success": true,
-  "message": "Mascota eliminada correctamente"
+  "message": "Foto eliminada correctamente",
+  "data": {
+    "id": 20,
+    "mascota_id": 12
+  }
 }
 ```
+---
 
-**Uso frontend**
-- botón eliminar publicación
+### DELETE /api/mascotas/id
+
+Elimina una mascota de forma lógica.
+
+**Privada:** Sí
+
+**Permisos**
+
+Solo puede eliminarla:
+
+- el usuario propietario de la mascota;
+- un usuario administrador desde el panel correspondiente.
+
+**Importante**
+
+La eliminación de mascotas se realiza mediante borrado lógico. Esto significa que el registro no se borra físicamente de la base de datos, sino que se marca como eliminado para que deje de aparecer en los listados públicos.
+
+Esta decisión evita errores con claves foráneas relacionadas con avistamientos, ubicaciones o fotografías.
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Mascota eliminada correctamente",
+  "data": {
+    "id": 12
+  }
+}
+```
 
 ---
 
@@ -1273,6 +1370,77 @@ Campos habituales:
 
 **Uso frontend**
 - formulario “He visto esta mascota”
+
+---
+
+### DELETE /api/avistamientos/id
+
+Elimina un avistamiento concreto.
+
+**Privada:** Sí
+
+**Permisos**
+
+Puede eliminarlo:
+
+- el usuario propietario de la mascota asociada al avistamiento;
+- un usuario administrador.
+
+**Parámetros de ruta**
+
+- `id`: ID del avistamiento.
+
+**Body**
+
+No necesita body.
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Avistamiento eliminado correctamente",
+  "data": {
+    "id": 8
+  }
+}
+```
+
+---
+
+### DELETE /api/avistamientos/fotos/id
+
+Elimina una foto concreta asociada a un avistamiento.
+
+**Privada:** Sí
+
+**Permisos**
+
+Puede eliminarla:
+
+- el usuario propietario de la mascota asociada al avistamiento;
+- un usuario administrador.
+
+**Parámetros de ruta**
+
+- `id`: ID de la foto en la tabla de fotos de avistamientos.
+
+**Body**
+
+No necesita body.
+
+**Éxito**
+
+```json
+{
+  "success": true,
+  "message": "Foto de avistamiento eliminada correctamente",
+  "data": {
+    "id": 7,
+    "avistamiento_id": 3
+  }
+}
+```
 
 ---
 
@@ -1449,7 +1617,7 @@ Lista todos los colores.
 
 ---
 
-### GET /api/colores/{id}
+### GET /api/colores/id
 
 Devuelve un color concreto.
 
@@ -1489,9 +1657,9 @@ Lista razas.
 
 ### GET /api/provincias
 
-Lista las provincias existentes en la tabla `ubicaciones`.
+Lista las provincias disponibles en el catálogo maestro de provincias.
 
-**Privada:** no
+**Privada:** No
 
 **Respuesta típica**
 
@@ -1499,27 +1667,31 @@ Lista las provincias existentes en la tabla `ubicaciones`.
 {
   "success": true,
   "data": [
-    "Murcia",
-    "Alicante"
+    "Alicante/Alacant",
+    "Almería",
+    "Barcelona",
+    "Murcia"
   ]
 }
-
 ```
 ---
 
 ### GET /api/municipios
 
-Lista los municipios existentes en la tabla `ubicaciones`.
+Lista los municipios disponibles en el catálogo maestro de municipios.
 
-**Privada:** no
+**Privada:** No
 
 **Query params**
-- `provincia` opcional
+
+- `provincia` opcional. Puede enviarse el nombre o código de la provincia, según la implementación del backend.
 
 **Ejemplos**
 
+```http
 GET /api/municipios
 GET /api/municipios?provincia=Murcia
+```
 
 **Respuesta típica**
 
@@ -1652,7 +1824,7 @@ Cambia el estado de publicación de un anuncio.
 
 ---
 
-### DELETE /api/admin/anuncios/{id}
+### DELETE /api/admin/anuncios/id
 
 Elimina un anuncio desde administración.
 
@@ -1858,12 +2030,15 @@ Activa o desactiva un usuario.
 - `POST /api/mascotas`
 - `PUT /api/mascotas/{id}`
 - `POST /api/mascotas/{id}/fotos`
+- `DELETE /api/mascotas/fotos/{id}`
 - `DELETE /api/mascotas/{id}`
 - `PATCH /api/mascotas/{id}/recuperar`
 
 ### Avistamientos
 - `GET /api/mascotas/{id}/avistamientos`
 - `POST /api/mascotas/{id}/avistamientos`
+- `DELETE /api/avistamientos/{id}`
+- `DELETE /api/avistamientos/fotos/{id}`
 
 ### Contacto, reportes y soporte
 - `POST /api/mascotas/{id}/contactos`

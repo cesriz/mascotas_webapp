@@ -10,6 +10,7 @@ require_once __DIR__ . '/../Validators/AvistamientoValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
 require_once __DIR__ . '/../Services/AuthService.php';
+require_once __DIR__ . '/../Helpers/FileHelper.php';
 
 /**
  * Controlador de avistamientos.
@@ -176,5 +177,130 @@ class AvistamientoController
         }
 
         return Request::json();
+    }
+
+    public function destroy(int $id): void
+    {
+        $usuario = Request::user();
+
+        if ($usuario === null) {
+            Response::json([
+                'success' => false,
+                'message' => 'No autorizado'
+            ], 401);
+            return;
+        }
+
+        $avistamiento = $this->avistamientoModel->getByIdWithOwner($id);
+
+        if ($avistamiento === null) {
+            Response::json([
+                'success' => false,
+                'message' => 'Avistamiento no encontrado'
+            ], 404);
+            return;
+        }
+
+        $esDuenoMascota = (int) $avistamiento['propietario_mascota_id'] === (int) $usuario['id'];
+        $esAdmin = ($usuario['rol'] ?? null) === 'ADMIN';
+
+        if (!$esDuenoMascota && !$esAdmin) {
+            Response::json([
+                'success' => false,
+                'message' => 'No tienes permiso para eliminar este avistamiento'
+            ], 403);
+            return;
+        }
+
+        try {
+            $deleted = $this->avistamientoService->delete($id);
+
+            if (!$deleted) {
+                Response::json([
+                    'success' => false,
+                    'message' => 'No se pudo eliminar el avistamiento'
+                ], 500);
+                return;
+            }
+
+            Response::json([
+                'success' => true,
+                'message' => 'Avistamiento eliminado correctamente',
+                'data' => [
+                    'id' => $id
+                ]
+            ]);
+        } catch (Throwable $e) {
+            Response::json([
+                'success' => false,
+                'message' => 'Error al eliminar el avistamiento',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteFoto(int $fotoId): void
+    {
+        $usuario = Request::user();
+
+        if ($usuario === null) {
+            Response::json([
+                'success' => false,
+                'message' => 'No autorizado'
+            ], 401);
+            return;
+        }
+
+        $foto = $this->fotoModel->getAvistamientoFotoById($fotoId);
+
+        if ($foto === null) {
+            Response::json([
+                'success' => false,
+                'message' => 'Foto no encontrada'
+            ], 404);
+            return;
+        }
+
+        $esDuenoMascota = (int) $foto['propietario_mascota_id'] === (int) $usuario['id'];
+        $esAdmin = ($usuario['rol'] ?? null) === 'ADMIN';
+
+        if (!$esDuenoMascota && !$esAdmin) {
+            Response::json([
+                'success' => false,
+                'message' => 'No tienes permiso para eliminar esta foto'
+            ], 403);
+            return;
+        }
+
+        try {
+            FileHelper::destroyImage($foto['public_id'] ?? null);
+
+            $deleted = $this->fotoModel->deleteAvistamientoFotoById($fotoId);
+
+            if (!$deleted) {
+                Response::json([
+                    'success' => false,
+                    'message' => 'No se pudo eliminar la foto'
+                ], 500);
+                return;
+            }
+
+            $this->fotoModel->ensureAvistamientoHasPrincipal((int) $foto['avistamiento_id']);
+
+            Response::json([
+                'success' => true,
+                'message' => 'Foto de avistamiento eliminada correctamente',
+                'data' => [
+                    'id' => $fotoId,
+                    'avistamiento_id' => (int) $foto['avistamiento_id']
+                ]
+            ]);
+        } catch (Throwable $e) {
+            Response::json([
+                'success' => false,
+                'message' => 'Error al eliminar la foto',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

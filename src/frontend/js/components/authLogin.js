@@ -1,9 +1,9 @@
 import { Auth } from '../auth.js';
-import { showSuccess, showHttpError } from "../main.js";
-import { HttpCat } from './http-cat.js';
 import { API } from '../api.js';
 
-import { createTemplate } from "../ui-utils.js";
+import { showSuccess, showHttpError } from "../main.js";
+
+import { createTemplate, showInputError, clearInputErrors } from "../ui-utils.js";
 import { authLoginHTML, authLoginCSS } from "../templates/authLoginTemplate.js";
 
 // Importamos plantilla (HTML y CSS)
@@ -24,6 +24,73 @@ export class AuthLogin extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
     }
 
+    // Lógica para validar datos antes de enviar formularios
+    // Login
+    validateLogin() {
+        clearInputErrors(this);
+        let isValid = true;
+        const correo = this.querySelector('#auth-correo').value.trim();
+        const pass = this.querySelector('#auth-pass').value;
+
+        if (!correo) {
+            showInputError(this, 'auth-correo', 'El correo es obligatorio');
+            isValid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            showInputError(this, 'auth-correo', 'Formato de correo no válido');
+            isValid = false;
+        }
+
+        if (!pass) {
+            showInputError(this, 'auth-pass', 'La contraseña es obligatoria');
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    // Registro
+    validateRegister() {
+        clearInputErrors(this);
+        let isValid = true;
+        const nombre = this.querySelector('#register-name').value.trim();
+        const correo = this.querySelector('#register-correo').value.trim();
+        const pass = this.querySelector('#register-pass').value;
+
+        if (!nombre) {
+            showInputError(this, 'register-name', 'El nombre es obligatorio');
+            isValid = false;
+        }
+
+        if (!correo) {
+            showInputError(this, 'register-correo', 'El correo es obligatorio');
+            isValid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            showInputError(this, 'register-correo', 'Formato de correo no válido');
+            isValid = false;
+        }
+
+        if (!pass) {
+            showInputError(this, 'register-pass', 'La contraseña es obligatoria');
+            isValid = false;
+        } else if (pass.length < 6) {
+            showInputError(this, 'register-pass', 'Mínimo 6 caracteres');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Olvido de contraseña
+    validateForgot() {
+        clearInputErrors(this);
+        const correo = this.querySelector('#forgot-correo').value.trim();
+        if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            showInputError(this, 'forgot-correo', 'Introduce un correo válido');
+            return false;
+        }
+        return true;
+    }
+
+    // Lógica de interacción con el formulario y funcionalidad
     initLogic() {
         // Comprobamos si el usuario está autenticado y redirigimos a la landing
         if (Auth.isLoggedIn()) {
@@ -92,19 +159,21 @@ export class AuthLogin extends HTMLElement {
             forgotDiv.style.display = 'block'; 
         });
     
-        // Lógica de Peticiones API
+        // --- Lógica de Peticiones API ---
         // Inicio de sesión
         const loginForm = this.querySelector('#init');
         loginForm.addEventListener('submit', async (e) => {
-            console.log('clic boton');
             e.preventDefault();
+            
+            // Validamos datos
+            if (!this.validateLogin()) return;
+
             const credentials = {
                 correo: this.querySelector('#auth-correo').value,
                 password: this.querySelector('#auth-pass').value
             };
 
             try {
-                console.log('try');
                 const data = await API.login(credentials);
                 
                 // Se guarda el token en localStorage
@@ -113,7 +182,7 @@ export class AuthLogin extends HTMLElement {
  
                 showSuccess("¡Bienvenido!");
                 
-                // Redirigir tras un breve delay o emitir evento
+                // Redirigimos al login
                 setTimeout(() => window.location.href = 'index.html', 1500);
             } catch (error) {
                 showHttpError(error);
@@ -124,6 +193,10 @@ export class AuthLogin extends HTMLElement {
         const registerForm = this.querySelector('#register');
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Validamos datos
+            if (!this.validateRegister()) return;
+
             const userData = {
                 nombre: this.querySelector('#register-name').value,
                 apellidos: this.querySelector('#register-surname').value,
@@ -133,12 +206,8 @@ export class AuthLogin extends HTMLElement {
                 password: this.querySelector('#register-pass').value
             };
 
-            console.log('datos obtenidos');
-
             try {
                 await API.registro(userData);
-
-                console.log('llamada');
 
                 showSuccess("Registro completado. Ya puedes iniciar sesión.");
                 registerForm.reset(); console.log('reset');
@@ -153,13 +222,15 @@ export class AuthLogin extends HTMLElement {
         const forgotForm = this.querySelector('#forgot-pss');
         forgotForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            // Validamos datos
+            if (!this.validateForgot()) return;
+
             const email = this.querySelector('#forgot-correo').value;
 
             try {
                 const data = await API.forgotPassword(email);
-
                 showSuccess("Se ha procesado la solicitud. Revisa tu correo electrónico.")
-                console.log(data);
+
             } catch (error) {
                 showHttpError(error, this);
             }

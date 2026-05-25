@@ -36,6 +36,7 @@ import './components/qr.js';
 import './components/reportForm.js';
 import './components/resetPassword.js';
 import './components/supportForm.js';
+import './components/userDeleteConfirm.js';
 import './components/userProfile.js';
 
 
@@ -129,8 +130,21 @@ export function showHttpError(error, container = document) {
  * Gestor de exitos
  * Capturar exitos y mostrar mensaje
  **/
-export function showSuccess(message) {
-    const successDiv = document.querySelector('#success-div');
+export function showSuccess(message, container = document) {
+    // Si pasamos 'this' desde un componente, buscamos solo dentro de ese componente.
+    let successDiv = container.querySelector('#success-div');
+
+    // Si no existe en el componente ni en el documento, lo creamos en el body 
+    if (!successDiv) {
+        successDiv = document.getElementById('success-div');
+        
+        if (!successDiv) {
+            successDiv = document.createElement('div');
+            successDiv.id = 'success-div';
+            document.body.appendChild(successDiv);
+        }
+    }
+
     successDiv.className = 'success-div';
     successDiv.textContent = message;
 
@@ -443,9 +457,14 @@ document.addEventListener('click', (e) => {
         
         // Logout
         if (panel === 'logout') {
-            API.logout();
-            Auth.clearSession();
-            window.location.href = '/login.html';
+
+            showSuccess('¡Nos vemos pronto!');
+
+            setTimeout(() => {
+                API.logout();
+                Auth.clearSession();
+                window.location.href = '/login.html';
+            }, 2000);
             return;
         }
 

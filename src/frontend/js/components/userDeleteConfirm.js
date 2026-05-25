@@ -2,20 +2,19 @@ import { API } from '../api.js';
 import { showHttpError, showSuccess } from '../main.js';
 
 import { createTemplate } from "../ui-utils.js";
-import { deleteConfirmHTML, deleteConfirmCSS } from '../templates/deleteConfirmTemplate.js';
+import { userDeleteConfirmHTML, userDeleteConfirmCSS } from '../templates/userDeleteConfirmTemplate.js';
 // Importamos plantilla (HTML y CSS)
-const template = createTemplate(deleteConfirmHTML, deleteConfirmCSS);
+const template = createTemplate(userDeleteConfirmHTML, userDeleteConfirmCSS);
 
 
-export class DeleteConfirm extends HTMLElement {
+export class userDeleteConfirm extends HTMLElement {
     constructor() {
         super();
-        this._petId = null;
+        this._user = null;
     }
 
-    // Permitimos pasar el ID de la mascota dinámicamente
-    set petId(value) {
-        this._petId = value;
+    set user(value) {
+            this._user = value;
     }
 
     connectedCallback() {
@@ -41,14 +40,15 @@ export class DeleteConfirm extends HTMLElement {
             // Limpiamos http-cat
             const httpCat = this.querySelector('http-cat');
             if (httpCat) httpCat.style.display = 'none';
-
+            
             try {
-                const result = await API.deleteMascota(this._petId);
-                showSuccess('Mascota eliminada correctamente');
-                setTimeout(() => window.location.href = 'perfil.html', 3000);
-                
+                const result = await API.deletePerfil();
+                console.log('Exito al borrar la cuenta de usuario:', result);
+                showSuccess("Cuenta eliminada. Lamentamos verte partir.");
+                setTimeout(() => window.location.href = 'index.html', 3000);
+
             } catch(error) {
-                showHttpError(error, this);
+                showHttpError(error);
             }
         };
 
@@ -59,15 +59,16 @@ export class DeleteConfirm extends HTMLElement {
     }
 
     // Método para abrir el formulario
-        open(petId) {
-            this._petId = petId;
+        open() {
             this.classList.add('is-visible');
+            document.body.style.overflow = 'hidden';
         }
 
     // Método para cerrar el formulario
         close() {
             this.classList.remove('is-visible');
             document.body.style.overflow = 'auto';
+
             const httpCat = this.querySelector('http-cat');
             if (httpCat) {
                 httpCat.style.display = 'none';
@@ -77,4 +78,4 @@ export class DeleteConfirm extends HTMLElement {
 
 }
 
-customElements.define('delete-confirm', DeleteConfirm);
+customElements.define('user-delete-confirm', userDeleteConfirm);

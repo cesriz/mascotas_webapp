@@ -62,9 +62,8 @@ export class ResetPassword extends HTMLElement {
                 // Llamada a la API
                 const response = await API.resetPassword(payload);
                 
-                console.log('Exito al cambiar la contraseña.');
+                showSuccess("¡Contraseña cambiada con éxito!");
 
-                // SUCCESS -----> 
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 5000);

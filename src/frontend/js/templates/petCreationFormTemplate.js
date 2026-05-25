@@ -1,5 +1,5 @@
 export const petCreationHTML = `
-    <div id="success-div"></div>
+    <http-cat style="display: none;"></http-cat>
     <form class="pet-create" id="pet-create-form">
             <div class="switch-div">
                 <label class="switch">
@@ -17,32 +17,38 @@ export const petCreationHTML = `
                 <div class="pet-create-inputs first">
                     <div>            
                         <label for="pet-cform-name">Nombre</label>
-                        <input type="text" id="pet-cform-name" required>
+                        <input type="text" id="pet-cform-name">
+                        <span class="error-text" id="error-pet-cform-name"></span>
                     </div>
 
                     <div>            
                         <label for="pet-cform-especie">Especie</label>
-                        <select id="pet-cform-especie" required></select>
+                        <select id="pet-cform-especie"></select>
+                        <span class="error-text" id="error-pet-cform-especie"></span>
                     </div>
 
                     <div>            
                         <label for="pet-cform-raza">Raza</label>
-                        <select id="pet-cform-raza" required></select>
+                        <select id="pet-cform-raza"></select>
+                        <span class="error-text" id="error-pet-cform-raza"></span>
                     </div>
 
                     <div>
                         <label for="pet-cform-sexo">Sexo</label>
-                        <select id="pet-cform-sexo" required></select>
+                        <select id="pet-cform-sexo"></select>
+                        <span class="error-text" id="error-pet-cform-sexo"></span>
                     </div>
 
                     <div>            
                         <label for="pet-cform-birth">Fecha de nacimiento</label>
                         <input type="date" id="pet-cform-birth">
+                        <span class="error-text" id="error-pet-cform-birth"></span>
                     </div>
 
                     <div>           
                         <label for="pet-cform-tamano">Tamaño</label>
-                        <select id="pet-cform-tamano" required></select>
+                        <select id="pet-cform-tamano"></select>
+                        <span class="error-text" id="error-pet-cform-tamano"></span>
                     </div>
 
                     <div>            
@@ -53,7 +59,8 @@ export const petCreationHTML = `
                     <div>           
                         <label for="pet-cform-color">Colores (elige al menos uno)</label>
                         <div id="pet-cform-color">
-                            <select id="pet-create-pcolor" required></select>
+                            <select id="pet-create-pcolor"></select>
+                            <span class="error-text" id="error-pet-create-pcolor"></span>
                             <select id="pet-create-scolor"></select>
                             <select id="pet-create-tcolor"></select>
                         </div>
@@ -62,6 +69,7 @@ export const petCreationHTML = `
                     <div>            
                         <label for="pet-cform-chip">¿Tiene chip?</label>
                         <select id="pet-cform-chip"></select>
+                        <span class="error-text" id="error-pet-cform-chip"></span>
                     </div>
                 </div>
             </div>
@@ -78,6 +86,7 @@ export const petCreationHTML = `
                     <span id="file-name-label">Haz clic para seleccionar o arrastra una imagen</span>
 
                     <input type="file" id="pet-create-fotos" accept="image/*" multiple>
+                    <span class="error-text" id="error-pet-create-fotos"></span>
 
                     <div id="preview-container"></div>
                 </div>
@@ -91,14 +100,16 @@ export const petCreationHTML = `
 
                 <div class="pet-create-inputs">
                     <div>            
-                        <label for="pet-cform-date">¿Cuándo has visto a tu mascota por última vez?</label>
-                        <input type="date" id="pet-cform-date" required>
+                        <label for="pet-cform-date">Fecha de la pérdida o hallazgo de la mascota</label>
+                        <input type="date" id="pet-cform-date">
+                        <span class="error-text" id="error-pet-cform-date"></span>
                     </div>
 
                     <div class="pet-create-location">            
-                        <label for="pet-cform-loc">¿Dónde has visto a tu mascota por última vez?</label>
+                        <label for="pet-cform-loc">Indica dónde se vio la mascota por última vez</label>
                         <div style="position:relative">
                             <input type="text" id="pet-cform-loc" placeholder="Escribe una dirección">
+                            <span class="error-text" id="error-pet-cform-loc"></span>
                             <div id="loc-autocomplete" class="loc-autocomplete"></div>
                         </div>
                         <button class="button-primary" type="button" id="pet-create-search-btn">Buscar</button>
@@ -111,7 +122,8 @@ export const petCreationHTML = `
 
                     <div>            
                         <label for="pet-cform-descripcion">Descripción</label>
-                        <textarea id="pet-cform-descripcion" required> </textarea>
+                        <textarea id="pet-cform-descripcion"> </textarea>
+                        <span class="error-text" id="error-pet-cform-descripcion"></span>
                     </div>
                     
                     <div class="reward-input">

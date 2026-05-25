@@ -14,19 +14,23 @@ export const avisCreationFormHTML = `
                 <div>            
                     <label for="avistamiento-form-email">Email</label>
                     <input type="email" id="avistamiento-form-email">
+                    <span class="error-text" id="error-avistamiento-form-email"></span>
                 </div>
                 <div>            
-                    <label for="avistamiento-form-telefono">Teléfono*</label>
-                    <input type="text" id="avistamiento-form-telefono" required>
+                    <label for="avistamiento-form-telefono">Teléfono</label>
+                    <input type="text" id="avistamiento-form-telefono">
+                    <span class="error-text" id="error-avistamiento-form-telefono"></span>
                 </div>
 
                 <div class="avistamiento-form-location">            
                     <label for="avistamiento-form-loc">¿Dónde has visto a la mascota por última vez?*</label>
                     <div style="position: relative;">
                         <input type="text" id="avistamiento-form-loc" placeholder="Escribe una dirección" autocomplete="off">
+                        <span class="error-text" id="error-avistamiento-form-loc"></span>
                         <div id="loc-autocomplete" class="loc-autocomplete"></div>
                     </div>
                     <button class="button-primary" type="button" id="avistamiento-search-btn">Buscar</button>
+                    
                 </div>
                 <div>
                     <pet-map id="avistamiento-form-map" mode="select"></pet-map>
@@ -37,14 +41,16 @@ export const avisCreationFormHTML = `
                 <div>            
                     <label for="avistamiento-form-date">¿Cuándo has visto a la mascota por última vez?*</label>
                     <div class="avistamiento-form-date">
-                        <input type="date" id="avistamiento-form-date" required>
-                        <input type="time" id="avistamiento-form-time" required>
+                        <input type="date" id="avistamiento-form-date">
+                        <input type="time" id="avistamiento-form-time">
                     </div>
+                    <span class="error-text" id="error-avistamiento-form-date"></span>
                 </div>
 
                 <div>            
                     <label for="contact-desc">Descripción</label>
-                    <textarea id="avistamiento-dsc" placeholder="Cualquier detalle puede marcar la diferencia..." required></textarea>
+                    <textarea id="avistamiento-dsc" placeholder="Cualquier detalle puede marcar la diferencia..."></textarea>
+                    <span class="error-text" id="error-avistamiento-dsc"></span>
                 </div>
 
                 <label for="avistamiento-foto">Sube una foto</label>
@@ -280,7 +286,6 @@ export const avisCreationFormCSS = `
         display: flex;
         gap: 10px;
     }
-
 
     /* --------Tablets y móviles--------- */
     @media (max-width: 600px) {

@@ -13,23 +13,28 @@ export const reportFormHTML = `
             <div class="report-form-inputs">
                 <div>            
                     <label for="report-subject">Asunto</label>
-                    <input type="text" id="report-subject" required>
+                    <input type="text" id="report-subject">
+                    <span class="error-text" id="error-report-subject"></span>
                 </div>
                 <div>            
                     <label for="report-msg">Mensaje</label>
-                    <textarea id="report-msg" placeholder="Escribe aquí tu mensaje..." required></textarea>
+                    <textarea id="report-msg" placeholder="Escribe aquí tu mensaje..."></textarea>
+                    <span class="error-text" id="error-report-msg"></span>
                 </div>
                 <div>            
                     <label for="report-name">Nombre</label>
-                    <input type="text" id="report-name" required>
+                    <input type="text" id="report-name">
+                    <span class="error-text" id="error-report-name"></span>
                 </div>
                 <div>            
                     <label for="report-email">Email</label>
-                    <input type="email" id="report-correo" required>
+                    <input type="email" id="report-correo">
+                    <span class="error-text" id="error-report-correo"></span>
                 </div>
                 <div>            
                     <label for="report-phone">Teléfono</label>
                     <input type="text" id="report-phone">
+                    <span class="error-text" id="error-report-phone"></span>
                 </div>
 
             </div>

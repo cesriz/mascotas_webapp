@@ -1,6 +1,8 @@
 import { API } from "../api.js";
 import { PetMap } from "./petMap.js";
+
 import { showSuccess, showHttpError } from "../main.js";
+import { showInputError, clearInputErrors } from '../ui-utils.js';
 
 import { createTemplate } from "../ui-utils.js";
 import { petCreationHTML, petCreationCSS } from "../templates/petCreationFormTemplate.js";
@@ -129,7 +131,8 @@ export class PetCreationForm extends HTMLElement {
             this.fillSelect('#pet-cform-tamano', tamano);
             this.fillSelect('#pet-cform-chip', chip);
         } catch (error) {
-            console.error("Error cargando filtros:", error);
+            showHttpError(error, this);
+            httpCat?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
 
@@ -220,12 +223,12 @@ export class PetCreationForm extends HTMLElement {
 
         const isEncontrada = stateSwitch.checked;
 
-        // 1. Actualizar texto del switch
+        // Actualizamos el texto del switch
         if (switchText) {
             switchText.textContent = isEncontrada ? 'He encontrado una mascota' : 'He perdido a mi mascota';
         }
 
-        // 2. Bloquear/Desbloquear Nombre y Fecha de nacimiento
+        // Bloqueamos/Desbloqueamos Nombre y Fecha de nacimiento
         const nameInput = this.querySelector('#pet-cform-name');
         const birthInput = this.querySelector('#pet-cform-birth');
         
@@ -237,7 +240,7 @@ export class PetCreationForm extends HTMLElement {
             if (birthInput) birthInput.disabled = false;
         }
 
-        // 3. Cambiar Labels (Fotos, Fecha suceso, Dirección suceso)
+        // Cambiamos labels (Fotos, Fecha suceso, Dirección suceso)
         const fotosLabel = this.querySelector('label[for="pet-create-fotos"]');
         const dateLabel = this.querySelector('label[for="pet-cform-date"]');
         const locLabel = this.querySelector('label[for="pet-cform-loc"]');
@@ -246,7 +249,7 @@ export class PetCreationForm extends HTMLElement {
         if (dateLabel) dateLabel.textContent = isEncontrada ? "¿Cuándo la has encontrado a la mascota?" : "¿Cuándo has visto a tu mascota por última vez?";
         if (locLabel) locLabel.textContent = isEncontrada ? "¿Dónde la has encontrado a la mascota?" : "¿Dónde has visto a tu mascota por última vez?";
 
-        // 4. Ocultar sección de Recompensa
+        // Ocultamos sección de Recompensa
         const rewardLabel = this.querySelector('.reward-input');
         const rewardPriceDiv = this.querySelector('.reward-price-input');
         const rewardCheck = this.querySelector('#reward-check');
@@ -385,8 +388,21 @@ export class PetCreationForm extends HTMLElement {
         // Limpiar campos
         const btnReset = this.querySelector('#pet-create-btn-reset');
         btnReset.onclick = () => {
-                form.reset();
-                this._currentLocationDetails = null;
+            form.reset();
+            this._currentLocationDetails = null;
+
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) {
+                httpCat.style.display = 'none';
+            }
+
+            // Fotos
+            const previewContainer = this.querySelector('#preview-container');
+            if (previewContainer) previewContainer.innerHTML = '';
+            const icon = this.querySelector('#upload-icon');
+            if (icon) icon.style.display = 'block';
+            const fileNameLabel = this.querySelector('#file-name-label');
+            if (fileNameLabel) fileNameLabel.textContent = "Haz clic para seleccionar o arrastra una imagen";
         };
 
     
@@ -411,24 +427,7 @@ export class PetCreationForm extends HTMLElement {
         // El estado dependerá del botón switch del formulario
         const state = this.querySelector('#pet-create-estado').checked ? 'ENCONTRADA' : 'PERDIDA';        
 
-        
-        // Validación y formateo de fechas
         const eventDate = this.querySelector('#pet-cform-date').value;
-        const selectedEventDate = new Date (eventDate);
-
-        const birthDate = this.querySelector('#pet-cform-birth').value;
-        const selectedBirthDate = new Date (birthDate);
-
-        const today = new Date();
-        if (selectedEventDate > today) {
-            alert("La fecha del evento no puede ser posterior al momento actual.");
-            return;
-        }
-
-        if (selectedBirthDate > today) {
-            alert("La fecha de nacimiento no puede ser posterior al momento actual.");
-            return;
-        }
     
         // Colores
         const colores = [
@@ -445,7 +444,7 @@ export class PetCreationForm extends HTMLElement {
             tiene_chip: this.querySelector('#pet-cform-chip').value === "1",
             tamano: this.querySelector('#pet-cform-tamano').value,
             peso: parseFloat(this.querySelector('#pet-cform-peso').value) || 0,
-            fecha_nacimiento: birthDate || null,
+            fecha_nacimiento: this.querySelector('#pet-cform-birth').value || null,
             descripcion: this.querySelector('#pet-cform-descripcion').value,
             estado: this._isEditMode ? this._petStatus : state, 
             recompensa: this.querySelector('#reward-check').checked ? parseFloat(this.querySelector('#reward-price').value) : 0,
@@ -472,18 +471,126 @@ export class PetCreationForm extends HTMLElement {
 
 
 
-    // Lógica para guardar los datos del formulario en la base de datos
-    async createPet() {        
-        // Validamos ubicación
-        if (!this._currentLocationDetails) {
-            alert("Por favor, selecciona una ubicación en el mapa.");
+    // Método para validar inputs del formulario
+    validatePetForm() {
+        clearInputErrors(this);
+        let isValid = true;
+        const today = new Date(); // Guardamos la fecha de "hoy" para validaciones
+
+        // Datos Básicos
+        const name = this.querySelector('#pet-cform-name').value;
+        const especie = this.querySelector('#pet-cform-especie').value;
+        const raza = this.querySelector('#pet-cform-raza').value;
+        const sexo = this.querySelector('#pet-cform-sexo').value;
+        const tamano = this.querySelector('#pet-cform-tamano').value;
+
+        if (!name.trim()) {
+            showInputError(this, 'pet-cform-name', 'El nombre es obligatorio');
+            isValid = false;
+        } else if (name.length > 50) {
+            showInputError(this, 'pet-cform-name', 'Máximo 50 caracteres');
+            isValid = false;
+        }
+
+        if (!especie) {
+            showInputError(this, 'pet-cform-especie', 'Selecciona una especie');
+            isValid = false;
+        }
+
+        if (!raza) {
+            showInputError(this, 'pet-cform-raza', 'Selecciona una raza');
+            isValid = false;
+        }
+
+        if (!sexo) {
+            showInputError(this, 'pet-cform-sexo', 'Indica el sexo');
+            isValid = false;
+        }
+
+        // Fecha de nacimiento
+        const birthDate = this.querySelector('#pet-cform-birth').value;
+        const selectedBirthDate = new Date (birthDate);
+        if (selectedBirthDate > today) {
+            showInputError(this, 'pet-cform-birth', 'La fecha de nacimiento no puede ser posterior al momento actual.');
             return;
         }
+
+        if (!tamano) {
+            showInputError(this, 'pet-cform-tamano', 'Selecciona el tamaño');
+            isValid = false;
+        }
+
+        // Color (Principal obligatorio)
+        const pColor = this.querySelector('#pet-create-pcolor').value;
+        if (!pColor) {
+            showInputError(this, 'pet-create-pcolor', 'Debes elegir al menos el color principal');
+            isValid = false;
+        }
+
+        // Fotos (Al menos una obligatoria al crear)
+        const fotos = this.querySelector('#pet-create-fotos');
+        if (!this._isEditMode && fotos.files.length === 0) {
+            showInputError(this, 'pet-create-fotos', 'Sube al menos una foto de la mascota');
+            isValid = false;
+        }
+
+        // Detalles del suceso
+        const date = this.querySelector('#pet-cform-date').value;
+        const loc = this.querySelector('#pet-cform-loc').value;
+        const lat = this.querySelector('#pet-create-lat-input').value;
+        const desc = this.querySelector('#pet-cform-descripcion').value;
+
+        if (!date) {
+            showInputError(this, 'pet-cform-date', 'La fecha es obligatoria');
+            isValid = false;
+        }
+        const selectedEventDate = new Date (date);
+        if (selectedEventDate > today) {
+            showInputError(this, 'pet-cform-date', 'La fecha del evento no puede ser posterior al momento actual.');
+            return;
+        }
+
+        if (!loc.trim() || !lat) {
+            showInputError(this, 'pet-cform-loc', 'Debes buscar una dirección y marcarla en el mapa');
+            isValid = false;
+        }
+
+        if (!desc.trim()) {
+            showInputError(this, 'pet-cform-descripcion', 'La descripción es obligatoria');
+            isValid = false;
+        } else if (desc.length > 1000) {
+            showInputError(this, 'pet-cform-descripcion', 'La descripción es demasiado larga (máx. 1000)');
+            isValid = false;
+        }
+
+        // Recompensa (Si el check está activo, el precio debe ser > 0)
+        const hasReward = this.querySelector('#reward-check').checked;
+        const rewardPrice = this.querySelector('#reward-price').value;
+        if (hasReward && (!rewardPrice || parseFloat(rewardPrice) <= 0)) {
+            showInputError(this, 'reward-price', 'Indica un valor válido para la recompensa');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+
+
+    // Lógica para guardar los datos del formulario en la base de datos
+    async createPet() {        
+        // Validamos campos
+        if (!this.validatePetForm()) {
+            // Hacemos scroll al primer error para que el usuario lo vea
+            this.querySelector('.error-text.active')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return; 
+        }
+
+        const httpCat = this.querySelector('http-cat');
+        if (httpCat) httpCat.style.display = 'none';
 
         const submitBtn = this.querySelector('#pet-create-btn-send');
 
         try {
-
             // Iniciamos estado de espera (botón)
             submitBtn.disabled = true;
             submitBtn.textContent = "PUBLICANDO ANUNCIO...";
@@ -507,6 +614,7 @@ export class PetCreationForm extends HTMLElement {
         } catch (error) {
             console.error("Error al crear mascota:", error);
             showHttpError(error, this);
+            httpCat?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         } finally {
             // Restauramos el botón
@@ -521,6 +629,13 @@ export class PetCreationForm extends HTMLElement {
     async uploadPhotos(id) {
         // Comprobamos que el id sea válido
         if (!id) return;
+
+        // Validamos campos
+        if (!this.validatePetForm()) {
+            // Hacemos scroll al primer error para que el usuario lo vea
+            this.querySelector('.error-text.active')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return; 
+        }
 
         const input = this.querySelector('#pet-create-fotos');
         // Validamos que el input tiene archivos
@@ -538,11 +653,15 @@ export class PetCreationForm extends HTMLElement {
 
         if (highSizeFiles.length > 0) {
             const names = highSizeFiles.map(f => f.name).join(", ");
-            alert(`Las siguientes imágenes superan los ${MAX_SIZE_MB}MB y no se pueden subir: \n\n${names}\n\nPor favor, reduce su tamaño o elige otras.`);
-            
-            // Opcional: Limpiar el input para que el usuario tenga que elegir de nuevo
+            showHttpError({
+                code: 413,
+                message: "Imágenes demasiado pesadas",
+                validationErrors: [`Las siguientes imágenes superan los ${MAX_SIZE_MB}MB: ${names}`]
+            }, this);
+
             input.value = ""; 
-            return; // Detenemos la ejecución
+            return;
+
         }
 
         files.forEach(file => {
@@ -700,6 +819,10 @@ export class PetCreationForm extends HTMLElement {
 
     // Lógica para actualizar los datos del formulario en la base de datos
     async updatePet() {
+
+        const httpCat = this.querySelector('http-cat');
+        if (httpCat) httpCat.style.display = 'none';
+
         const submitBtn = this.querySelector('#pet-create-btn-send');
 
         try {
@@ -719,17 +842,19 @@ export class PetCreationForm extends HTMLElement {
                 try {
                     await this.uploadPhotos(this._petId);
                 } catch (fotoError) {
-                    // Si fallan las fotos pero los datos se guardaron, avisamos al usuario
-                    console.error("Los datos se guardaron, pero las fotos fallaron:", fotoError);
-                    alert("Se han actualizado los datos, pero hubo un problema al subir las nuevas imágenes.");
+                    showHttpError(error, this);
+                    httpCat?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     return; 
                 }
             }
 
             showSuccess("¡Anuncio actualizado con éxito!");
+
         } catch (error) {
             console.error("Error al actualizar mascota:", error);
             showHttpError(error, this);
+            httpCat?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
         } finally {
             // Restauramos el botón
             submitBtn.disabled = false;

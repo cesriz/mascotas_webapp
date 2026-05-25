@@ -2,7 +2,7 @@ import { API } from '../api.js';
 import { Auth } from '../auth.js';
 import { showHttpError, showSuccess } from '../main.js';
 
-import { createTemplate } from "../ui-utils.js";
+import { createTemplate, showInputError, clearInputErrors } from "../ui-utils.js";
 import { petContactFormHTML, petContactFormCSS } from "../templates/petContactFormTemplate.js";
 
 // Importamos plantilla (HTML y CSS)
@@ -36,7 +36,11 @@ export class PetContactForm extends HTMLElement {
         bg.onclick = () => this.close();
 
         // Limpiar campos
-        btnReset.onclick = () => form.reset();
+        btnReset.onclick = () => {
+            form.reset();
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
+        }
 
         // Envío del formulario
         form.onsubmit = async (e) => {
@@ -59,17 +63,62 @@ export class PetContactForm extends HTMLElement {
             this.querySelector('#contact-phone').value = user.telefono || '';
         }
     }
+
+
+    // Lógica para validar los datos antes de enviarlos
+    validateForm() {
+        clearInputErrors(this);
+        let isValid = true;
+
+        const nombre = this.querySelector('#contact-name').value;
+        const correo = this.querySelector('#contact-correo').value;
+        const telefono = this.querySelector('#contact-phone').value;
+        const mensaje = this.querySelector('#contact-msg').value;
+        const privacy = this.querySelector('#privacy-check').checked;
+
+        if (!nombre.trim()) {
+            showInputError(this, 'contact-name', 'El nombre es obligatorio');
+            isValid = false;
+        }
+
+        if (!correo.trim()) {
+            showInputError(this, 'contact-correo', 'El correo es obligatorio');
+            isValid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            showInputError(this, 'contact-correo', 'El formato del correo no es válido');
+            isValid = false;
+        }
+
+        if (!telefono.trim()) {
+            showInputError(this, 'contact-phone', 'El teléfono es obligatorio');
+            isValid = false;
+        }
+
+        if (!mensaje.trim()) {
+            showInputError(this, 'contact-msg', 'Debes escribir un mensaje');
+            isValid = false;
+        }
+
+        return isValid;
+    }
         
 
     // Lógica para enviar el mensaje
     async sendMsg() {
+
+        
         // Limpiamos posibles errores previos
+        clearInputErrors(this);
         const httpCat = document.querySelector('http-cat');
         if (httpCat) httpCat.style.display = 'none';
 
-        if (!this._petId) {
-            alert("Error: No se ha especificado la mascota.");
+        // Validamos datos antes de enviar
+        if (!this.validateForm()) {
             return;
+        }
+
+        if (!this._petId) {
+            showHttpError({ code: 400, message: "No se ha especificado la mascota." }, this);            return;
         }
 
         const data = {
@@ -79,15 +128,25 @@ export class PetContactForm extends HTMLElement {
             mensaje: this.querySelector('#contact-msg').value
         };
 
+        const submitBtn = this.querySelector('#contact-btn-send');
+
         try {
-            // POST /api/mascotas/{id}/contacto
+            // Cambiamos el estado del botón
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Enviando...";
+
             await API.enviarContacto(this._petId, data);
-            showSuccess("Mensaje enviado correctamente");
-            setTimeout(() => this.close(), 2000); // Se cierra automáticamente tras 2s
+            showSuccess("Mensaje enviado correctamente", this);
+            setTimeout(() => this.close(), 3000); // Se cierra automáticamente tras 2s
         
         } catch (error) {
-            console.error("Error al enviar contacto:", error);
             showHttpError(error, this);
+            // Scroll al inicio del panel para ver al gato
+            const panel = this.querySelector('.pet-contact-form') || this;
+            panel.scrollTop = 0;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Enviar";
         }
         
     }
@@ -104,6 +163,10 @@ export class PetContactForm extends HTMLElement {
         this.classList.remove('is-visible');
         document.body.style.overflow = 'auto';
         this.querySelector('#form-contact').reset();
+
+        // Ocultamos el gato al cerrar
+        const httpCat = this.querySelector('http-cat');
+        if (httpCat) httpCat.style.display = 'none';
     }
 }
 

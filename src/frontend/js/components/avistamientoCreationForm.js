@@ -1,8 +1,10 @@
 import { API } from '../api.js';
 import { Auth } from '../auth.js';
-import { PetMap } from './petMap.js';
-import { showHttpError, showSuccess } from '../main.js';
 
+import { showInputError, clearInputErrors } from '../ui-utils.js';
+import { showSuccess, showHttpError } from '../main.js';
+
+import { PetMap } from './petMap.js';
 import { addressAutocomplete } from '../ui-utils.js';
 
 import { createTemplate } from "../ui-utils.js";
@@ -24,9 +26,13 @@ export class AvistamientoCreationForm extends HTMLElement {
         this._petId = value;
     }
 
+
+
     connectedCallback() {
         this.render();
     }
+
+
 
     render() {
         this.innerHTML = '';
@@ -147,8 +153,11 @@ export class AvistamientoCreationForm extends HTMLElement {
         const btnReset = this.querySelector('#avistamiento-btn-reset');
         btnReset.onclick = () => {
                 form.reset();
-                previewImg.style.display = 'none';
+                if (previewContainer) previewContainer.innerHTML = '';
                 this._currentLocationDetails = null;
+
+                const httpCat = this.querySelector('http-cat');
+                if (httpCat) httpCat.style.display = 'none';
             };
 
         // Envío del formulario
@@ -161,6 +170,7 @@ export class AvistamientoCreationForm extends HTMLElement {
     }
 
 
+
     // Lógica para cargar los datos del usuario autenticado en el formulario
         async loadUserData() {
             const user = Auth.getUserData();
@@ -170,53 +180,80 @@ export class AvistamientoCreationForm extends HTMLElement {
                 this.querySelector('#avistamiento-form-telefono').value = user.telefono || '';
             }
         }
-           
+     
+        
+
+    // Lógica para validar los datos antes de enviarlos
+        validateForm() {
+            clearInputErrors(this);
+            let isValid = true;
+
+            const email = this.querySelector('#avistamiento-form-email').value;
+            const telefono = this.querySelector('#avistamiento-form-telefono').value;
+            const dateVal = this.querySelector('#avistamiento-form-date').value;
+            const timeVal = this.querySelector('#avistamiento-form-time').value;
+            const address = this.querySelector('#avistamiento-form-loc').value;
+
+            // Teléfono (Obligatorio)
+            if (!telefono.trim()) {
+                showInputError(this, 'avistamiento-form-telefono', 'El teléfono es obligatorio para contactarte');
+                isValid = false;
+            }
+
+            // Email (Opcional, validamos formato)
+            if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showInputError(this, 'avistamiento-form-email', 'El formato del correo no es válido');
+                isValid = false;
+            }
+
+            // Ubicación
+            if (!address.trim() || !this._currentLocationDetails) {
+                showInputError(this, 'avistamiento-form-loc', 'Debes seleccionar una ubicación exacta en el mapa');
+                isValid = false;
+            }
+
+            // Fecha y Hora
+            if (!dateVal || !timeVal) {
+                showInputError(this, 'avistamiento-form-date', 'Indica la fecha y hora del avistamiento');
+                isValid = false;
+            } else {
+                const selectedDate = new Date(`${dateVal}T${timeVal}`);
+                if (selectedDate > new Date()) {
+                    showInputError(this, 'avistamiento-form-date', 'La fecha no puede ser posterior al momento actual.');
+                    isValid = false;
+                }
+            }
+            return isValid;
+        }
+
+
 
     // Lógica para enviar el formulario
         async sendMsg() {
             // Limpiamos posibles errores previos
+            clearInputErrors(this);
             const httpCat = document.querySelector('http-cat');
             if (httpCat) httpCat.style.display = 'none';
+            
 
             if (!this._petId) {
                 alert("Error: No se ha especificado la mascota.");
                 return;
             }
 
-            // Obtenemos valores del formulario
+            // Realizamos validaciones con el método de arriba
+            if (!this.validateForm()) {
+                    return; 
+                }
+
+            // Obtenemos datos ya validados
             const dateVal = this.querySelector('#avistamiento-form-date').value;
             const timeVal = this.querySelector('#avistamiento-form-time').value;
-
-            // Validaciones básicas antes de enviar
-            if (!dateVal || !timeVal) {
-                alert("Por favor, indica la fecha y la hora del avistamiento.");
-                return;
-            }
-
-            // Validamos la fecha y formateamos para el backend: "YYYY-MM-DD HH:mm:ss"
-            const selectedDate = new Date(`${dateVal}T${timeVal}`);
-            const today = new Date();
-            if (selectedDate > today) {
-                alert("La fecha y hora del avistamiento no pueden ser posteriores al momento actual.");
-                return;
-            }
-
-            const selectedDateFormat = `${dateVal} ${timeVal}:00`;
-
-
-            if (!this._currentLocationDetails) {
-                alert("Primero busca una dirección en el mapa para obtener los datos de ubicación.");
-                return;
-            }
+            const selectedDateFormat = `${dateVal} ${timeVal}:00`; // Formateamos la fecha
 
             // Aseguramos que tomamos los valores numéricos para latitud y longigud
             const lat = parseFloat(this._currentLocationDetails?.latitud || this.querySelector('#lat-input').value);
             const lng = parseFloat(this._currentLocationDetails?.longitud || this.querySelector('#lng-input').value);
-
-            if (isNaN(lat) || isNaN(lng)) {
-                alert("La ubicación no es válida. Por favor, selecciona un punto en el mapa.");
-                return;
-            }
 
             // Usamos FormData para poder enviar archivos (fotografía). El backend usa multipart
             const formData = new FormData();
@@ -248,18 +285,43 @@ export class AvistamientoCreationForm extends HTMLElement {
                         formData.append('fotos[]', fileInput.files[i]); 
                     }
             }
+            
+            // Seleccionamos botón de enviar
+            const submitBtn = this.querySelector('#avistamiento-btn-send');
+// FORZAR ERROR DE PRUEBA
+const email = this.querySelector('#avistamiento-form-email').value;
+if (email === 'test@gato.com') {
+    showHttpError({ 
+        code: 403, 
+        message: "No tienes permisos para editar este perfil.",
+        validationErrors: ["Tu sesión ha caducado", "Reintenta loguearte"]
+    }, this);
+    return; // Detiene el envío real
+}
 
             try {
+
+                // Iniciamos estado de espera (botón)
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Enviando..";
+
                 // Llamamos a la API pasando el FormData directamente
-                const response = await API.crearAvistamiento(this._petId, formData);
-                showSuccess("¡Avistamiento registrado con éxito!");
-                setTimeout(() => this.close(), 2000); // Se cierra automáticamente tras 2s
+                await API.crearAvistamiento(this._petId, formData);
+                showSuccess("¡Avistamiento registrado con éxito!", this);
+                setTimeout(() => this.close(), 3000); // Se cierra automáticamente tras 3s
                 
             } catch (error) {
-                console.error("Error al enviar el avistamiento:", error);
-                //showHttpError(error, this);
+                console.error("Error capturado en el componente:", error);
+                showHttpError(error, this);
+
+            } finally {
+                // Restauramos el botón
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Enviar";
             }
         }
+
+
 
     // Método para abrir el formulario
         open(petId) {
@@ -276,11 +338,16 @@ export class AvistamientoCreationForm extends HTMLElement {
             }
         }
 
+
+
     // Método para cerrar el formulario
         close() {
             this.classList.remove('is-visible');
             document.body.style.overflow = 'auto';
             this.querySelector('#avistamiento-form').reset();
+
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
         }
 }
 

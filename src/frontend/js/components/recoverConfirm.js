@@ -56,10 +56,24 @@ export class RecoverConfirm extends HTMLElement {
             
             if (editBtn) {
                 const petId = this._petId;
-                console.log ('PETID' + petId);
 
                 if (petId) {
                     window.location.href = `perfil?panel=publicar&editar=${petId}`
+                } else 
+                    window.location.href = `perfil?panel=mascotas`;
+            }
+        };
+
+        // Volver y recargar vista
+        const reloadBtn = this.querySelector('#btn-r-reload');
+        reloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            
+            if (reloadBtn) {
+                const petId = this._petId;
+
+                if (petId) {
+                    window.location.href = `detalles?id=${petId}`
                 } else 
                     window.location.href = `perfil?panel=mascotas`;
             }

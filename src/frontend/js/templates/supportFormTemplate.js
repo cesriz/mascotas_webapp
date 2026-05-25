@@ -16,11 +16,12 @@ export const supportFormHTML = `
                 </div>
                 <div>            
                     <label for="support-subject">Asunto</label>
-                    <input type="text" id="support-subject" required>
+                    <input type="text" id="support-subject">
+                    <span class="error-text" id="error-support-subject"></span>
                 </div>
                 <div>            
                     <label for="support-category">Categoría</label>
-                    <select id="support-category" required>
+                    <select id="support-category">
                         <!-- Opción por defecto vacía para forzar a elegir -->
                         <option value="" disabled selected>Selecciona una opción...</option>
                         
@@ -32,19 +33,23 @@ export const supportFormHTML = `
                 </div>
                 <div>            
                     <label for="support-msg">Mensaje</label>
-                    <textarea id="support-msg" placeholder="Escribe aquí tu mensaje..." required></textarea>
+                    <textarea id="support-msg" placeholder="Escribe aquí tu mensaje..."></textarea>
+                    <span class="error-text" id="error-support-msg"></span>
                 </div>
                 <div>            
                     <label for="support-name">Nombre</label>
-                    <input type="text" id="support-name" required>
+                    <input type="text" id="support-name">
+                    <span class="error-text" id="error-support-name"></span>
                 </div>
                 <div>            
                     <label for="support-email">Email</label>
-                    <input type="email" id="support-correo" required>
+                    <input type="email" id="support-correo">
+                    <span class="error-text" id="error-support-correo"></span>
                 </div>
                 <div>            
                     <label for="support-phone">Teléfono</label>
                     <input type="text" id="support-phone">
+                    <span class="error-text" id="error-support-phone"></span>
                 </div>
 
             </div>

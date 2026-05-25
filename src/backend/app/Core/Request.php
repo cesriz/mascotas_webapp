@@ -25,21 +25,19 @@ class Request
     // Devuelve un fichero subido.
     public static function file(string $key): ?array
     {
-        return isset($_FILES[$key]) && is_array($_FILES[$key]) ? $_FILES[$key] : null;
+        if (isset($_FILES[$key])) return $_FILES[$key];
+        if (isset($_FILES[$key . '[]'])) return $_FILES[$key . '[]'];
+        return null;
     }
 
     // Comprueba si hay al menos un fichero válido.
     public static function hasFile(string $key): bool
     {
-        if (!isset($_FILES[$key]) || !is_array($_FILES[$key])) {
-            return false;
-        }
+        $file = self::file($key);
 
-        $file = $_FILES[$key];
-
-        if (!isset($file['error'])) {
-            return false;
-        }
+            if (!$file || !isset($file['error'])) {
+                return false;
+            }
 
         if (is_array($file['error'])) {
             foreach ($file['error'] as $error) {

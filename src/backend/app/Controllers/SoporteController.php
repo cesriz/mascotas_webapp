@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Throwable;
-
 require_once __DIR__ . '/../Models/SoporteModel.php';
 require_once __DIR__ . '/../Validators/SoporteValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
@@ -53,7 +51,7 @@ class SoporteController
                 $input['telefono'] = $usuario['telefono'];
             }
         } else {
-            $input['usuario_id'] = null;
+            $input['usuario_id'] = isset($input['usuario_id']) ? (int) $input['usuario_id'] : null;
         }
 
         $result = SoporteValidator::validateStore($input);
@@ -78,7 +76,7 @@ class SoporteController
                     'id' => $newId
                 ]
             ], 201);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             Response::json([
                 'success' => false,
                 'message' => 'Error al enviar el mensaje de soporte',

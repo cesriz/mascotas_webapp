@@ -40,7 +40,7 @@ export class DeleteConfirm extends HTMLElement {
             try {
                 const result = API.deleteMascota(this._petId);
                 console.log('Exito al borrar la mascota:', result);
-                window.location.href = `perfil?panel=mascotas`;
+                window.location.href = 'perfil.html';
 
             } catch(error) {
                 console.log('Error al borrar la mascota', error)

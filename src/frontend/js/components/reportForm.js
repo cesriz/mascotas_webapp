@@ -1,4 +1,5 @@
 import { API } from '../api.js';
+import { Auth } from '../auth.js';
 import { showHttpError, showSuccess } from '../main.js';
 import { createTemplate } from "../ui-utils.js";
 import { reportFormHTML, reportFormCSS } from "../templates/reportFormTemplate.js";
@@ -40,6 +41,20 @@ export class ReportForm extends HTMLElement {
             e.preventDefault();
             await this.sendReport();
         };
+
+        this.loadUserData();
+    }
+
+    // Lógica para cargar los datos del usuario autenticado en el formulario
+    async loadUserData() {
+        const user = Auth.getUserData();
+        console.log(user);
+
+        if (user) {
+            this.querySelector('#report-name').value = `${user.nombre} ${user.apellidos}` || '';
+            this.querySelector('#report-correo').value = user.correo || '';
+            this.querySelector('#report-phone').value = user.telefono || '';
+        }
     }
 
     // Método para enviar el mensaje de reporte

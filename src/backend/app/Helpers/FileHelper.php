@@ -30,17 +30,21 @@ class FileHelper
             return [$files];
         }
 
-        $count = count($files['name']);
-
         // Convierte el formato raro de $_FILES en un array más cómodo.
-        for ($i = 0; $i < $count; $i++) {
-            $normalized[] = [
-                'name' => $files['name'][$i],
-                'type' => $files['type'][$i],
-                'tmp_name' => $files['tmp_name'][$i],
-                'error' => $files['error'][$i],
-                'size' => $files['size'][$i],
-            ];
+        if (isset($files['name'][0]) || is_array($files['name'])) {
+            $count = count($files['name']);
+            for ($i = 0; $i < $count; $i++) {
+                // Solo añadimos si existe el nombre (evita posiciones vacías)
+                if (!empty($files['name'][$i])) {
+                    $normalized[] = [
+                        'name'     => $files['name'][$i],
+                        'type'     => $files['type'][$i] ?? '',
+                        'tmp_name' => $files['tmp_name'][$i] ?? '',
+                        'error'    => $files['error'][$i] ?? 4, // UPLOAD_ERR_NO_FILE
+                        'size'     => $files['size'][$i] ?? 0,
+                    ];
+                }
+            }
         }
 
         return $normalized;
@@ -92,7 +96,7 @@ class FileHelper
 
             // Comprueba errores generales de subida.
             if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
-                throw new RuntimeException('Error al subir una de las imágenes');
+                throw new RuntimeException('Error de subida PHP código: ' . $file['error']);
             }
 
             // Valida tamaño máximo.

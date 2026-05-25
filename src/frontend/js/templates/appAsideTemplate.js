@@ -33,7 +33,7 @@ export const appAsideCSS = `
     /* Contenedor principal*/
     #aside {
         background-color: var(--backgroundblue);
-        width: 350px;
+        width: 300px;
         height: 100%;
         box-shadow: var(--shadow-sharp);
         display: flex;
@@ -41,7 +41,7 @@ export const appAsideCSS = `
         justify-content: flex-start;
         align-items: center;
         gap: 1rem;
-        padding: 2rem;
+        padding: 1rem;
         border-radius: 0 0 var(--radius-md) 0;
         overflow: hidden;
         transition: width 0.3s ease, padding 0.3s ease;

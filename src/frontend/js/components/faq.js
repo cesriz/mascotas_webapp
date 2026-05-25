@@ -1,3 +1,4 @@
+import { SupportForm } from "./supportForm.js";
 import { createTemplate } from "../ui-utils.js";
 import { faqHTML, faqCSS } from "../templates/faqTemplate.js";
 
@@ -99,6 +100,16 @@ export class FaqView extends HTMLElement {
 
             list.appendChild(faqItem);
         });
+
+        // Botón de soporte
+        const supportBtn = this.querySelector('#btn-show-support');
+        const supportForm = this.querySelector('#support-form') || document.querySelector('support-form');;
+
+        if (supportBtn && supportForm) {
+                supportBtn.onclick = () => {
+                supportForm.open();
+            };
+        };
     }
 }
 customElements.define('faq-view', FaqView);

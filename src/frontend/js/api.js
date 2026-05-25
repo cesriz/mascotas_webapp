@@ -211,6 +211,7 @@ export const API = {
 
     // Registrar un avistamiento de una mascota
     crearAvistamiento(idMascota, formData) {
+        console.log (this.getHeaders(true));
         return this.call(`/api/mascotas/${idMascota}/avistamientos`, {
             method: 'POST',
             headers: this.getHeaders(true),
@@ -237,11 +238,11 @@ export const API = {
     },
 
     // Enviar un mensaje de soporte 
-    crearSoporte(idUsuario, data) {
-        return this.call(`/api/mascotas/${idUsuario}/soporte`, {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: JSON.stringify(data)
+    crearSoporte(data) {
+        return this.call(`/api/soporte`, { 
+            method: 'POST', 
+            headers: this.getHeaders(), 
+            body: JSON.stringify(data),
         });
     },
 

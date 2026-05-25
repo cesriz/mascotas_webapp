@@ -312,6 +312,7 @@ label + input,select {
 /* ---------- Estilos de vistas completas----------- */
 .dashboard-wrapper {
     padding:0 3rem;
+    overflow-x: hidden;
 }
 
 /* Títulos del contenedor principal */
@@ -354,6 +355,7 @@ label + input,select {
     background-color: inherit;
     padding-left: 2rem;
     padding-top: 1rem;
+    overflow-x: auto; /* Permitimos scroll interno */
 }
 
     /* Efecto de transición */

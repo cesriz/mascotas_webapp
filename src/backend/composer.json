@@ -1,15 +1,15 @@
 {
-  "name": "cesar/mascotas-webapp-backend",
-  "description": "Backend PHP del proyecto Mascotas WebApp",
-  "type": "project",
-  "require": {
-    "firebase/php-jwt": "^7.0",
-    "cloudinary/cloudinary_php": "*",
-    "phpmailer/phpmailer": "^7.1"
-  },
-  "autoload": {
-    "classmap": [
-      "app/"
-    ]
-  }
+    "name": "cesar/mascotas-webapp-backend",
+    "description": "Backend PHP del proyecto Mascotas WebApp",
+    "type": "project",
+    "require": {
+        "firebase/php-jwt": "^7.0",
+        "cloudinary/cloudinary_php": "^3.1",
+        "phpmailer/phpmailer": "^7.1"
+    },
+    "autoload": {
+        "classmap": [
+            "app/"
+        ]
+    }
 }

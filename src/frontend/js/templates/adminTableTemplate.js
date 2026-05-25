@@ -24,6 +24,7 @@ export const adminTableCSS = `
         width: 100%;
         border-collapse: collapse;
         text-align: left;
+        table-layout: auto;
     }
     .admin-table th, .admin-table td {
         padding: 1rem;

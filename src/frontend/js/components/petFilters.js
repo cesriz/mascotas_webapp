@@ -89,7 +89,7 @@ export class PetFilters extends HTMLElement {
         }
     }
 
-    // Método para rellenar los select
+    // Lógica para rellenar los select en los formularios
     fillSelect(selector, data) {
         const select = this.querySelector(selector);
         if (!select || !data) return;
@@ -103,17 +103,17 @@ export class PetFilters extends HTMLElement {
 
         data.forEach(item => {
             const option = document.createElement('option');
-            // Si el item es un string (provincias), lo usamos directamente. 
+            // Si el item es un string, lo usamos directamente. 
             // Si es un objeto (razas), usamos id y nombre.
             if (typeof item === 'object' && item !== null) {
-                        // Si es un objeto (Razas, Especies)
-                        option.value = item.id || item.nombre || "";
-                        option.textContent = item.nombre || "";
-                    } else {
-                        // Si es un string (Municipios, Provincias)
-                        option.value = item;
-                        option.textContent = item;
-                    }
+                // Si es un objeto (Razas, Especies)
+                option.value = item.id || "";
+                option.textContent = item.nombre || "";
+            } else {
+                // Si es un string
+                option.value = item;
+                option.textContent = item;
+            }
             select.appendChild(option);
         });
     }

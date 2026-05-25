@@ -12,8 +12,8 @@ Thumbs.db
 .env
 .env.*
 
-# Configuración sensible de base de datos, para no exponer credenciales
-src/backend/app/Config/database.php
+# Como ya no contiene secretos rales y es necesario para el despliegue en Railway, se ha eliminado de la lista de ignorados
+# src/backend/app/Config/database.php
 
 #################################
 # PHP / Composer

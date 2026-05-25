@@ -447,4 +447,69 @@ class MascotaController
             ], 500);
         }
     }
+
+    public function deleteFoto(int $fotoId): void
+    {
+        $usuario = Request::user();
+
+        if ($usuario === null) {
+            Response::json([
+                'success' => false,
+                'message' => 'No autorizado'
+            ], 401);
+            return;
+        }
+
+        $foto = $this->fotoModel->getMascotaFotoById($fotoId);
+
+        if ($foto === null) {
+            Response::json([
+                'success' => false,
+                'message' => 'Foto no encontrada'
+            ], 404);
+            return;
+        }
+
+        $esDueno = (int) $foto['usuario_id'] === (int) $usuario['id'];
+        $esAdmin = ($usuario['rol'] ?? null) === 'ADMIN';
+
+        if (!$esDueno && !$esAdmin) {
+            Response::json([
+                'success' => false,
+                'message' => 'No tienes permiso para eliminar esta foto'
+            ], 403);
+            return;
+        }
+
+        try {
+            FileHelper::destroyImage($foto['public_id'] ?? null);
+
+            $deleted = $this->fotoModel->deleteMascotaFotoById($fotoId);
+
+            if (!$deleted) {
+                Response::json([
+                    'success' => false,
+                    'message' => 'No se pudo eliminar la foto'
+                ], 500);
+                return;
+            }
+
+            $this->fotoModel->ensureMascotaHasPrincipal((int) $foto['mascota_id']);
+
+            Response::json([
+                'success' => true,
+                'message' => 'Foto eliminada correctamente',
+                'data' => [
+                    'id' => $fotoId,
+                    'mascota_id' => (int) $foto['mascota_id']
+                ]
+            ]);
+        } catch (Throwable $e) {
+            Response::json([
+                'success' => false,
+                'message' => 'Error al eliminar la foto',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

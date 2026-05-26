@@ -13,7 +13,8 @@ RUN docker-php-ext-install pdo pdo_mysql
 
 # Activa mod_rewrite de Apache
 # Esto suele hacer falta para front controller y rutas amigables
-RUN a2enmod rewrite
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork rewrite
 
 # Directorio de trabajo dentro del contenedor
 WORKDIR /var/www/project/backend

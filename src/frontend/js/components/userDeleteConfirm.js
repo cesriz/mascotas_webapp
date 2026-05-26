@@ -1,4 +1,5 @@
 import { API } from '../api.js';
+import { Auth } from '../auth.js';
 import { showHttpError, showSuccess } from '../main.js';
 
 import { createTemplate } from "../ui-utils.js";
@@ -43,10 +44,10 @@ export class userDeleteConfirm extends HTMLElement {
             
             try {
                 const result = await API.deletePerfil();
-                console.log('Exito al borrar la cuenta de usuario:', result);
                 showSuccess("Cuenta eliminada. Lamentamos verte partir.");
+                Auth.clearSession(); // Borramos datos de sesión
                 setTimeout(() => window.location.href = 'index.html', 3000);
-
+                
             } catch(error) {
                 showHttpError(error);
             }

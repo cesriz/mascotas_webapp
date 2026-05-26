@@ -201,10 +201,11 @@ class AvistamientoController
             return;
         }
 
+        $esAutor = (int) $avistamiento['usuario_id'] === (int) $usuario['id'];
         $esDuenoMascota = (int) $avistamiento['propietario_mascota_id'] === (int) $usuario['id'];
         $esAdmin = ($usuario['rol'] ?? null) === 'ADMIN';
 
-        if (!$esDuenoMascota && !$esAdmin) {
+        if (!$esDuenoMascota && !$esAdmin && !$esAutor) {
             Response::json([
                 'success' => false,
                 'message' => 'No tienes permiso para eliminar este avistamiento'
@@ -261,10 +262,11 @@ class AvistamientoController
             return;
         }
 
+        $esAutor = (int) $foto['autor_avistamiento_id'] === (int) $usuario['id'];
         $esDuenoMascota = (int) $foto['propietario_mascota_id'] === (int) $usuario['id'];
         $esAdmin = ($usuario['rol'] ?? null) === 'ADMIN';
 
-        if (!$esDuenoMascota && !$esAdmin) {
+        if (!$esDuenoMascota && !$esAdmin && !$esAutor) {
             Response::json([
                 'success' => false,
                 'message' => 'No tienes permiso para eliminar esta foto'

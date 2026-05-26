@@ -52,6 +52,7 @@ export const petMapCSS = `
         flex-direction: column;
         align-items: start;
         gap: 5px;
+
     }
 
         .map-popup-info p {
@@ -82,6 +83,10 @@ export const petMapCSS = `
             display: flex;
             align-items: center;
             gap: 5px;
+            
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         .map-popup-contact img {

@@ -62,19 +62,34 @@ export const userProfileHTML = `
         <div class="profile-data-inputs">
             <div>            
                 <label for="profile-pass">Contraseña actual</label>
-                <input type="password" id="profile-old-pass">
+                <div class="password-container">
+                    <input type="password" id="profile-old-pass">
+                    <span class="toggle-pass">
+                        <img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña">
+                    </span>
+                </div>
                 <span class="error-text" id="error-profile-old-pass"></span>
             </div>
 
             <div>            
                 <label for="profile-newpass">Nueva contraseña</label>
-                <input type="password" id="profile-new-pass">
+                <div class="password-container">
+                    <input type="password" id="profile-new-pass">
+                    <span class="toggle-pass">
+                        <img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña">
+                    </span>
+                </div>
                 <span class="error-text" id="error-profile-new-pass"></span>
             </div>
 
             <div>            
                 <label for="profile-repeat-pass">Repite la contraseña</label>
-                <input type="password" id="profile-confirm-pass">
+                <div class="password-container">
+                    <input type="password" id="profile-confirm-pass">
+                    <span class="toggle-pass">
+                        <img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña">
+                    </span>
+                </div>
                 <span class="error-text" id="error-profile-confirm-pass"></span>
             </div>
         </div>

@@ -12,6 +12,7 @@ export class DeleteConfirm extends HTMLElement {
         super();
         this._id = null;
         this._type = 'null'; //mascota o avistamiento
+        this._photoId = 'null';
     }
 
 
@@ -40,12 +41,18 @@ export class DeleteConfirm extends HTMLElement {
                     if (httpCat) httpCat.style.display = 'none';
 
                     try {
-                        if (this._tipo === 'mascota') {
+                        if (this._type === 'mascota') {
                             await API.deleteMascota(this._id);
-                            showSuccess('Mascota eliminada correctamente');
-                        } else if (this._tipo === 'avistamiento') {
+                            showSuccess('Mascota eliminada correctamente', this);
+
+                        } else if (this._type === 'foto') {
+                            await API.deleteFotoAvistamiento(this._photoId);
+                            showSuccess('Fotografía eliminada correctamente', this);
+
+                        } else if (this._type === 'avistamiento') {
+                            if (this._photoId) await API.deleteFotoAvistamiento(this._photoId);
                             await API.deleteAvistamiento(this._id);
-                            showSuccess('Avistamiento eliminado correctamente');
+                            showSuccess('Avistamiento eliminado correctamente', this);
                         }
 
                         setTimeout(() => window.location.href = 'perfil.html', 3000);
@@ -62,9 +69,11 @@ export class DeleteConfirm extends HTMLElement {
     }
 
     // Método para abrir el formulario
-        open(id, tipo) {
+        open(id, type, fotoId) {
             this._id = id;
-            this._tipo = tipo;
+            this._type = type;
+            this._photoId = fotoId;
+
             this.classList.add('is-visible');
             document.body.style.overflow = 'hidden';
         }

@@ -1,6 +1,6 @@
 import { API } from '../api.js';
 import { showSuccess, showHttpError } from "../main.js";
-import { createTemplate } from "../ui-utils.js";
+import { createTemplate, initPasswordToggles  } from "../ui-utils.js";
 import { authResetHTML, authResetCSS } from "../templates/authResetTemplate.js";
 
 const template = createTemplate(authResetHTML, authResetCSS); 
@@ -18,6 +18,9 @@ export class AuthResetPassword extends HTMLElement {
     render() {
         this.innerHTML = template.innerHTML;
         
+        // Mostrar y ocultar contraseña en el input (ui-utils)
+        initPasswordToggles(this);
+
         // Extraer el token de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');

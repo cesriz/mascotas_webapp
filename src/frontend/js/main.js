@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Intentamos sincronizar los datos del usuario. 
     // Hacemos petición a la API, actualizamos localstorage o borramos si hay error.
     const user = await Auth.syncUser();
-    console.log(user);
 
     if (Auth.isLoggedIn() && !user) {
         console.warn("Token detectado pero no válido..");
@@ -295,7 +294,6 @@ async function loadPanel(panel) {
     const params = new URLSearchParams(window.location.search);
     const editPetId = params.get('editar');
     const initialState = params.get('estado');
-    console.log(editPetId + ' | ' + initialState);
 
     // ASIDE: el texto del link de "PUBLICAR" cambia según los parámetros de la url (Modo publicar / Modo editar)
     if (publishLink) {

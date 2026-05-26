@@ -42,7 +42,6 @@ export class PetDetail extends HTMLElement {
             // Utilizamos el método getMascotaById(id) de api.js
             this.petData = await API.getMascotaById(id);
 
-            console.log(this.petData);
             this.render();
         } catch (error) {
             console.error("Error cargando mascota:", error);
@@ -56,44 +55,44 @@ export class PetDetail extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
 
         // Título
-            this.applyTitle(this.petData);
+        this.applyTitle(this.petData);
 
         // Imágenes
-            const carrousel = this.querySelector('#carrousel');
-            const dotsContainer = this.querySelector('#carrousel-dots');
-            const photos = this.petData.fotos || [];
+        const carrousel = this.querySelector('#carrousel');
+        const dotsContainer = this.querySelector('#carrousel-dots');
+        const photos = this.petData.fotos || [];
 
-            if (photos.length > 0) {
-                photos.forEach((photo, index) => {
-                    const img = document.createElement('img');
-                    img.src = photo.url;
-                    img.alt = `Foto ${index + 1} de ${this.petData.nombre}`;
-                    carrousel.appendChild(img);
+        if (photos.length > 0) {
+            photos.forEach((photo, index) => {
+                const img = document.createElement('img');
+                img.src = photo.url;
+                img.alt = `Foto ${index + 1} de ${this.petData.nombre}`;
+                carrousel.appendChild(img);
 
-                    // Creamos los puntos indicadores
-                    const dot = document.createElement('div');
-                    dot.className = `dot ${index === 0 ? 'active' : ''}`;
-                    dot.onclick = () => this.moveToImage(index);
-                    dotsContainer.appendChild(dot);
-                });
-            } else {
-                // Imagen por defecto si no hay fotos
-                carrousel.innerHTML = `<img src="../assets/placeholder.png">`;
-            }
+                // Creamos los puntos indicadores
+                const dot = document.createElement('div');
+                dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                dot.onclick = () => this.moveToImage(index);
+                dotsContainer.appendChild(dot);
+            });
+        } else {
+            // Imagen por defecto si no hay fotos
+            carrousel.innerHTML = `<img src="../assets/placeholder.png">`;
+        }
 
-            // Ocultamos flechas si solo hay una imagen
-            if (photos.length <= 1) {
-                this.querySelector('#prev-btn').classList.add('hidden');
-                this.querySelector('#next-btn').classList.add('hidden');
-            }
+        // Ocultamos flechas si solo hay una imagen
+        if (photos.length <= 1) {
+            this.querySelector('#prev-btn').classList.add('hidden');
+            this.querySelector('#next-btn').classList.add('hidden');
+        }
             
         // Datos del evento
         // Fecha - mostramos una fecha u otra según el estado de la mascota
-            const eventDateMap = {
-                PERDIDA: this.petData.fecha_perdida,
-                ENCONTRADA: this.petData.fecha_encontrada
-            };
-            const eventDate = this.petData.recuperada === 'RECUPERADA' ? this.petData.fecha_recuperada : eventDateMap[this.petData.estado] || '';
+        const eventDateMap = {
+            PERDIDA: this.petData.fecha_perdida,
+            ENCONTRADA: this.petData.fecha_encontrada
+        };
+        const eventDate = this.petData.recuperada === 'RECUPERADA' ? this.petData.fecha_recuperada : eventDateMap[this.petData.estado] || '';
             
             // Formateamos fecha a DD/MM/YYYY
             const eventDateFormatted = eventDate ? new Date(eventDate).toLocaleDateString('es-ES') : 'No disponible';
@@ -101,60 +100,60 @@ export class PetDetail extends HTMLElement {
             this.querySelector('#pet-det-date').textContent = `Fecha del suceso: ${eventDateFormatted}`;
 
         // Dirección
-            this.querySelector('#pet-det-loc').textContent = `Lugar del suceso: ${this.petData.direccion_formateada}`
+        this.querySelector('#pet-det-loc').textContent = `Lugar del suceso: ${this.petData.direccion_formateada}`
         
-        // Recompensa.
-            const reward = this.querySelector('.pet-det-reward-div');
+        // Recompensa
+        const reward = this.querySelector('.pet-det-reward-div');
 
-            if (reward && this.petData.recompensa !== null && this.petData.recompensa > 0) {
-                reward.style.display = 'flex';
-            } else if (reward) {
-                reward.style.display = 'none';
-            }
+        if (reward && this.petData.recompensa !== null && this.petData.recompensa > 0) {
+            reward.style.display = 'flex';
+        } else if (reward) {
+            reward.style.display = 'none';
+        }
 
         // Descripción y nombre
-            this.querySelector('#pet-det-description').textContent = `${this.petData.descripcion}`;
-            this.querySelector('#pet-name').textContent = `Características de ${this.petData.nombre}`;
+        this.querySelector('#pet-det-description').textContent = `${this.petData.descripcion}`;
+        this.querySelector('#pet-name').textContent = `Características de ${this.petData.nombre}`;
 
         // Lista de detalles
-            const list = this.querySelector('#pet-det-list');
-            list.innerHTML = '';
+        const list = this.querySelector('#pet-det-list');
+        list.innerHTML = '';
 
-            // Ponemos primera letra de cada palabra en mayúscula y resto minúscula
-            const formatText = (str) => {
-                if (!str) return 'Desconocido';
-                return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-            };
-            
-            // Colores
-            const colors = this.petData.colores;
+        // Ponemos primera letra de cada palabra en mayúscula y resto minúscula
+        const formatText = (str) => {
+            if (!str) return 'Desconocido';
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        };
+        
+        // Colores
+        const colors = this.petData.colores;
 
-            const formatColors = colors.map(
-                col => col.nombre).join(', ');
+        const formatColors = colors.map(
+            col => col.nombre).join(', ');
 
-            // Edad - la calculamos según el año de nacimiento
-            const birthDate = this.petData.fecha_nacimiento;
-            const age = birthDate ? `${new Date().getFullYear() - new Date(birthDate).getFullYear()} años` : 'Desconocida';
+        // Edad - la calculamos según el año de nacimiento
+        const birthDate = this.petData.fecha_nacimiento;
+        const age = birthDate ? `${new Date().getFullYear() - new Date(birthDate).getFullYear()} años` : 'Desconocida';
 
-            // Resto de datos
-            const info = [
-                `<strong>Especie:</strong> ${this.petData.especie_nombre || 'Desconocida'}`,
-                `<strong>Raza:</strong> ${this.petData.raza_nombre || 'Desconocida'}`,
-                `<strong>Sexo:</strong> ${(this.petData.sexo || '').toLowerCase() || 'Desconocido'}`,
-                `<strong>Edad:</strong> ${age}`,
-                `<strong>Tamaño:</strong> ${(this.petData.tamano || '').toLowerCase() || 'Desconocido'} `,
-                `<strong>Peso:</strong> ${this.petData.peso ? `${this.petData.peso} kg` : 'Desconocido'} `,
-                `<strong>Colores:</strong> ${formatColors || 'No especificados'}`,
-                `<strong>Chip:</strong> ${(this.petData.tiene_chip ? 'Sí' : 'No').toLowerCase() || 'Desconocido '}`          
-            ];
-            
-                info.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = item;
-                list.appendChild(li);
-            });
+        // Resto de datos
+        const info = [
+            `<strong>Especie:</strong> ${this.petData.especie_nombre || 'Desconocida'}`,
+            `<strong>Raza:</strong> ${this.petData.raza_nombre || 'Desconocida'}`,
+            `<strong>Sexo:</strong> ${(this.petData.sexo || '').toLowerCase() || 'Desconocido'}`,
+            `<strong>Edad:</strong> ${age}`,
+            `<strong>Tamaño:</strong> ${(this.petData.tamano || '').toLowerCase() || 'Desconocido'} `,
+            `<strong>Peso:</strong> ${this.petData.peso ? `${this.petData.peso} kg` : 'Desconocido'} `,
+            `<strong>Colores:</strong> ${formatColors || 'No especificados'}`,
+            `<strong>Chip:</strong> ${(this.petData.tiene_chip ? 'Sí' : 'No').toLowerCase() || 'Desconocido '}`          
+        ];
+        
+            info.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = item;
+            list.appendChild(li);
+        });
 
-   
+
         // Ejecutamos funciones definidas abajo
         this.initCarouselEvents();
         this.buttonEvents();
@@ -226,42 +225,6 @@ export class PetDetail extends HTMLElement {
             btnRecover.classList.remove('hidden');
             btnDelete.classList.remove('hidden');
 
-            // Editar anuncio de mascota
-            btnEdit.onclick = (e) => {
-                e.stopPropagation();
-                
-                if (btnEdit) {
-                    const petId = this.petData.id;
-                    if (petId) {
-                        window.location.href = `perfil?panel=publicar&editar=${petId}`
-                    } else 
-                        window.location.href = `perfil?panel=mascotas`;
-                }
-            };
-
-            // Borrar anuncio de mascota
-            btnDelete.onclick = async (e) => {
-                e.stopPropagation();
-
-                const confirmPanel = this.querySelector('#delete-confirm');
-
-                if (confirmPanel) {
-                    confirmPanel.open(this.petData.id);
-                }
-
-            };
-
-            // Marcar como recuperada
-            btnRecover.onclick = async (e) => {
-                e.stopPropagation();
-
-                const confirmRPanel = this.querySelector('#recover-confirm');
-
-                if (confirmRPanel) {
-                    confirmRPanel.open(this.petData.id);
-                }
-            };
-
         } if (isOwner && est == 'recuperada') {
             // Ocultamos el botón de 'recuperada'
             btnRecover.classList.add('hidden');
@@ -313,11 +276,11 @@ export class PetDetail extends HTMLElement {
 
         if (avistamientoBtn && avistamientoForm) {
                 avistamientoBtn.onclick = () => {
-                console.log("Click en botón avistamiento");
                 avistamientoForm.open(this.petData.id);
             };
         };
 
+        // Botón de QR
         const QRBtn = this.querySelector('#btn-qr');
         const QR = this.querySelector('#qr');
         QRBtn.addEventListener('click', () => {
@@ -330,7 +293,6 @@ export class PetDetail extends HTMLElement {
 
         if (reporteBtn && reportForm) {
             reporteBtn.onclick = () => {
-                console.log("Click en botón de reporte");
                 reportForm.open(this.petData.id);
             };
         };
@@ -344,9 +306,99 @@ export class PetDetail extends HTMLElement {
                 await posterExporter.download(this.petData);
             };
         }
-  
+       
+
+        // Editar anuncio de mascota
+        const btnEdit = this.querySelector('#btn-edit');
+        btnEdit.onclick = (e) => {
+            e.stopPropagation();
+            
+            if (btnEdit) {
+                const petId = this.petData.id;
+                if (petId) {
+                    window.location.href = `perfil?panel=publicar&editar=${petId}`
+                } else 
+                    window.location.href = `perfil?panel=mascotas`;
+            }
+        };
+
+        // Borrar anuncio de mascota
+        const btnDelete = this.querySelector('#btn-delete');
+        btnDelete.onclick = async (e) => {
+            e.stopPropagation();
+
+            const confirmPanel = this.querySelector('#delete-confirm');
+
+            if (confirmPanel) {
+                confirmPanel.open(this.petData.id, 'mascota',);
+            }
+
+        };
+
+        // Marcar como recuperada
+        const btnRecover = this.querySelector('#btn-recover');
+        btnRecover.onclick = async (e) => {
+            e.stopPropagation();
+
+            const confirmRPanel = this.querySelector('#recover-confirm');
+
+            if (confirmRPanel) {
+                confirmRPanel.open(this.petData.id);
+            }
+        };
+        
+        // Botones de redes sociales (utilizamos la funcón definida abajo)
+        const networks = ['facebook', 'twitter', 'whatsapp', 'telegram'];
+
+        networks.forEach(net => {
+            // Buscamos el id correspondiente en el HTML
+            const btn = this.querySelector(`#${net}`); 
+            if (btn) {
+                btn.onclick = () => {
+                    const est = this.petData?.estado;
+                    
+                    // Llamamos a la función pasando el estado
+                    const link = this.getShareLink(net, est);
+                    
+                    // Abrimos el enlace
+                    window.open(link, '_blank', 'noopener,noreferrer');
+                };
+            }
+        });
+
     }
 
+    // Lógica para construir los links de redirección de RRHH
+    getShareLink(network, est) {
+        const url = window.location.href;
+        
+        // Asignamos el texto dinámico según el estado
+        let text;
+        switch (est?.toLowerCase()) {
+            case 'perdida':
+                text = `¡Ayúdame a encontrar a ${this.petData.nombre}!`;
+                break;
+            case 'encontrada':
+                text = `¡Se ha encontrado a este animal! ¿Lo conoces?`;
+                break;
+            case 'recuperada':
+                let name = this.petData.nombre;
+                const shareName = name === 'Desconocido' ? 'Esta mascota' :  this.petData.nombre;
+                text = `¡Buenas noticias! ${shareName} ha vuelto a casa.`;
+                break;
+            default:
+                text = `Mira esta mascota en nuestra plataforma.`;
+        }
+
+        const schemes = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+            twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+            whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`,
+            telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
+        };
+
+        return schemes[network];
+    }
 }
 
 customElements.define('pet-details', PetDetail);

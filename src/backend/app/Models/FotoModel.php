@@ -183,6 +183,7 @@ class FotoModel extends BaseModel
             fav.es_principal,
             fav.orden,
             a.mascota_id,
+            a.usuario_id AS autor_avistamiento_id,
             am.usuario_id AS propietario_mascota_id
         FROM fotos_avistamientos fav
         INNER JOIN avistamientos a ON a.id = fav.avistamiento_id

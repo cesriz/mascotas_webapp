@@ -116,7 +116,7 @@ export class Notification extends HTMLElement {
                     if (mascotaId && mascotaId !== "undefined") {
                             window.location.href = `detalles?id=${mascotaId}`;
                     } else {
-                        console.log("No se encontró el id de la mascota");
+                        console.warn("No se encontró el id de la mascota");
                     }
                 }
             }

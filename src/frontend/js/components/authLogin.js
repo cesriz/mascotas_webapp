@@ -3,7 +3,7 @@ import { API } from '../api.js';
 
 import { showSuccess, showHttpError } from "../main.js";
 
-import { createTemplate, showInputError, clearInputErrors } from "../ui-utils.js";
+import { createTemplate, showInputError, clearInputErrors, initPasswordToggles } from "../ui-utils.js";
 import { authLoginHTML, authLoginCSS } from "../templates/authLoginTemplate.js";
 
 // Importamos plantilla (HTML y CSS)
@@ -120,6 +120,9 @@ export class AuthLogin extends HTMLElement {
         registerDiv.style.display = 'none';
         initBtnDiv.style.borderBottom = '3px solid var(--primary, #000)';
 
+        // Mostrar y ocultar contraseña en el input (ui-utils)
+        initPasswordToggles(this);
+
         // Lógica de intercambio entre autenticaciónn, registro y recuperación de contraseña
         // Función para resetear pestañas
         const resetTabs = () => {
@@ -210,7 +213,7 @@ export class AuthLogin extends HTMLElement {
                 await API.registro(userData);
 
                 showSuccess("Registro completado. Ya puedes iniciar sesión.");
-                registerForm.reset(); console.log('reset');
+                registerForm.reset();
                 setTimeout(() => initBtn.click(), 2500);
 
             } catch (error) {
@@ -226,7 +229,6 @@ export class AuthLogin extends HTMLElement {
             if (!this.validateForgot()) return;
 
             const email = this.querySelector('#forgot-correo').value;
-
             try {
                 const data = await API.forgotPassword(email);
                 showSuccess("Se ha procesado la solicitud. Revisa tu correo electrónico.")

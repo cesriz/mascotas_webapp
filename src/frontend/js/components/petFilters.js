@@ -186,7 +186,6 @@ export class PetFilters extends HTMLElement {
         if (provSelect) {
         provSelect.onchange = async (e) => {
             const provSeleccionada = e.target.value;
-            console.log("Cambio detectado en provincia:", provSeleccionada);
             await this.updateMunicipioOptions(provSeleccionada);
         }
     }
@@ -244,8 +243,6 @@ export class PetFilters extends HTMLElement {
             // Limpiamos visualmente
             selects.forEach(s => s.value = "");
             inputs.forEach(i => i.value = "");
-
-            console.log("Filtros reseteados visualmente");
 
             // Aplicamos filtros
             dispatchFilter();

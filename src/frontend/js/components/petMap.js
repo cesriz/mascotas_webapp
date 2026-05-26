@@ -136,7 +136,7 @@ export class PetMap extends HTMLElement {
                 finalUrl = API.resolveMediaUrl(fotoPath, './assets/placeholder.png');
             }
         } else {
-            // Para avistamientos (ajusta según si el avistamiento devuelve 'foto_url' o similar)
+            // Para avistamientos
             if (data.fotos && data.fotos.length > 0) {
                 const fotoPath = data.fotos[0].url; // Cogemos la primera foto
                 finalUrl = API.resolveMediaUrl(fotoPath, './assets/placeholder.png');
@@ -242,7 +242,6 @@ export class PetMap extends HTMLElement {
             if (data.length > 0) {
                 // Guardamos resultado de petición a Nominatim en variables
                 const result = data[0];
-                console.log('Pet-Map', result);
                 const addr = result.address || {};
                 const coords = [parseFloat(result.lat), parseFloat(result.lon)];
 

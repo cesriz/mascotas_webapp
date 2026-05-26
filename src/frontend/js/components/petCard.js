@@ -78,7 +78,7 @@ export class PetCard extends HTMLElement {
                 const confirmPanel = this.querySelector('#delete-confirm');
 
                 if (confirmPanel) {
-                    confirmPanel.open(pet.id);
+                    confirmPanel.open(pet.id, 'mascota', null);
                 }
 
             };

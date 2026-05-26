@@ -113,3 +113,30 @@ export function clearInputErrors(scope) {
         el.textContent = '';
     });
 }
+
+
+
+/**
+ * Lógica para mostrar y ocultar las contraseñas
+ **/
+
+export const initPasswordToggles = (parentElement) => {
+    const toggles = parentElement.querySelectorAll('.toggle-pass');
+
+    toggles.forEach(toggle => {
+        const img = toggle.querySelector('img');
+
+        toggle.addEventListener('click', () => {
+            const container = toggle.closest('.password-container');
+            const input = container.querySelector('input');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                img.src = '../assets/icons/solar--eye-closed-bold.svg';
+            } else {
+                input.type = 'password';
+                img.src = '../assets/icons/mdi--eye-outline.svg';
+            }
+        });
+    });
+};

@@ -18,7 +18,6 @@ export async function renderAdminPanel(apiMethod, columns) {
         
         // Guardamos la respuesta
         const datos = response || [];
-        console.log(datos);
 
         // Insertamos en la tabla
         adminTable.config = {
@@ -27,7 +26,7 @@ export async function renderAdminPanel(apiMethod, columns) {
         };
     } catch (error) {
         console.error("Error al cargar el panel admin:", error);
-        showHttpError(error);
+        showHttpError(error, this);
     }
 }
 
@@ -71,7 +70,6 @@ export const adminConfig = {
                     
                     btnToggle.onclick = async () => {
                         const nuevoEstado = anuncio.estado === 'PUBLICADO' ? 'OCULTO' : 'PUBLICADO';
-                        console.log(nuevoEstado);
                         try {
                             await API.updateAnuncioEstado(anuncio.id, { estado_publicacion: nuevoEstado });
                             // Refrescamos la tabla tras la acción

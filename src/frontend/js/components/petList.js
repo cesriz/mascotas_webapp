@@ -39,7 +39,6 @@ export class PetList extends HTMLElement {
             if (grid) grid.style.display = 'none';
             if (emptyMsg) emptyMsg.style.display = 'none';
             
-            // Usamos la utilidad global para configurar al gato correctamente
             showHttpError(this._pets, this);
             return;
         }
@@ -58,21 +57,12 @@ export class PetList extends HTMLElement {
         emptyMsg.style.display = 'none';
         httpCat.style.display = 'none';
 
+        grid.innerHTML = ''; // Limpiamos el grid por si acaso
+
         items.forEach(petData => {
             const card = document.createElement('pet-card');
             card.petData = petData; 
-            grid.appendChild(card);
-            
-            // Evento para editar
-            card.addEventListener('edit-pet', (e) => {
-                this.dispatchEvent(new CustomEvent('request-edit', {
-                    detail: { petId: e.detail.petId },
-                    bubbles: true,
-                    composed: true
-                }));
-            });
-
-            
+            grid.appendChild(card);          
         });
     }
 }

@@ -39,13 +39,16 @@ export class RecoverConfirm extends HTMLElement {
             e.stopPropagation();
             try {
                 const result = API.marcarRecuperada(this._petId);
-                console.log('Exito al actualizar la mascota:', result);
 
-                const editDiv = this.querySelector('#recover-edit-actions');
-                editDiv.classList.remove('hidden');
+                if (result) {
+                    showSuccess('Mascota marcada como recuperada, ¡Enhorabuena!', this);
+
+                    const editDiv = this.querySelector('#recover-edit-actions');
+                    setTimeout(() => editDiv.classList.remove('hidden'), 2000);                 
+                }
 
             } catch(error) {
-                console.log('Error al actualizar la mascota', error)
+                showHttpError(error, this);
             }
         };
 
@@ -71,11 +74,7 @@ export class RecoverConfirm extends HTMLElement {
             
             if (reloadBtn) {
                 const petId = this._petId;
-
-                if (petId) {
-                    window.location.href = `detalles?id=${petId}`
-                } else 
-                    window.location.href = `perfil?panel=mascotas`;
+                window.location.href = `perfil?panel=mascotas`;
             }
         };
 

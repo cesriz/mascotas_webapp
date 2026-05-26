@@ -104,6 +104,13 @@ class AvistamientoModel extends BaseModel
                 u.latitud,
                 u.longitud,
                 (
+                    SELECT fav.id
+                    FROM fotos_avistamientos fav
+                    WHERE fav.avistamiento_id = a.id
+                    ORDER BY fav.es_principal DESC, fav.orden ASC, fav.id ASC
+                    LIMIT 1
+                ) AS foto_avistamiento_id,
+                (
                     SELECT fav.url
                     FROM fotos_avistamientos fav
                     WHERE fav.avistamiento_id = a.id

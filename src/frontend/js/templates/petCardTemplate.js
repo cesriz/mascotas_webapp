@@ -104,7 +104,8 @@ export const petCardCSS = `
     /* Colocamos ambos divs superpuestos */
     .pet-card-info, .pet-card-actions {
         grid-area: stack;
-        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;    }
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;    
+    }
 
     /* Sección de Detalles (Raza, Ubicación, Fecha) */
     .pet-card-info {
@@ -133,10 +134,9 @@ export const petCardCSS = `
         }
 
         .pet-card-info > div p  {
-            font-weight: none;
             margin: 0;
             font-size: var(--text-md);
-            white-space: wrap;
+            white-space: nowrap;
         }
 
 

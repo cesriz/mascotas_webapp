@@ -271,6 +271,33 @@ label + input,select {
             box-shadow: 0 0 8px var(--secondary500);
         }
 
+
+/* Elementos para mostrar y ocultar contraseñas */
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 40px; /* Espacio para el icono */
+    box-sizing: border-box;
+}
+
+.toggle-pass {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-40%);
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-pass img {
+    width: 20px;
+}
+
+
 /* Div para el mensaje de éxito */
 .success-div {
     position: fixed;
@@ -395,6 +422,50 @@ label + input,select {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
+
+/* Términos de uso y políticas de privacidad */
+.terms-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    padding: 40px 20px;
+}
+
+.terms-container {
+    display: flex; 
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 3rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sharp)
+}
+
+.terms-container h3 {
+    font-size: var(--text-2md);
+}
+
+.terms-container p {
+    font-size: var(--text-md);
+}
+
+.terms-container ul {
+    font-size: var(--text-md);
+    padding: 0 2rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* -------- Tablet y móvil -------- */
 @media (max-width: 768px) {

@@ -1,6 +1,8 @@
 export const recoverConfirmHTML = `
     <div class="panel-overlay" id="a-panel-overlay"></div>
     <div class="recover-confirm">
+        <div id="success-div"></div>
+
         <div class="recover-confirm-title">
             <img src="../assets/icons/mingcute--happy-line.svg" alt="Icono emoji feliz">
             <h3>¿Estás seguro?</h3>
@@ -17,6 +19,8 @@ export const recoverConfirmHTML = `
                 <button class="button-secondary" id="btn-r-reload">No, volver</button>
                 <button class="button-primary" id="btn-r-edit">Editar anuncio</button>
             </div>
+
+            <http-cat style="display: none;"></http-cat>
         </div>
     </div>
 `;

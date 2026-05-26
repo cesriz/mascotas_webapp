@@ -7,6 +7,8 @@ export const deleteConfirmHTML = `
             <img src="../assets/icons/mingcute--alert-line.svg" alt="Icono alerta">
             <h3>¿Estás seguro?</h3>
         </div>
+        
+        <div class="delete-confirm-body">
             <p>Esta acción no se puede deshacer</p>
             <div id="delete-confirm-actions">
                 <button class="button-secondary" id="btn-c-cancel">No, volver</button>
@@ -69,11 +71,20 @@ export const deleteConfirmCSS = `
     .delete-confirm-title img {
         width: 24px;
         height: 24px;
-    } 
+    }
+
+    .delete-confirm-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
 
     #delete-confirm-actions {
         display: flex;
         gap: 1rem;
+        margin-top: 1rem;
     }
 
     /* --------Tablets y móviles--------- */

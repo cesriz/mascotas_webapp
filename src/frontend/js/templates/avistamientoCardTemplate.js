@@ -28,6 +28,7 @@ export const avistamientoCardHTML = `
 
             <div class="avistamiento-card-actions">
                 <button class="button-danger" id="btn-delete">Eliminar</button>
+                <button id="btn-delete-photo" class="button-danger"">Eliminar foto</button>
             </div>
         </div>
     </div>

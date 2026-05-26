@@ -72,7 +72,6 @@ export class AvistamientoCreationForm extends HTMLElement {
             // Uso del buscador por dirección (declarado en petMap.js)
             searchBtn.addEventListener('click', async () => {
                 const result = await mapComponentForm.searchAddress(addressInput.value);
-                console.log(result);
                 if (result) {
                     this._currentLocationDetails = {
                         latitud: result.latitud,
@@ -311,7 +310,6 @@ if (email === 'test@gato.com') {
                 setTimeout(() => this.close(), 3000); // Se cierra automáticamente tras 3s
                 
             } catch (error) {
-                console.error("Error capturado en el componente:", error);
                 showHttpError(error, this);
 
             } finally {

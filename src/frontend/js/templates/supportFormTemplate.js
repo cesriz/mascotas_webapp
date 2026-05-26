@@ -56,7 +56,7 @@ export const supportFormHTML = `
 
             <label class="privacy-input">
                 <input type="checkbox" id="privacy-check" required>
-                <span>Mediante el envío de mis datos confirmo que he leído y acepto la <a href="privacidad.html" target="_blank">política de privacidad</a>.</span>
+                <span>Mediante el envío de mis datos confirmo que he leído y acepto la <a href="terms.html" target="_blank">política de privacidad</a>.</span>
             </label>
 
             <div class="support-buttons">

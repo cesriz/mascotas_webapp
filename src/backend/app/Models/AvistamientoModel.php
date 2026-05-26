@@ -93,6 +93,7 @@ class AvistamientoModel extends BaseModel
             SELECT
                 a.id,
                 a.mascota_id,
+                a.usuario_id,
                 am.nombre AS mascota_nombre,
                 am.estado AS estado_mascota,
                 a.fecha_hora,

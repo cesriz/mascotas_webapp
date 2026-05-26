@@ -183,6 +183,14 @@ export const API = {
         });
     },
 
+    // Borrar foto de una mascota asociada
+    deleteFotoMascota(id) {
+        return this.call(`/api/mascotas/fotos/${id}`, { 
+            method: 'DELETE', 
+            headers: this.getHeaders() 
+        });
+    },
+
     // Actualizar datos de una mascota existente
     updateMascota(id, data) {
         return this.call(`/api/mascotas/${id}`, {
@@ -216,6 +224,22 @@ export const API = {
             method: 'POST',
             headers: this.getHeaders(true),
             body: formData
+        });
+    },
+
+    // Eliminar foto de avistamiento
+    deleteFotoAvistamiento(id) {
+        return this.call(`/api/avistamientos/fotos/${id}`, { 
+            method: 'DELETE', 
+            headers: this.getHeaders() 
+        });
+    },
+
+    // Eliminar avistamiento
+    deleteAvistamiento(id) {
+        return this.call(`/api/avistamientos/${id}`, { 
+            method: 'DELETE', 
+            headers: this.getHeaders() 
         });
     },
 

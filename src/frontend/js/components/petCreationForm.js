@@ -830,10 +830,17 @@ export class PetCreationForm extends HTMLElement {
             submitBtn.disabled = true;
             submitBtn.textContent = "ACTUALIZANDO...";
 
+            // Eliminamos fotos individuales marcadas
+            if (this._fotosParaEliminar && this._fotosParaEliminar.length > 0) {
+                for (const fotoId of this._fotosParaEliminar) {
+                    await API.deleteFotoMascota(fotoId); 
+                }
+                this._fotosParaEliminar = []; // Limpiamos el array tras el éxito
+            }
+
+            // Actualizamos datos básicos
             const payload = this.getPetPayload();
             if (!payload) return;
-            
-            // Actualizamos datos básicos
             await API.updateMascota(this._petId, payload);
 
             // Subimos fotos nuevas si el usuario seleccionó archivos

@@ -10,13 +10,10 @@ const template = createTemplate(deleteConfirmHTML, deleteConfirmCSS);
 export class DeleteConfirm extends HTMLElement {
     constructor() {
         super();
-        this._petId = null;
+        this._id = null;
+        this._type = 'null'; //mascota o avistamiento
     }
 
-    // Permitimos pasar el ID de la mascota dinámicamente
-    set petId(value) {
-        this._petId = value;
-    }
 
     connectedCallback() {
         this.render();
@@ -33,35 +30,43 @@ export class DeleteConfirm extends HTMLElement {
             this.close();
         };
 
-        // Borrar la mascota al pulsar el botón de confirmar
+        // Borramos registro según el tipo que le pasemos
         const btnDelete = this.querySelector('#btn-c-delete');
-        btnDelete.onclick = async (e) => {
-            e.stopPropagation();
+            if (btnDelete) {
+                btnDelete.onclick = async (e) => {
+                    e.stopPropagation();
 
-            // Limpiamos http-cat
-            const httpCat = this.querySelector('http-cat');
-            if (httpCat) httpCat.style.display = 'none';
+                    const httpCat = this.querySelector('http-cat');
+                    if (httpCat) httpCat.style.display = 'none';
 
-            try {
-                const result = await API.deleteMascota(this._petId);
-                showSuccess('Mascota eliminada correctamente');
-                setTimeout(() => window.location.href = 'perfil.html', 3000);
-                
-            } catch(error) {
-                showHttpError(error, this);
+                    try {
+                        if (this._tipo === 'mascota') {
+                            await API.deleteMascota(this._id);
+                            showSuccess('Mascota eliminada correctamente');
+                        } else if (this._tipo === 'avistamiento') {
+                            await API.deleteAvistamiento(this._id);
+                            showSuccess('Avistamiento eliminado correctamente');
+                        }
+
+                        setTimeout(() => window.location.href = 'perfil.html', 3000);
+                    } catch (error) {
+                        showHttpError(error, this);
+                    }
+                };
             }
-        };
 
-        // Cerrar formulario al pinchar fuera (overlay)
+        // Cerramos formulario al pinchar fuera (overlay)
         const overlay = this.querySelector('#a-panel-overlay');
         overlay.onclick = () => this.close();
 
     }
 
     // Método para abrir el formulario
-        open(petId) {
-            this._petId = petId;
+        open(id, tipo) {
+            this._id = id;
+            this._tipo = tipo;
             this.classList.add('is-visible');
+            document.body.style.overflow = 'hidden';
         }
 
     // Método para cerrar el formulario

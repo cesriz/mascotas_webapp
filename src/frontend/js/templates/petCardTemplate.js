@@ -136,7 +136,7 @@ export const petCardCSS = `
             font-weight: none;
             margin: 0;
             font-size: var(--text-md);
-            white-space: nowrap;
+            white-space: wrap;
         }
 
 

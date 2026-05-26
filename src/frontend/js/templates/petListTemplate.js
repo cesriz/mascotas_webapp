@@ -4,7 +4,8 @@ export const petListHTML = `
     <div id="grid-container"></div>
 
     <div id="empty-msg" class="empty-state">
-        <p>No se encontraron mascotas en esta categoría.</p>
+        <p>No se encontraron mascotas.</p>
+        <img src="../assets/Gemini_Generated_Image_12vyw712vyw712vy.png" alt="Gato cuenco vacío" id="list-img">
     </div>
 `;
 
@@ -25,6 +26,28 @@ export const petListCSS = `
         padding: 3rem;
         color: #666;
         display: none;
+    }
+
+    #list-img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        margin-top: 1rem;
+        object-fit: cover;
+        border-radius: var(--radius-xl);
+        transition: transform 0.4s ease;
+    }
+
+    #list-img:hover {
+        animation: shake 0.6s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%   { transform: rotate(0deg); }
+        25%  { transform: rotate(10deg); }
+        50%  { transform: rotate(-10deg); }
+        75%  { transform: rotate(8deg); }
+        100% { transform: rotate(0deg); }
     }
 
 /* --------Tablets y móviles--------- */
@@ -54,6 +77,10 @@ export const petListCSS = `
         .empty-state {
             padding: 1.5rem;
             font-size: 0.95rem;
+        }
+
+        #hamster-img {
+            max-width: 160px;
         }
     }
 `;

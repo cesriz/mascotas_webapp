@@ -1,18 +1,18 @@
 FROM php:8.2-apache
 
+# Instala herramientas necesarias para Composer y extensiones PHP
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        unzip \
+        libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql zip \
+    && rm -rf /var/lib/apt/lists/*
+
 # Instala composer para gestionar librerías de php
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Instala utilidades necesarias para composer y las extensiones PHP del proyecto
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends unzip \
-    && rm -rf /var/lib/apt/lists/*
-
-# Instala las extensiones necesarias para trabajar con PDO y MySQL
-RUN docker-php-ext-install pdo pdo_mysql
-
-# Activa mod_rewrite de Apache
-# Esto suele hacer falta para front controller y rutas amigables
+# Activa mod_rewrite y usa mpm_prefork para evitar conflictos de MPM en Railway
 RUN a2dismod mpm_event mpm_worker || true \
     && a2enmod mpm_prefork rewrite
 

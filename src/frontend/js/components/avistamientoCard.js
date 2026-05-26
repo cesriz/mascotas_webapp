@@ -1,4 +1,5 @@
 import { API } from '../api.js';
+import { Auth } from '../auth.js';
 import { showSuccess, showHttpError } from "../main.js";
 import { createTemplate } from "../ui-utils.js";
 import { avistamientoCardHTML, avistamientoCardCSS } from "../templates/avistamientoCardTemplate.js";
@@ -31,6 +32,12 @@ export class AvistamientoCard extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
 
         const avistamiento = this._avistamientoData;
+        console.log (avistamiento);
+        const card = this.querySelector('.avistamiento-card');
+
+        if (!card) {
+            console.error('No existe la tarjeta');
+        }
 
         // Mapeo de datos
         this.querySelector('#card-avistamiento-pet-name').textContent = avistamiento.mascota_nombre;
@@ -43,18 +50,40 @@ export class AvistamientoCard extends HTMLElement {
         imgElement.src = avistamiento.foto_avistamiento_url || '../assets/placeholder.png';
         imgElement.onerror = () => { imgElement.src = '../assets/placeholder.png'; };
 
-        // Al hacer click en la tarjeta redirecciona a pet-detail
-        const card = this.querySelector('.avistamiento-card');
 
-        if (!card) {
-            console.error('No existe la tarjeta');
-
-        }
+        // Lógica para los botones de acción
+        const actions = this.querySelector('.avistamiento-card-actions');
         
+        // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
+        const currentUser = Auth.getUserData(); 
+        const isOwner = currentUser && currentUser.id === avistamiento.usuario_id;
+        console.log(isOwner);
+
+        if (isOwner) {
+            card.classList.add('is-owner');
+            this.classList.add('is-owner');
+
+            // Botones
+            const btnDelete = this.querySelector('#btn-delete');
+
+            // Borrar anuncio de mascota
+            btnDelete.onclick = async (e) => {
+                e.stopPropagation();
+
+                const confirmPanel = this.querySelector('#delete-confirm');
+
+                if (confirmPanel) {
+                    confirmPanel.open(this._avistamientoData.id, 'avistamiento');                }
+            };
+
+        } else {
+            // Si no es el dueño, eliminamos el elemento del DOM por seguridad
+            actions.remove(); 
+        }
+
+        // Al hacer click en la tarjeta redirecciona a pet-detail       
         card.addEventListener('click', () => {
             const id = this._avistamientoData.mascota_id;
-            console.log(id);
-            
             if (id) {
                 window.location.href = `detalles?id=${id}`;
             } else {

@@ -1,7 +1,9 @@
 import { API } from '../api.js';
 import { Auth } from '../auth.js';
+
 import { showSuccess, showHttpError } from "../main.js";
-import { createTemplate } from "../ui-utils.js";
+import { userDeleteConfirm } from './userDeleteConfirm.js';
+import { showInputError, clearInputErrors, createTemplate } from "../ui-utils.js";
 import { userProfileHTML, userProfileCSS } from "../templates/userProfileTemplate.js";
 
 // Creamos la plantilla a partir del HTML y CSS importados
@@ -124,16 +126,45 @@ export class UserProfile extends HTMLElement {
         btnReset.addEventListener('click', (e) => {
             e.preventDefault();
             this.fillForm(this._userData); // Restauramos datos originales
+            clearInputErrors(this);
             this.setReadOnly(profileForm, true);
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
         });
 
         // Envío del formulario de perfil (Guardar)
         profileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Limpiamos posibles errores
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
+            clearInputErrors(this);
+
+            // Validamos datos
+            clearInputErrors(this);
+            let isValid = true;
+
+            const nombre = this.querySelector('#profile-name').value.trim();
+            const correo = this.querySelector('#profile-email').value.trim();
+
+            if (nombre === '') {
+                showInputError(this, 'profile-name', 'El nombre es obligatorio');
+                isValid = false;
+            }
+
+            if (correo === '') {
+                showInputError(this, 'profile-email', 'El correo es obligatorio');
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+                showInputError(this, 'profile-email', 'El formato del correo no es válido');
+                isValid = false;
+            }
+
             const updatedData = {
-                nombre: this.querySelector('#profile-name').value,
+                nombre: nombre,
                 apellidos: this.querySelector('#profile-surname').value,
-                correo: this.querySelector('#profile-email').value,
+                correo: correo,
                 telefono: this.querySelector('#profile-phone').value,
                 direccion: this.querySelector('#profile-direction').value
             };
@@ -143,8 +174,10 @@ export class UserProfile extends HTMLElement {
                 showSuccess("Perfil actualizado correctamente");
                 this._userData = { ...this._userData, ...updatedData }; // Actualizamos memoria local
                 this.setReadOnly(profileForm, true);
+
             } catch (error) {
-                showHttpError(error);
+                showHttpError(error, this);
+                this.scrollTop = 0;
             }
         });
 
@@ -163,53 +196,89 @@ export class UserProfile extends HTMLElement {
         btnResetPss.addEventListener('click', (e) => {
             e.preventDefault();
             this.fillForm(this._userData); // Restauramos datos originales
+            clearInputErrors(this);
             this.setReadOnly(passwordForm, true);
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
         });
 
 
         passwordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const passData = {
-                oldPassword: this.querySelector('#profile-old-pass').value,
-                newPassword: this.querySelector('#profile-new-pass').value,
-                confirmPassword: this.querySelector('#profile-confirm-pass').value
-            };
 
-            if (passData.newPassword !== passData.confirmPassword) {
-                alert("Las contraseñas nuevas no coinciden");
-                return;
+            // Limpiamos posibles errores
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
+            clearInputErrors(this);
+
+            // Seleccionamos inputs
+            const currentPass = this.querySelector('#profile-old-pass').value;
+            const newPass = this.querySelector('#profile-new-pass').value;
+            const confirmPass = this.querySelector('#profile-confirm-pass').value;
+            
+            let hasError = false;
+
+            // Validaciones
+            if (!currentPass) {
+                showInputError(this, 'profile-old-pass', 'La contraseña actual es obligatoria');                
+                hasError = true;
             }
 
+            if (!newPass) {
+                showInputError(this, 'profile-new-pass', 'La nueva contraseña es obligatoria');                
+                hasError = true;
+            } else if (newPass.length < 6) {
+                showInputError(this, 'profile-new-pass', 'Debe tener al menos 6 caracteres');                
+                hasError = true;
+            }
+
+            if (!confirmPass) {
+                showInputError(this, 'profile-confirm-pass', 'Debes confirmar la contraseña');                
+                hasError = true;
+            } else if (newPass !== confirmPass) {
+                showInputError(this, 'profile-confirm-pass', 'Las contraseñas no coinciden');                
+                hasError = true;
+            }
+
+            if (currentPass && newPass && currentPass === newPass) {
+                showInputError(this, 'profile-new-pass', 'La nueva contraseña no puede ser igual a la anterior');                
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Guardamos datos
+            const passData = {
+                current_password: currentPass,
+                new_password: newPass,
+                new_password_confirm: confirmPass
+            };
+
             try {
-                await API.updatePassword({
-                    current_password: passData.oldPassword,
-                    new_password: passData.newPassword
-                });
+                await API.updatePassword(passData);
 
                 showSuccess("Contraseña actualizada correctamente");
                 passwordForm.reset();
                 this.setReadOnly(passwordForm, true);
+
             } catch (error) {
-                showHttpError(error);
+                showHttpError(error, this);
+                this.scrollTop = 0;
             }
         });
 
         // Sección 3: borrar cuenta
         const btnDelete = this.querySelector('#profile-delete-btn');
-        btnDelete.addEventListener('click', async () => {
-            const confirmacion = confirm("¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.");
-            
-            if (confirmacion) {
-                try {
-                    await API.deletePerfil();
-                    showSuccess("Cuenta eliminada. Lamentamos verte partir.");
-                    Auth.logout(); // Limpiamos sesión
-                    setTimeout(() => window.location.href = 'index.html', 2000);
-                } catch (error) {
-                    showHttpError(error);
-                }
+        btnDelete.onclick = async (e) => {
+            e.stopPropagation();
+
+            const confirmPanel = this.querySelector('#delete-confirm');
+
+            if (confirmPanel) {
+                confirmPanel.open();
             }
-        });
+
+        };
     }
 }
 

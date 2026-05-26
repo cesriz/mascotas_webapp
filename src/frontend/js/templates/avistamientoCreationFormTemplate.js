@@ -14,19 +14,23 @@ export const avisCreationFormHTML = `
                 <div>            
                     <label for="avistamiento-form-email">Email</label>
                     <input type="email" id="avistamiento-form-email">
+                    <span class="error-text" id="error-avistamiento-form-email"></span>
                 </div>
                 <div>            
-                    <label for="avistamiento-form-telefono">Teléfono*</label>
-                    <input type="text" id="avistamiento-form-telefono" required>
+                    <label for="avistamiento-form-telefono">Teléfono</label>
+                    <input type="text" id="avistamiento-form-telefono">
+                    <span class="error-text" id="error-avistamiento-form-telefono"></span>
                 </div>
 
                 <div class="avistamiento-form-location">            
                     <label for="avistamiento-form-loc">¿Dónde has visto a la mascota por última vez?*</label>
                     <div style="position: relative;">
                         <input type="text" id="avistamiento-form-loc" placeholder="Escribe una dirección" autocomplete="off">
+                        <span class="error-text" id="error-avistamiento-form-loc"></span>
                         <div id="loc-autocomplete" class="loc-autocomplete"></div>
                     </div>
                     <button class="button-primary" type="button" id="avistamiento-search-btn">Buscar</button>
+                    
                 </div>
                 <div>
                     <pet-map id="avistamiento-form-map" mode="select"></pet-map>
@@ -37,22 +41,26 @@ export const avisCreationFormHTML = `
                 <div>            
                     <label for="avistamiento-form-date">¿Cuándo has visto a la mascota por última vez?*</label>
                     <div class="avistamiento-form-date">
-                        <input type="date" id="avistamiento-form-date" required>
-                        <input type="time" id="avistamiento-form-time" required>
+                        <input type="date" id="avistamiento-form-date">
+                        <input type="time" id="avistamiento-form-time">
                     </div>
+                    <span class="error-text" id="error-avistamiento-form-date"></span>
                 </div>
 
                 <div>            
                     <label for="contact-desc">Descripción</label>
-                    <textarea id="avistamiento-dsc" placeholder="Cualquier detalle puede marcar la diferencia..." required></textarea>
+                    <textarea id="avistamiento-dsc" placeholder="Cualquier detalle puede marcar la diferencia..."></textarea>
+                    <span class="error-text" id="error-avistamiento-dsc"></span>
                 </div>
 
                 <label for="avistamiento-foto">Sube una foto</label>
                 <div class="foto-div">            
                     <img src="../assets/icons/proicons--photo.svg" alt="Icono subir foto" id="upload-icon">
                     <span id="file-name-label">Haz clic para seleccionar o arrastra una imagen</span>
-                    <input type="file" id="avistamiento-foto" accept="image/*">
-                    <img id="preview-img">
+                    
+                    <input type="file" id="avistamiento-fotos" accept="image/*" multiple>
+                    
+                    <div id="preview-container">
                 </div>
             </div>
 
@@ -75,6 +83,7 @@ export const avisCreationFormCSS = `
     }
 
     avistamiento-creation-form.is-visible {
+        display: block !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -83,7 +92,7 @@ export const avisCreationFormCSS = `
         display: flex !important;
         align-items: center;
         justify-content: center;
-        z-index: 1000;
+        z-index: 1001;
     }
 
     .avistamiento-creation {
@@ -203,41 +212,52 @@ export const avisCreationFormCSS = `
         opacity: 0.7;
     }
 
-    #avistamiento-foto { 
+    #avistamiento-fotos { 
         display: none; 
     }
 
-    #preview-img {
-        display:none; 
+    #preview-container {
         width: 100%;
-        min-height: 200px;
-        max-height: 180px; 
-        object-fit: contain; 
-        margin-top: 10px;
+        min-height: 100px;
+        max-height: auto; 
+        margin-top: 1rem;
+        padding: 0.5rem;
+        gap: 0.3rem;
         background-color: var(--inputbackground);
         border-radius: var(--radius-sm);
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        flex-wrap: wrap;
+    }
+
+    #preview-container img {
+        max-width: 100px;
+        height: auto;
+        object-fit: cover;
+        border-radius: var(--radius-xs);
+        border: 1p solid var(--secondary500);
     }
 
     /* Botones */
     .avistamiento-buttons {
-        width: auto;
-        display: flex;
-        flex-direction: row;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
         align-items: center;
         justify-content: center;
-        padding-top: 10px;
-        margin-bottom: 10px;
-        flex-shrink: 0;
-        gap: 10px;
+        gap: 20px; /* Espacio entre botones */
+        margin-top: 20px;
     }
     
     .avistamiento-buttons button {
-        flex: 1;
-        max-width: 150px;
+        flex: 0 1 150px; 
+        width: 150px;
         padding: 10px;
+        white-space: nowrap;
     }
 
-    #avistamiento-search-btn{
+    #avistamiento-search-btn {
         max-width: 150px;
         align-self: flex-end;
         margin-top: 5px;
@@ -266,7 +286,6 @@ export const avisCreationFormCSS = `
         display: flex;
         gap: 10px;
     }
-
 
     /* --------Tablets y móviles--------- */
     @media (max-width: 600px) {

@@ -7,13 +7,16 @@ export const recoverConfirmHTML = `
         </div>
         <p>Esta acción no se puede deshacer</p>
         <div id="recover-confirm-actions">
-            <button class="button-secondary" id="btn-r-cancel">No, volver</button>
+            <button class="button-secondary" id="btn-r-cancel">Cancelar</button>
             <button class="button-success" id="btn-r-recover">Sí, ¡Ha vuelto a casa!</button>
         </div>
 
         <div id="recover-edit-actions" class="hidden">
             <p>Si quieres, puedes actualizar tu anuncio pulsando en el siguiente botón: </p>
-            <button class="button-primary" id="btn-r-edit">Editar anuncio</button>
+            <div>
+                <button class="button-secondary" id="btn-r-reload">No, volver</button>
+                <button class="button-primary" id="btn-r-edit">Editar anuncio</button>
+            </div>
         </div>
     </div>
 `;

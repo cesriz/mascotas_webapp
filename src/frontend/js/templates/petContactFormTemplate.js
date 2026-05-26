@@ -13,19 +13,23 @@ export const petContactFormHTML = `
             <div class="pet-contact-form-inputs">
                 <div>            
                     <label for="contact-name">Nombre</label>
-                    <input type="text" id="contact-name" required>
+                    <input type="text" id="contact-name">
+                    <span class="error-text" id="error-contact-name"></span>
                 </div>
                 <div>            
                     <label for="contact-email">Email</label>
-                    <input type="email" id="contact-correo" required>
+                    <input type="email" id="contact-correo">
+                    <span class="error-text" id="error-contact-correo"></span>
                 </div>
                 <div>            
                     <label for="contact-phone">Teléfono</label>
                     <input type="tel" id="contact-phone">
+                    <span class="error-text" id="error-contact-phone"></span>
                 </div>
                 <div>            
                     <label for="contact-msg">Mensaje</label>
-                    <textarea id="contact-msg" placeholder="Escribe aquí tu mensaje..." required></textarea>
+                    <textarea id="contact-msg" placeholder="Escribe aquí tu mensaje..."></textarea>
+                    <span class="error-text" id="error-contact-msg"></span>
                 </div>
             </div>
 
@@ -33,6 +37,7 @@ export const petContactFormHTML = `
                 <input type="checkbox" id="privacy-check" required>
                 <span>Mediante el envío de mis datos confirmo que he leído y acepto la <a href="privacidad.html" target="_blank">política de privacidad</a>.</span>
             </label>
+            <span class="error-text" id="error-privacy-check"></span>
 
             <div class="contact-buttons">
                 <button type="button" class="button-secondary" id="contact-btn-reset">Limpiar</button>

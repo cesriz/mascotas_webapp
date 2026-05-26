@@ -29,6 +29,7 @@ export class HttpCat extends HTMLElement {
         const img = this.querySelector('#cat-img');
         const messagesContainer = this.querySelector('#messages');
 
+        // Usamos la URL según la documentción de la API
         img.src = `https://http.cat/${code}`;
 
         let html = '';
@@ -45,6 +46,20 @@ export class HttpCat extends HTMLElement {
             }
 
             messagesContainer.innerHTML = html;
+
+            // Lógica para cerrar el modal
+            const closeBtn = this.querySelector('#close-cat');
+            const retryBtn = this.querySelector('#retry-btn');
+
+            const hideMe = () => {
+                this.style.display = 'none';
+                this.removeAttribute('code');
+                this.removeAttribute('message');
+                this.removeAttribute('errors');
+            };
+
+            if (closeBtn) closeBtn.onclick = hideMe;
+            if (retryBtn) retryBtn.onclick = hideMe;
     }
 }
 customElements.define('http-cat', HttpCat);

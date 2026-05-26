@@ -35,12 +35,15 @@ export class PetList extends HTMLElement {
         const httpCat = this.querySelector('http-cat');
 
         // Si hay algún error en la llamada en la API, se utiliza http-cats
-        if (this._pets === null) {
+        if (this._pets instanceof Error || (this._pets && this._pets.status)) {
             if (grid) grid.style.display = 'none';
             if (emptyMsg) emptyMsg.style.display = 'none';
-            if (httpCat) httpCat.style.display = 'block';
+            
+            // Usamos la utilidad global para configurar al gato correctamente
+            showHttpError(this._pets, this);
             return;
         }
+
         const items = Array.isArray(this._pets) ? this._pets : []; 
         // Si no hay mascotas, mostramos el mensaje de "No encontrado"
         if (!this._pets || this._pets.length === 0) {
@@ -71,10 +74,6 @@ export class PetList extends HTMLElement {
 
             
         });
-    }
-
-    getGrid() {
-        return this.querySelector('#grid-container');
     }
 }
 

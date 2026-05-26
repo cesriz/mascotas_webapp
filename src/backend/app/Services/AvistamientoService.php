@@ -78,4 +78,39 @@ class AvistamientoService
             throw $e;
         }
     }
+
+    public function delete(int $avistamientoId): bool
+    {
+        $avistamiento = $this->avistamientoModel->getById($avistamientoId);
+
+        if ($avistamiento === null) {
+            return false;
+        }
+
+        $fotos = $this->fotoModel->getByAvistamientoId($avistamientoId);
+
+        foreach ($fotos as $foto) {
+            FileHelper::destroyImage($foto['public_id'] ?? null);
+        }
+
+        try {
+            $this->avistamientoModel->beginTransaction();
+
+            $this->fotoModel->deleteByAvistamientoId($avistamientoId);
+            $this->avistamientoModel->deleteAvistamientoById($avistamientoId);
+
+            // La ubicación del avistamiento normalmente queda huérfana.
+            // La borramos después de eliminar el avistamiento.
+            if (!empty($avistamiento['ubicaciones_avistamientos_id'])) {
+                $this->ubicacionModel->deletePublicById((int) $avistamiento['ubicaciones_avistamientos_id']);
+            }
+
+            $this->avistamientoModel->commit();
+
+            return true;
+        } catch (Throwable $e) {
+            $this->avistamientoModel->rollBack();
+            throw $e;
+        }
+    }
 }

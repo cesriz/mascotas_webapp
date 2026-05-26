@@ -41,6 +41,7 @@ return [
     ['POST', '/api/mascotas', 'MascotaController@store', ['auth' => true]],
     ['PUT', '/api/mascotas/{id}', 'MascotaController@update', ['auth' => true]],
     ['POST', '/api/mascotas/{id}/fotos', 'MascotaController@uploadFotos', ['auth' => true]],
+    ['DELETE', '/api/mascotas/fotos/{id}', 'MascotaController@deleteFoto', ['auth' => true]],
     ['DELETE', '/api/mascotas/{id}', 'MascotaController@destroy', ['auth' => true]],
     ['PATCH', '/api/mascotas/{id}/recuperar', 'MascotaController@marcarRecuperada', ['auth' => true]],
 
@@ -49,6 +50,8 @@ return [
     // =========================
     ['GET', '/api/mascotas/{id}/avistamientos', 'AvistamientoController@index'],
     ['POST', '/api/mascotas/{id}/avistamientos', 'AvistamientoController@store'],
+    ['DELETE', '/api/avistamientos/{id}', 'AvistamientoController@destroy', ['auth' => true]],
+    ['DELETE', '/api/avistamientos/fotos/{id}', 'AvistamientoController@deleteFoto', ['auth' => true]],
 
     // =========================
     // Contacto sobre un anuncio

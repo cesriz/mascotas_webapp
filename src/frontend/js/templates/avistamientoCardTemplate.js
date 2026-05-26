@@ -1,4 +1,5 @@
 export const avistamientoCardHTML = `
+    <delete-confirm id="delete-confirm"></delete-confirm>
     <div class="avistamiento-card">
         <img src="" id="card-avistamiento-img" alt="Foto del avistamiento">
 
@@ -10,17 +11,23 @@ export const avistamientoCardHTML = `
             <h3>Avistamiento de <span id="card-avistamiento-pet-name"></span></h3>
         </div>
 
-        <div class="avistamiento-card-info">
-            <div>
-                <img src="../assets/icons/tdesign--location.svg" alt="Icono ubicación">
-                <p id="card-avistamiento-loc"></p>
+        <div class="avistamiento-card-body">
+            <div class="avistamiento-card-info">
+                <div>
+                    <img src="../assets/icons/tdesign--location.svg" alt="Icono ubicación">
+                    <p id="card-avistamiento-loc"></p>
+                </div>
+                <div>
+                    <img src="../assets/icons/solar--calendar-linear.svg" alt="Fecha">
+                    <p id="card-avistamiento-date"></p>
+                </div>
+                <div class="avistamiento-desc">
+                    <p id="card-avistamiento-desc"></p>
+                </div>
             </div>
-            <div>
-                <img src="../assets/icons/solar--calendar-linear.svg" alt="Fecha">
-                <p id="card-avistamiento-date"></p>
-            </div>
-            <div class="avistamiento-desc">
-                <p id="card-avistamiento-desc"></p>
+
+            <div class="avistamiento-card-actions">
+                <button class="button-danger" id="btn-delete">Eliminar</button>
             </div>
         </div>
     </div>
@@ -67,10 +74,20 @@ export const avistamientoCardCSS = `
         margin-top: 1rem;
     }
 
-    #card-pet-name {
-        text-align: center;
-        color: var(--secondary500);
-        font-size: var(--text-lg)
+
+    /* Contenido de la tarjeta */
+    .avistamiento-card-body {
+        width: 60%;
+        display: grid;
+        grid-template-areas: "stack";
+        align-items: start;
+        min-height: 100px;
+    }
+    
+    /* Colocamos ambos divs superpuestos */
+    .avistamiento-card-info, .avistamiento-card-actions {
+        grid-area: stack;
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;    
     }
 
     /* Sección de Detalles (Raza, Ubicación, Fecha) */
@@ -106,6 +123,38 @@ export const avistamientoCardCSS = `
             font-style: italic;
         }
 
+        /* Botones de acción */
+        .avistamiento-card-actions {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0.5rem;
+
+            /* Estado inicial */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* No clickable mientras está oculto */
+        }
+
+        .avistamiento-card-actions button {
+            padding: 5px;
+        }
+
+        /* EFECTO DEL HOVER (si el usuario logeado es el dueño) */
+        .avistamiento-card.is-owner:hover .avistamiento-card-info {
+            
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px)
+        }
+
+        .avistamiento-card.is-owner:hover .avistamiento-card-actions {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
     /* Badges */
     .badge {
         padding: 5px 20px;
@@ -126,105 +175,51 @@ export const avistamientoCardCSS = `
     .badge-recuperado {background-color: var(--success); }
 
 
-    
-    /* Overlay con degradado - Menú */
-    .card-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        
-        
-        background: linear-gradient(180deg, rgba(255,107,0,0.0) 0%, var(--primary) 60%, var(--secondary) 100%);
-        
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: center;
-        padding: 20px;
-        gap: 10px;
-        box-sizing: border-box;
-        
-        /* Oculto por defecto */
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        z-index: 10;
-    }
-
-    /* Solo si la tarjeta tiene la clase 'is-owner', 
-    permitimos que el hover active el overlay */
-    .pet-card.is-owner:hover .card-overlay {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* Estilo para visitantes */
-    .pet-card:not(.is-owner) {
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .pet-card:not(.is-owner):hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-sharp)
-    }
-
-
     /* ------- Tablet y móvil ---------- */
     @media (max-width: 768px) {
 
-        .pet-card {
+        .avistamiento-card {
             max-width: 100%;
             padding: 20px;
         }
 
-        .pet-card > img:first-child {
+        .avistamiento-card > img:first-child {
             max-height: 200px;
         }
 
-        .pet-card-info {
+        .avistamiento-card-info {
             width: 80%;
         }
 
-        .pet-card-info > div {
+        .avistamiento-card-info > div {
             justify-content: flex-start;
         }
     }
 
     @media (max-width: 480px) {
 
-        .pet-card {
+        .avistamiento-card {
             padding: 12px;
             gap: 8px;
         }
 
-        .pet-card > img:first-child {
+        .avistamiento-card > img:first-child {
             max-height: 150px;
         }
 
-        .pet-card h3,
+        .avistamiento-card h3,
         #card-pet-name {
             font-size: var(--text-md);
         }
 
-        .pet-card-info p {
+        .avistamiento-card-info p {
             font-size: var(--text-xs);
         }
 
-        .pet-card-info img {
+        .avistamiento-card-info img {
             width: 16px;
             height: 16px;
         }
 
-        .card-overlay {
-            padding: 10px;
-        }
-
-        .card-overlay button {
-            font-size: var(--text-sm);
-            padding: 8px;
-        }
     } 
 `;

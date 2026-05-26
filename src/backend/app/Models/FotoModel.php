@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
@@ -143,6 +144,138 @@ class FotoModel extends BaseModel
         ";
 
         return $this->executeQuery($sql, [
+            'avistamiento_id' => $avistamientoId
+        ]);
+    }
+
+    public function getMascotaFotoById(int $fotoId): ?array
+    {
+        $sql = "
+        SELECT
+            fa.id,
+            fa.mascota_id,
+            fa.url,
+            fa.public_id,
+            fa.fecha_subida,
+            fa.es_principal,
+            fa.orden,
+            am.usuario_id
+        FROM fotos_anuncios fa
+        INNER JOIN anuncio_mascotas am ON am.id = fa.mascota_id
+        WHERE fa.id = :id
+        LIMIT 1
+    ";
+
+        return $this->fetchOne($sql, [
+            'id' => $fotoId
+        ]);
+    }
+
+    public function getAvistamientoFotoById(int $fotoId): ?array
+    {
+        $sql = "
+        SELECT
+            fav.id,
+            fav.avistamiento_id,
+            fav.url,
+            fav.public_id,
+            fav.fecha_subida,
+            fav.es_principal,
+            fav.orden,
+            a.mascota_id,
+            am.usuario_id AS propietario_mascota_id
+        FROM fotos_avistamientos fav
+        INNER JOIN avistamientos a ON a.id = fav.avistamiento_id
+        INNER JOIN anuncio_mascotas am ON am.id = a.mascota_id
+        WHERE fav.id = :id
+        LIMIT 1
+    ";
+
+        return $this->fetchOne($sql, [
+            'id' => $fotoId
+        ]);
+    }
+
+    public function deleteMascotaFotoById(int $fotoId): bool
+    {
+        $sql = "
+        DELETE FROM fotos_anuncios
+        WHERE id = :id
+    ";
+
+        return $this->executeQuery($sql, [
+            'id' => $fotoId
+        ]);
+    }
+
+    public function deleteAvistamientoFotoById(int $fotoId): bool
+    {
+        $sql = "
+        DELETE FROM fotos_avistamientos
+        WHERE id = :id
+    ";
+
+        return $this->executeQuery($sql, [
+            'id' => $fotoId
+        ]);
+    }
+
+    public function ensureMascotaHasPrincipal(int $mascotaId): void
+    {
+        $sql = "
+        SELECT COUNT(*) AS total
+        FROM fotos_anuncios
+        WHERE mascota_id = :mascota_id
+          AND es_principal = 1
+    ";
+
+        $result = $this->fetchOne($sql, [
+            'mascota_id' => $mascotaId
+        ]);
+
+        if ((int) ($result['total'] ?? 0) > 0) {
+            return;
+        }
+
+        $sql = "
+        UPDATE fotos_anuncios
+        SET es_principal = 1
+        WHERE mascota_id = :mascota_id
+        ORDER BY orden ASC, id ASC
+        LIMIT 1
+    ";
+
+        $this->executeQuery($sql, [
+            'mascota_id' => $mascotaId
+        ]);
+    }
+
+    public function ensureAvistamientoHasPrincipal(int $avistamientoId): void
+    {
+        $sql = "
+        SELECT COUNT(*) AS total
+        FROM fotos_avistamientos
+        WHERE avistamiento_id = :avistamiento_id
+          AND es_principal = 1
+    ";
+
+        $result = $this->fetchOne($sql, [
+            'avistamiento_id' => $avistamientoId
+        ]);
+
+        if ((int) ($result['total'] ?? 0) > 0) {
+            return;
+        }
+
+        $sql = "
+        UPDATE fotos_avistamientos
+        SET es_principal = 1
+        WHERE avistamiento_id = :avistamiento_id
+        ORDER BY orden ASC, id ASC
+        LIMIT 1
+    ";
+
+        $this->executeQuery($sql, [
             'avistamiento_id' => $avistamientoId
         ]);
     }

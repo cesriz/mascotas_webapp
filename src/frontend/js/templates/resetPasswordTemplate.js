@@ -5,20 +5,23 @@ export const resetPasswordHTML = `
         </div>
         <div class="reset-body-section">
             <form id="reset-pss">
-                <label for="forgot-correo">Nueva contraseña</label>
+                <label for="password">Nueva contraseña</label>
                 <input type="password" id="password">
 
-                <label for="forgot-correo">Repetir contraseña</label>
+                <label for="password-confirm">Repetir contraseña</label>
                 <input type="password" id="password-confirm">
 
                 <div class="hidden">
-                    <input type="string" id="reset-token">
+                    <input type="hidden" id="reset-token">
                 </div>
 
                 <div class="reset-form-buttons"> 
                     <button class="button-primary" type="submit">RESTABLECER CONTRASEÑA</button>
                 </div>
             </form>
+
+            <http-cat style="display: none;"></http-cat>
+            <div id="success-div"></div>
         </div>
     </div>
 `;

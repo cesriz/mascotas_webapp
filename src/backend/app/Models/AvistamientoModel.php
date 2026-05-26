@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/BaseModel.php';
 
+
 class AvistamientoModel extends BaseModel
 {
     // Devuelve los avistamientos de una mascota.
@@ -92,6 +93,7 @@ class AvistamientoModel extends BaseModel
             SELECT
                 a.id,
                 a.mascota_id,
+                a.usuario_id,
                 am.nombre AS mascota_nombre,
                 am.estado AS estado_mascota,
                 a.fecha_hora,
@@ -260,4 +262,40 @@ class AvistamientoModel extends BaseModel
             'mascota_id' => $mascotaId
         ]);
     }
+
+    public function getByIdWithOwner(int $id): ?array
+    {
+        $sql = "
+        SELECT
+            a.id,
+            a.mascota_id,
+            a.usuario_id,
+            a.telefono,
+            a.correo,
+            a.descripcion,
+            a.fecha_hora,
+            a.ubicaciones_avistamientos_id,
+            am.usuario_id AS propietario_mascota_id
+        FROM avistamientos a
+        INNER JOIN anuncio_mascotas am ON am.id = a.mascota_id
+        WHERE a.id = :id
+        LIMIT 1
+    ";
+
+        return $this->fetchOne($sql, [
+            'id' => $id
+        ]);
+    }
+
+    public function deleteAvistamientoById(int $id): bool
+{
+    $sql = "
+        DELETE FROM avistamientos
+        WHERE id = :id
+    ";
+
+    return $this->executeQuery($sql, [
+        'id' => $id
+    ]);
+}
 }

@@ -172,6 +172,34 @@ input, select, textarea {
     outline: none;
 }
 
+    /* Input cuando hay un error */
+    input.is-invalid, textarea.is-invalid, select.is-invalid {
+        border: 1.5px solid var(--danger) !important;
+        background-color: #fff5f5 !important;
+    }
+
+    /* Texto de error debajo del input */
+    .error-text {
+        color: var(--danger);
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 4px;
+        margin-bottom: 1rem;
+        margin-left: 1rem;
+        display: none; /* Oculto por defecto */
+        animation: fadeInError 0.3s ease-out;
+    }
+
+    /* Clase para mostrar el error */
+    .error-text.active {
+        display: block;
+    }
+
+    @keyframes fadeInError {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
 textarea {
     border-radius: var(--radius-sm);
 }
@@ -255,7 +283,7 @@ label + input,select {
     border-radius: 8px;
     opacity: 0;
     transition: all 0.3s ease;
-    z-index: 2000;
+    z-index: 9999;
 }
 
     .success-div.visible {
@@ -312,6 +340,7 @@ label + input,select {
 /* ---------- Estilos de vistas completas----------- */
 .dashboard-wrapper {
     padding:0 3rem;
+    overflow-x: hidden;
 }
 
 /* Títulos del contenedor principal */
@@ -354,6 +383,7 @@ label + input,select {
     background-color: inherit;
     padding-left: 2rem;
     padding-top: 1rem;
+    overflow-x: auto; /* Permitimos scroll interno */
 }
 
     /* Efecto de transición */

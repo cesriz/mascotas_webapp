@@ -13,15 +13,15 @@ export const petCardHTML = `
 
         <div class="pet-card-body">
             <div class="pet-card-info">
-                <div class="info-item">
+                <div>
                     <img src="../assets/icons/streamline-plump--pet-paw.svg" alt="Icono raza">
                     <p id="card-pet-raza"></p>
                 </div>
-                <div class="info-item">
+                <div>
                     <img src="../assets/icons/tdesign--location.svg" alt="Icono ubicación">
                     <p id="card-pet-loc"></p>
                 </div>
-                <div class="info-item">
+                <div>
                     <img src="../assets/icons/solar--calendar-linear.svg" alt="Icono fecha">
                     <p id="card-pet-date"></p>
                 </div>
@@ -123,7 +123,7 @@ export const petCardCSS = `
         /* Filas de iconos y texto */
         .pet-card-info > div {
             display: flex;
-            align-items: center;
+            align-items: start;
             gap: 8px;
         }
 
@@ -136,7 +136,7 @@ export const petCardCSS = `
             font-weight: none;
             margin: 0;
             font-size: var(--text-md);
-            word-break: break-word;
+            white-space: wrap;
         }
 
 

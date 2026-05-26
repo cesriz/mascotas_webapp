@@ -1,144 +1,43 @@
-# Despliegue en Railway
+# Guia de despliegue en Railway
 
-Esta rama prepara el proyecto para desplegarse en Railway como un unico servicio web con PHP/Apache, frontend estatico y una base de datos MySQL gestionada por Railway.
+Esta guia describe como desplegar Mascotas WebApp en Railway desde el repositorio GitHub del proyecto. El despliegue recomendado usa un unico servicio web PHP/Apache para servir el frontend estatico y la API, mas un servicio MySQL gestionado por Railway.
 
-## Resumen de la arquitectura
+## Arquitectura
 
-- Railway construye la imagen usando `docker/Dockerfile`.
-- Apache sirve el frontend desde `src/frontend`, copiado durante el build dentro de `src/backend/public`.
-- Las rutas `/api/...` siguen entrando por el front controller PHP `src/backend/public/index.php`.
-- MySQL no se despliega con `docker-compose.yml` en Railway. Se crea como servicio gestionado de Railway y la app lee sus variables.
-- Las imagenes subidas siguen usando Cloudinary, asi que no hace falta volumen persistente para uploads.
+- Railway construye la imagen del servicio web usando `railway.json` y `docker/Dockerfile`.
+- Apache sirve el frontend estatico desde el `public` del backend.
+- Las rutas `/api/...` entran por el front controller PHP `src/backend/public/index.php`.
+- MySQL se crea como servicio gestionado de Railway, no mediante `docker/docker-compose.yml`.
+- Las imagenes subidas se almacenan en Cloudinary, por lo que Railway no necesita volumen persistente para uploads.
+- `docker/docker-compose.yml` queda para desarrollo local.
 
-Referencias oficiales consultadas:
+## Archivos relevantes
 
-- Docker Compose en Railway: https://docs.railway.com/guides/docker-compose
-- MySQL en Railway: https://docs.railway.com/databases/mysql
-- Config as Code: https://docs.railway.com/config-as-code/reference
-- Public Networking: https://docs.railway.com/deploy/exposing-your-app
+- `railway.json`: indica a Railway que debe construir con Dockerfile y donde encontrarlo.
+- `docker/Dockerfile`: crea una imagen autosuficiente con PHP/Apache, Composer, backend, frontend y configuracion de Apache.
+- `docker/start-apache.sh`: adapta Apache al puerto que Railway inyecta en `PORT`.
+- `docker/000-default.conf`: configura Apache para servir frontend estatico y enrutar `/api/...` al backend PHP.
+- `.dockerignore`: excluye archivos innecesarios o sensibles del contexto de build.
+- `railway.env.example`: plantilla de variables para Railway y para crear un `.env` local.
+- `docker/docker-compose.yml`: entorno local con MySQL, phpMyAdmin, backend y frontend.
 
-## Que se ha cambiado y por que
+Railway no lee `railway.env.example` automaticamente. Ese archivo solo sirve como referencia: las variables reales deben configurarse en el panel de Railway.
 
-### Docker y Railway
+## Variables de entorno
 
-Se ha actualizado `docker/Dockerfile` para que la imagen sea autosuficiente.
+La plantilla de variables esta en `railway.env.example`.
 
-Antes funcionaba en local porque `docker-compose.yml` montaba el codigo con volumenes:
+Para Railway, usa ese archivo como referencia y configura las variables reales desde el panel de Railway.
 
-- `../src:/var/www/project`
-- `./000-default.conf:/etc/apache2/sites-enabled/000-default.conf`
+Para desarrollo local, puedes crear un `.env` en la raiz del proyecto a partir de esa plantilla:
 
-En Railway esos volumenes no existen. Por eso ahora el Dockerfile:
-
-- instala dependencias PHP con Composer;
-- copia el backend dentro de `/var/www/project/backend`;
-- copia el frontend dentro de `public`;
-- copia la configuracion de Apache;
-- expone el puerto 80;
-- adapta Apache a la variable `PORT` si Railway la inyecta.
-
-Se ha actualizado `docker/000-default.conf` para que Apache priorice `index.html` en la home y no devuelva el JSON 404 del backend al visitar `/`.
-
-Se ha anadido `docker/start-apache.sh` para arrancar Apache usando `PORT` cuando Railway lo defina.
-
-Se ha anadido `railway.json` para que Railway sepa que debe usar:
-
-```json
-{
-  "build": {
-    "builder": "DOCKERFILE",
-    "dockerfilePath": "docker/Dockerfile"
-  }
-}
+```powershell
+Copy-Item railway.env.example .env
 ```
 
-Se ha anadido `.dockerignore` para que el build no envie al contexto:
+El archivo `.env` contiene secretos reales y no debe subirse a Git.
 
-- `.git`
-- `vendor`
-- `node_modules`
-- `mysql_data`
-- ficheros `.env`
-- documentacion y otros archivos que no necesita la imagen
-
-Esto reduce peso y evita subir secretos o datos locales al build.
-
-### Configuracion de base de datos
-
-`src/backend/app/Config/database.php` ahora puede leer:
-
-- `DATABASE_URL`, si existe;
-- variables MySQL de Railway: `MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD`, `MYSQLDATABASE`;
-- variables genericas: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`;
-- valores locales por defecto para Docker Compose.
-
-`src/backend/app/Core/Database.php` ahora incluye `port` en el DSN de PDO. Esto es importante porque Railway entrega el puerto de MySQL como variable.
-
-### Configuracion de aplicacion
-
-`src/backend/app/Config/app.php` ahora lee variables:
-
-- `APP_NAME`
-- `APP_ENV`
-- `APP_DEBUG`
-- `APP_TIMEZONE`
-- `APP_URL`
-- `FRONTEND_URL`
-- `MAIL_FROM`
-
-Esto permite que los enlaces de recuperacion de contrasena apunten al dominio real de Railway y no a `localhost`.
-
-### CORS
-
-`src/backend/app/Config/cors.php` ahora lee:
-
-- `CORS_ALLOWED_ORIGIN`
-- `FRONTEND_URL`
-- `APP_URL`
-
-Como el despliegue recomendado sirve frontend y API desde el mismo dominio, CORS casi no deberia molestar. Aun asi queda preparado para permitir el dominio correcto.
-
-Tambien se corrigio el `require_once` en `src/backend/public/index.php`:
-
-```php
-require_once __DIR__ . '/../app/Config/cors.php';
-```
-
-Antes buscaba `Cors.php`, pero el archivo real es `cors.php`. En Windows funciona por casualidad; en Railway/Linux puede romper.
-
-### JWT
-
-`src/backend/app/Helpers/JwtHelper.php` ahora lee `JWT_SECRET`.
-
-Antes la clave estaba fija en codigo. Ahora, si `APP_ENV=production` y falta `JWT_SECRET`, la app falla en vez de firmar tokens con una clave de desarrollo.
-
-### Frontend
-
-`src/frontend/js/api.js` ya no esta atado a `http://localhost:3000`.
-
-Comportamiento actual:
-
-- si el frontend corre en `localhost:4200`, usa `http://localhost:3000`;
-- si corre desde Railway, usa el mismo dominio y llama a `/api/...`;
-- si alguna vez necesitas forzar una URL, puedes definir `window.MASCOTAS_API_BASE_URL` antes de cargar `js/main.js`.
-
-Tambien se centralizo la resolucion de imagenes relativas con `API.resolveMediaUrl()`. Asi las fotos que no vengan de Cloudinary se resuelven contra el backend correcto.
-
-`src/backend/public/.htaccess` ahora sirve vistas estaticas sin extension. Por ejemplo:
-
-- `/detalles?id=1` carga `detalles.html`.
-- `/perfil?panel=publicar` carga `perfil.html`.
-- `/api/...` no se convierte a HTML y sigue entrando al backend PHP.
-
-### Secretos locales
-
-`docker/docker-compose.yml` ya no contiene credenciales reales de Cloudinary.
-
-Para local, copia `docker/env.example` a `docker/.env` y rellena tus valores reales. Ese `.env` no debe subirse a Git.
-
-## Variables necesarias en Railway
-
-En el servicio web de Railway configura:
+Variables principales del servicio web:
 
 ```text
 APP_ENV=production
@@ -147,13 +46,18 @@ APP_URL=https://tu-dominio.up.railway.app
 FRONTEND_URL=https://tu-dominio.up.railway.app
 CORS_ALLOWED_ORIGIN=https://tu-dominio.up.railway.app
 JWT_SECRET=una_clave_larga_aleatoria_y_privada
+```
+
+Variables de Cloudinary:
+
+```text
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 CLOUDINARY_FOLDER=mascotas_webapp
 ```
 
-Para MySQL, crea un servicio MySQL en el mismo proyecto Railway y referencia sus variables desde el servicio web:
+Variables de MySQL en Railway:
 
 ```text
 MYSQLHOST=${{MySQL.MYSQLHOST}}
@@ -161,33 +65,40 @@ MYSQLPORT=${{MySQL.MYSQLPORT}}
 MYSQLUSER=${{MySQL.MYSQLUSER}}
 MYSQLPASSWORD=${{MySQL.MYSQLPASSWORD}}
 MYSQLDATABASE=${{MySQL.MYSQLDATABASE}}
+MYSQL_URL=mysql://root:tu_password_mysql@mysql.railway.internal:3306/railway
 ```
 
-El nombre `MySQL` puede variar si llamas al servicio de otra forma. Usa el nombre real del servicio en Railway.
+El nombre `MySQL` puede variar si el servicio de base de datos tiene otro nombre en Railway. Usa el nombre real del servicio al referenciar sus variables.
 
-Tienes una plantilla en `railway.env.example`.
+Si Railway proporciona `DATABASE_URL`, la aplicacion tambien puede leerla. Si no existe, usa las variables `MYSQL...` o, en local, las variables `DB_...` y los valores por defecto del `docker-compose.yml`.
 
-## Pasos para desplegar
+Para recuperacion de contrasena y envio de correo, configura tambien las variables SMTP incluidas en `railway.env.example`.
 
-1. Sube esta rama a GitHub.
+## Despliegue paso a paso
+
+1. Sube la rama que quieras desplegar al remoto `origin`.
 2. En Railway, crea un proyecto nuevo.
-3. Anade un servicio MySQL.
+3. Anade un servicio MySQL al proyecto.
 4. Anade un servicio web desde el repositorio GitHub.
-5. Selecciona esta rama.
-6. Railway leera `railway.json` y usara `docker/Dockerfile`.
-7. Configura las variables del apartado anterior.
-8. Genera un dominio publico para el servicio web.
-9. Actualiza `APP_URL`, `FRONTEND_URL` y `CORS_ALLOWED_ORIGIN` con ese dominio.
-10. Importa la base de datos.
-11. Lanza un redeploy del servicio web.
+5. Selecciona la rama que contiene la configuracion de Railway.
+6. En el servicio web, entra en `Settings/Build/Builder` y selecciona la opcion `Dockerfile`.
+7. En `Settings/Config-as-code/Railway Config File`, selecciona `/railway.json`.
+8. Configura las variables de entorno del servicio web usando `railway.env.example` como referencia. En este primer paso, puedes dejar `APP_URL`, `FRONTEND_URL` y `CORS_ALLOWED_ORIGIN` con valores temporales o vacíos, ya que el dominio público aún no se ha generado. Asegúrate de configurar `JWT_SECRET`, las variables de Cloudinary y SMTP.
+9. Lanza el primer deploy del servicio web. Este despliegue inicial es necesario para que Railway provisione el servicio y permita la generación del dominio.
+10. Una vez que el servicio web haya completado su primer despliegue, entra en `Settings/Networking` y pulsa `Generate Domain` para crear el dominio público.
+11. Copia el dominio público generado.
+12. Vuelve a las variables de entorno del servicio web y actualiza `APP_URL`, `FRONTEND_URL` y `CORS_ALLOWED_ORIGIN` con la URL pública real que acabas de generar.
+13. Lanza un segundo deploy del servicio web para que tome las URLs actualizadas.
+14. Importa la base de datos en el servicio MySQL.
+15. Si importas datos o realizas cambios en variables o SQL que afecten la aplicación, lanza otro redeploy si es necesario.
 
-## Importar la base de datos
+## Importacion de base de datos
 
-Los SQL estan en `db/`:
+Los scripts SQL estan en `db/`:
 
 - `01_estructura.sql`: estructura de tablas.
+- `03_catalogos_ubicacion.sql`: catalogos de provincias y municipios.
 - `02_datos_prueba.sql`: datos de prueba.
-- `03_catalogos_ubicacion.sql`: catalogos de provincias/municipios.
 
 Orden recomendado:
 
@@ -195,7 +106,9 @@ Orden recomendado:
 2. `03_catalogos_ubicacion.sql`
 3. `02_datos_prueba.sql`
 
-Puedes importarlos desde un cliente MySQL conectado a Railway o desde las herramientas de datos que tengas disponibles en Railway.
+Puedes importarlos desde un cliente MySQL conectado a Railway o desde las herramientas de datos disponibles en Railway.
+
+Railway suele crear la base de datos con el nombre `railway`. Al ejecutar los scripts SQL en Railway, evita instrucciones como `CREATE DATABASE ...` o `USE ...`; ejecuta las tablas y datos directamente sobre la base seleccionada/conectada.
 
 ## Comprobaciones despues del deploy
 
@@ -209,7 +122,7 @@ Prueba estas rutas en el dominio publico:
 - `/api/provincias`
 - `/api/mascotas/recientes?limit=4`
 
-Luego prueba flujo real:
+Despues prueba los flujos principales:
 
 - registro;
 - login;
@@ -219,10 +132,12 @@ Luego prueba flujo real:
 - ver mapa;
 - recuperar contrasena.
 
-## Cosas a tener en cuenta
+## Problemas frecuentes
 
-- No subas valores reales en `railway.env.example` ni en `docker/env.example`.
-- Si cambias el dominio Railway, cambia tambien `APP_URL`, `FRONTEND_URL` y `CORS_ALLOWED_ORIGIN`.
-- Si decides separar frontend y backend en dos servicios distintos, habra que ajustar CORS y `window.MASCOTAS_API_BASE_URL`.
-- El envio de correo usa `mail()` en PHP. En Railway puede no ser suficiente para correo real; para produccion seria mejor usar SMTP externo o un proveedor transaccional.
-- Railway no usa `docker-compose.yml` como en local. Ese archivo queda para desarrollo local.
+- Si el frontend carga pero la API falla por CORS, revisa que `APP_URL`, `FRONTEND_URL` y `CORS_ALLOWED_ORIGIN` coincidan con el dominio publico actual.
+- Si el login o las rutas privadas fallan en produccion, comprueba que `JWT_SECRET` existe y tiene un valor largo y privado.
+- Si la app no conecta con MySQL, revisa las referencias `MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD` `MYSQLDATABASE` y `MYSQL_URL` en el panel de Railway.
+- Si las imagenes no se suben o no se muestran, comprueba las variables de Cloudinary.
+- Si una ruta funciona en Windows pero falla en Railway, revisa mayusculas y minusculas en nombres de archivos PHP. Railway corre sobre Linux y distingue `cors.php` de `Cors.php`.
+- Si cambias el dominio publico de Railway, actualiza tambien las variables de URL y lanza un redeploy.
+- No subas valores reales en `railway.env.example` ni en `.env`.

@@ -1,19 +1,23 @@
 export const authLoginHTML = `
     <div id="success-div"></div>
-    <div id="http-cat"></div>
+
     <div id="login-div">
         <div class="auth-buttons-section">
             <div class="init-btn-div"><button id="init-btn">INICIAR SESIÓN</button></div>
             <div class="register-btn-div"><button id="register-btn">REGISTRARSE</button></div>
         </div>
 
+        <http-cat style="display: none;"></http-cat>
+
         <div class="pet-auth-section" id="init-div">
             <form id="init">
                 <label for="auth-correo">Email</label>
                 <input type="text" id="auth-correo">
+                <span class="error-text" id="error-auth-correo"></span>
 
                 <label for="auth-pass">Contraseña</label>
                 <input type="password" id="auth-pass">
+                <span class="error-text" id="error-auth-pass"></span>
 
                 <div class="auth-form-buttons">
                     <button class="button-primary auth-btn" type="submit">ENTRAR</button>
@@ -24,22 +28,28 @@ export const authLoginHTML = `
         <div class="pet-auth-section" id="register-div">
             <form id="register">
                 <label for="register-name">Nombre</label>
-                <input type="text" id="register-name" required>
+                <input type="text" id="register-name">
+                <span class="error-text" id="error-register-name"></span>
 
                 <label for="register-surname">Apellidos</label>
                 <input type="text" id="register-surname">
+                <span class="error-text" id="error-register-surname"></span>
 
                 <label for="register-direction">Dirección</label>
                 <input type="text" id="register-direction">
+                <span class="error-text" id="error-register-direction"></span>
 
                 <label for="register-phone">Teléfono</label>
                 <input type="text" id="register-phone">
+                <span class="error-text" id="error-register-phone"></span>
 
                 <label for="register-correo">Email</label>
-                <input type="text" id="register-correo" required>
+                <input type="text" id="register-correo">
+                <span class="error-text" id="error-register-correo"></span>
 
                 <label for="register-pass">Contraseña</label>
-                <input type="password" id="register-pass" required>
+                <input type="password" id="register-pass">
+                <span class="error-text" id="error-register-pass"></span>
 
                 <div class="auth-form-buttons">
                     <button class="button-primary auth-btn" type="submit">REGISTRARME</button>
@@ -59,6 +69,7 @@ export const authLoginHTML = `
             <form id="forgot-pss">
                 <label for="forgot-correo">Email</label>
                 <input type="text" id="forgot-correo">
+                <span class="error-text" id="error-forgot-correo"></span>
 
                 <div class="auth-form-buttons"> 
                     <button class="button-primary auth-btn" type="submit">ENVIAR CONTRASEÑA NUEVA</button>

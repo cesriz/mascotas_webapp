@@ -83,15 +83,16 @@ export class AppNavbar extends HTMLElement {
     
     // Función para marcar el link según la vista activa
     updateActiveLinks() {
-        // Obtenemos la ruta actual (ej: "/Tablon.html")
+        // Obtenemos la ruta actual (ej: "/tablon.html")
         // Usamos decodeURI por si hay caracteres especiales y eliminamos barras iniciales
-        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-
+        const currentPath = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();;
         // Buscamos todos los enlaces dentro del componente
         const links = this.querySelectorAll('nav.navbar a');
 
         links.forEach(link => {
             // Obtenemos solo el nombre del archivo del atributo href
+            const href = link.getAttribute('href') || '';
+
             const linkPath = link.getAttribute('href').split('/').pop();
 
             // Comparamos y añadimos/quitamos la clase

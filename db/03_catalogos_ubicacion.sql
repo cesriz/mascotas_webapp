@@ -64,10 +64,8 @@ INSERT INTO provincias (codigo_ine, nombre) VALUES
 ('49', 'Zamora'),
 ('50', 'Zaragoza'),
 ('51', 'Ceuta'),
-('52', 'Melilla')
-AS nuevas_provincias
+('52', 'Melilla') AS nuevas_provincias
 ON DUPLICATE KEY UPDATE
-    nombre = VALUES(nombre);
     nombre = nuevas_provincias.nombre;
 
 -- =========================================
@@ -8235,15 +8233,17 @@ INSERT INTO tmp_municipios (cpro, codigo_ine, nombre) VALUES
 
 INSERT INTO municipios (provincia_id, codigo_ine, nombre)
 SELECT
-    p.id,
-    t.codigo_ine,
-    t.nombre
-FROM tmp_municipios t
-INNER JOIN provincias p ON p.codigo_ine = t.cpro
+    datos.provincia_id,
+    datos.codigo_ine,
+    datos.nombre
+FROM (
+    SELECT
+        p.id AS provincia_id,
+        t.codigo_ine,
+        t.nombre
+    FROM tmp_municipios t
+    INNER JOIN provincias p ON p.codigo_ine = t.cpro
+) AS datos
 ON DUPLICATE KEY UPDATE
-    provincia_id = VALUES(provincia_id),
-    nombre = VALUES(nombre);
-    provincia_id = p.id,
-    nombre = t.nombre;
-
-DROP TEMPORARY TABLE IF EXISTS tmp_municipios;
+    provincia_id = datos.provincia_id,
+    nombre = datos.nombre;

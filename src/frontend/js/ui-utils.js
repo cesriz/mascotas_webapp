@@ -81,3 +81,35 @@ export function addressAutocomplete(inputElement, resultsContainer, onSelect) {
         }
     });
 }
+
+
+/**
+ * Lógica para mostrar errores de validación en inputs
+ **/
+
+export function showInputError(scope, inputId, message) {
+    const input = scope.querySelector(`#${inputId}`);
+    const errorSpan = scope.querySelector(`#error-${inputId}`);
+
+    if (input && errorSpan) {
+        input.classList.add('is-invalid');
+        errorSpan.textContent = message;
+        errorSpan.classList.add('active');
+
+        // Limpiar error al escribir
+        input.addEventListener('input', () => {
+            input.classList.remove('is-invalid');
+            errorSpan.classList.remove('active');
+            errorSpan.textContent = '';
+        }, { once: true }); // Usamos once:true para que el event listener se limpie solo
+    }
+}
+
+// Lógica para limpiar todos los errores de validación de los inputs (útil al hacer submit o reset)
+export function clearInputErrors(scope) {
+    scope.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    scope.querySelectorAll('.error-text').forEach(el => {
+        el.classList.remove('active');
+        el.textContent = '';
+    });
+}

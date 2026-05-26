@@ -11,29 +11,45 @@ export const supportFormHTML = `
 
         <form id="form-support">
             <div class="support-form-inputs">
+                <div style="display: none">            
+                    <input type="number" id="support-user-id">
+                </div>
                 <div>            
                     <label for="support-subject">Asunto</label>
-                    <input type="text" id="support-subject" required>
+                    <input type="text" id="support-subject">
+                    <span class="error-text" id="error-support-subject"></span>
                 </div>
                 <div>            
                     <label for="support-category">Categoría</label>
-                    <input type="text" id="support-category" required>
+                    <select id="support-category">
+                        <!-- Opción por defecto vacía para forzar a elegir -->
+                        <option value="" disabled selected>Selecciona una opción...</option>
+                        
+                        <!-- Categorías principales -->
+                        <option value="tecnico">Problema técnico</option>
+                        <option value="dudas">Dudas sobre la web</option>
+                        <option value="sugerencia">Sugerencias e ideas de mejora</option>
+                    </select>
                 </div>
                 <div>            
                     <label for="support-msg">Mensaje</label>
-                    <textarea id="support-msg" placeholder="Escribe aquí tu mensaje..." required></textarea>
+                    <textarea id="support-msg" placeholder="Escribe aquí tu mensaje..."></textarea>
+                    <span class="error-text" id="error-support-msg"></span>
                 </div>
                 <div>            
                     <label for="support-name">Nombre</label>
-                    <input type="text" id="support-name" required>
+                    <input type="text" id="support-name">
+                    <span class="error-text" id="error-support-name"></span>
                 </div>
                 <div>            
                     <label for="support-email">Email</label>
-                    <input type="email" id="support-correo" required>
+                    <input type="email" id="support-correo">
+                    <span class="error-text" id="error-support-correo"></span>
                 </div>
                 <div>            
                     <label for="support-phone">Teléfono</label>
                     <input type="text" id="support-phone">
+                    <span class="error-text" id="error-support-phone"></span>
                 </div>
 
             </div>
@@ -52,6 +68,7 @@ export const supportFormHTML = `
 `;
 
 export const supportFormCSS = `
+    /* Contenedor principal*/
     support-form {
         display: none !important; /* Oculto por defecto hasta que se active */
     }
@@ -79,7 +96,23 @@ export const supportFormCSS = `
         border-radius: var(--radius-md);
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
-    
+
+    /* Ocultamos barra de desplazamiento */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Firefox */
+        support-form {
+            scrollbar-width: none;
+        }
+
+        /* IE y Edge antiguos */
+        support-form {
+            -ms-overflow-style: none;
+        }
+
+    /* Título */    
     .support-title {
         width: 100%;
         display: flex;
@@ -96,6 +129,7 @@ export const supportFormCSS = `
         height: 24px;
     }
 
+    /* Formulario */
     .support-form-inputs {
         display: flex;
         flex-direction: column; 
@@ -122,6 +156,7 @@ export const supportFormCSS = `
         resize: vertical;
     }
 
+    /* Selector de términos y condiciones */
     .privacy-input {
         display: flex;
         margin-top: 10px;
@@ -140,6 +175,7 @@ export const supportFormCSS = `
         text-decoration: underline;
     }
 
+    /* Botones */
     .support-buttons {
         width: 100%;
         display: flex;

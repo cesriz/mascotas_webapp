@@ -41,11 +41,8 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-    environment:
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
-      CLOUDINARY_FOLDER: ${CLOUDINARY_FOLDER:-mascotas_webapp}
+    env_file:
+      - ../.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -58,6 +55,8 @@ services:
       # Configuración opcional de Xdebug
       # Déjalo solo si existe docker/xdebug.ini
       - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     ports:
       - "3000:80"
 

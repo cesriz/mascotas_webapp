@@ -1,8 +1,10 @@
 import { API } from '../api.js';
 import { Auth } from '../auth.js';
-import { PetMap } from './petMap.js';
-import { showHttpError, showSuccess } from '../main.js';
 
+import { showInputError, clearInputErrors } from '../ui-utils.js';
+import { showSuccess, showHttpError } from '../main.js';
+
+import { PetMap } from './petMap.js';
 import { addressAutocomplete } from '../ui-utils.js';
 
 import { createTemplate } from "../ui-utils.js";
@@ -24,17 +26,19 @@ export class AvistamientoCreationForm extends HTMLElement {
         this._petId = value;
     }
 
+
+
     connectedCallback() {
         this.render();
     }
+
+
 
     render() {
         this.innerHTML = '';
         this.appendChild(template.content.cloneNode(true));
 
-        const overlay = this.querySelector('#a-panel-overlay');
         const form = this.querySelector('#avistamiento-form');
-        const btnReset = this.querySelector('#avistamiento-btn-reset');
 
         // Lógica para regisrar ubicaciones en el formulario
             const mapComponentForm = document.querySelector('#avistamiento-form-map');
@@ -43,74 +47,46 @@ export class AvistamientoCreationForm extends HTMLElement {
             const addressInput = this.querySelector('#avistamiento-form-loc');
             const searchBtn = this.querySelector('#avistamiento-search-btn');
 
-            // Activamos el modo registro cuando cargue el mapa
-            // Utilizamos una función propia de Leaflet
+            // Activamos el modo registro cuando cargue el mapa (usamos función de petMap.js)
             mapComponentForm.map.whenReady(() => {
                 mapComponentForm.initRegistrationMode();
             });
 
-            // Si el usuario mueve el marcador, obtenemos coordenadas
-            mapComponentForm.addEventListener('location-selected', async (e) => {
+            mapComponentForm.addEventListener('location-selected', (e) => {
+            this._currentLocationDetails = {
+                latitud: parseFloat(e.detail.lat),
+                longitud: parseFloat(e.detail.lng),
+                direccion_formateada: e.detail.direccion_formateada,
+                municipio: e.detail.municipio,
+                provincia: e.detail.provincia,
+                codigo_postal: e.detail.codigo_postal,
+                pais: e.detail.pais
+            };
 
-                const lat = e.detail.lat;
-                const lng = e.detail.lng;
-                
-                latInput.value = lat;
-                lngInput.value = lng;
-
-                try {
-                    // Llamamos a la API de Nominatim para obtener la dirección real de las coordenadas
-                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);                    
-                    const result = await response.json();
-
-                    if (result && result.address) {
-                        // Guardamos datos de la ubicación
-                        this._currentLocationDetails = {
-                            latitud: parseFloat(lat),
-                            longitud: parseFloat(lng),
-                            direccion_formateada: result.display_name,
-                            municipio: result.address.city || result.address.town || result.address.village || "No especificado",
-                            provincia: result.address.province || result.address.state || "No especificado",
-                            codigo_postal: result.address.postcode || "",
-                            pais: result.address.country || "España"
-                        };
-
-                        // Actualizamos el input de direcciones
-                        if (addressInput) {
-                            addressInput.value = result.display_name;
-                        }
-                        
-                        console.log("Datos de ubicación actualizados:", this._currentLocationDetails);
-                    }
-                } catch (error) {
-                    console.error("Error en geocodificación", error);
-                    // Respuesta en caso de error de red
-                    this._currentLocationDetails = {
-                        latitud: lat,
-                        longitud: lng,
-                        direccion_formateada: "Ubicación seleccionada en el mapa"
-                    };
-                }
-            });
+            // Actualizamos los inputs del formulario
+            if (latInput) latInput.value = e.detail.lat;
+            if (lngInput) lngInput.value = e.detail.lng;
+            if (addressInput) addressInput.value = e.detail.direccion_formateada;
+        });   
 
             // Uso del buscador por dirección (declarado en petMap.js)
             searchBtn.addEventListener('click', async () => {
                 const result = await mapComponentForm.searchAddress(addressInput.value);
                 console.log(result);
                 if (result) {
-                        this._currentLocationDetails = {
-                            latitud: parseFloat(result.lat),
-                            longitud: parseFloat(result.lon),
-                            direccion_formateada: result.displayName,
-                            municipio: result.address?.city || result.address?.town || result.address?.village || "No especificado",
-                            provincia: result.address?.province || result.address?.state || "No especificado",
-                            codigo_postal: result.address?.postcode || "00000",
-                            pais: result.address?.country || "España"
+                    this._currentLocationDetails = {
+                        latitud: result.latitud,
+                        longitud: result.longitud,
+                        direccion_formateada: result.direccion_formateada,
+                        municipio: result.municipio,
+                        provincia: result.provincia,
+                        codigo_postal: result.codigo_postal,
+                        pais: result.pais
                     };
                     
                     // Actualizamos los inputs ocultos por seguridad
-                    this.querySelector('#lat-input').value = result.lat;
-                    this.querySelector('#lng-input').value = result.lon;
+                    this.querySelector('#lat-input').value = result.latitud,
+                    this.querySelector('#lng-input').value = result.longitud
                 }
             });
 
@@ -122,51 +98,66 @@ export class AvistamientoCreationForm extends HTMLElement {
             addressAutocomplete(inputLoc, resultsContainer, (data) => {
                 if (mapComponent && mapComponent.map) {
                     mapComponent.map.setView([data.lat, data.lon], 16);
-                    if (mapComponent.marker) {
-                        mapComponent.marker.setLatLng([data.lat, data.lon]);
+                    if (mapComponent.registrationMarker) {
+                        mapComponent.registrationMarker.setLatLng([data.lat, data.lon]);
                     }
                 }
                 console.log("Dirección seleccionada:", data.address);
             });
 
-        // Lógica para registrar fotografías
+        // Lógica para registrar fotografías y previsualizarlas
             const fotoDiv = this.querySelector('.foto-div');
-            const fotoInput = this.querySelector('#avistamiento-foto');
-            const previewImg = this.querySelector('#preview-img');
+            const fotoInput = this.querySelector('#avistamiento-fotos');
+            const previewContainer = this.querySelector('#preview-container');
             const fileNameLabel = this.querySelector('#file-name-label');
+            const icon = this.querySelector('#upload-icon');
 
             fotoDiv.addEventListener('click', () => {
                 fotoInput.click();
             });
 
-            // Ver fotografía antes de enviarla (vista previa)
-            fotoInput.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                        previewImg.src = URL.createObjectURL(file);
-                        previewImg.style.display = 'block';
-                        
-                        // Cambiar el texto para dar feedback al usuario
-                        fileNameLabel.textContent = `Archivo seleccionado: ${file.name}`;
-                        
-                        // Ocultar el icono y el texto original para que se vea mejor la foto
-                        this.querySelector('#upload-icon').style.display = 'none';
+            if (fotoInput) {
+                fotoInput.onchange = (e) => {
+                    const files = e.target.files;
+                    previewContainer.innerHTML = '';
+
+                    if (files.length > 0) {
+                        // Ocultamos el icono y actualizamos el texto
+                        if (icon) icon.style.display = 'none';
+                        fileNameLabel.textContent = `${files.length} archivos seleccionados`;
+
+                        // Creamos la miniatura de cada archivo
+                        Array.from(files).forEach(file => {
+                            const reader = new FileReader();
+                            
+                            // Creamos un elemento imagen para cada archivo
+                            const img = document.createElement('img');
+                            img.src = URL.createObjectURL(file);
+                            
+                            // Añadimos la imagen al contenedor
+                            previewContainer.appendChild(img);
+                        });
+                    } else {
+                        // Si el usuario cancela o no elige nada, restauramos el estado inicial
+                        if (icon) icon.style.display = 'block';
+                        fileNameLabel.textContent = "Haz clic para seleccionar o arrastra imágenes";
                     }
                 };
-                
-                // Evitar que el clic en el input se propague (bucle infinito=
-                fotoInput.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
+            }
 
         // Cerrar formulario al pinchar fuera (overlay)
+        const overlay = this.querySelector('#a-panel-overlay');
         overlay.onclick = () => this.close();
 
         // Limpiar campos
+        const btnReset = this.querySelector('#avistamiento-btn-reset');
         btnReset.onclick = () => {
                 form.reset();
-                previewImg.style.display = 'none';
+                if (previewContainer) previewContainer.innerHTML = '';
                 this._currentLocationDetails = null;
+
+                const httpCat = this.querySelector('http-cat');
+                if (httpCat) httpCat.style.display = 'none';
             };
 
         // Envío del formulario
@@ -179,6 +170,7 @@ export class AvistamientoCreationForm extends HTMLElement {
     }
 
 
+
     // Lógica para cargar los datos del usuario autenticado en el formulario
         async loadUserData() {
             const user = Auth.getUserData();
@@ -188,36 +180,80 @@ export class AvistamientoCreationForm extends HTMLElement {
                 this.querySelector('#avistamiento-form-telefono').value = user.telefono || '';
             }
         }
-           
+     
+        
+
+    // Lógica para validar los datos antes de enviarlos
+        validateForm() {
+            clearInputErrors(this);
+            let isValid = true;
+
+            const email = this.querySelector('#avistamiento-form-email').value;
+            const telefono = this.querySelector('#avistamiento-form-telefono').value;
+            const dateVal = this.querySelector('#avistamiento-form-date').value;
+            const timeVal = this.querySelector('#avistamiento-form-time').value;
+            const address = this.querySelector('#avistamiento-form-loc').value;
+
+            // Teléfono (Obligatorio)
+            if (!telefono.trim()) {
+                showInputError(this, 'avistamiento-form-telefono', 'El teléfono es obligatorio para contactarte');
+                isValid = false;
+            }
+
+            // Email (Opcional, validamos formato)
+            if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showInputError(this, 'avistamiento-form-email', 'El formato del correo no es válido');
+                isValid = false;
+            }
+
+            // Ubicación
+            if (!address.trim() || !this._currentLocationDetails) {
+                showInputError(this, 'avistamiento-form-loc', 'Debes seleccionar una ubicación exacta en el mapa');
+                isValid = false;
+            }
+
+            // Fecha y Hora
+            if (!dateVal || !timeVal) {
+                showInputError(this, 'avistamiento-form-date', 'Indica la fecha y hora del avistamiento');
+                isValid = false;
+            } else {
+                const selectedDate = new Date(`${dateVal}T${timeVal}`);
+                if (selectedDate > new Date()) {
+                    showInputError(this, 'avistamiento-form-date', 'La fecha no puede ser posterior al momento actual.');
+                    isValid = false;
+                }
+            }
+            return isValid;
+        }
+
+
 
     // Lógica para enviar el formulario
         async sendMsg() {
             // Limpiamos posibles errores previos
+            clearInputErrors(this);
             const httpCat = document.querySelector('http-cat');
             if (httpCat) httpCat.style.display = 'none';
+            
 
             if (!this._petId) {
                 alert("Error: No se ha especificado la mascota.");
                 return;
             }
 
-            // Obtenemos valores del formulario
+            // Realizamos validaciones con el método de arriba
+            if (!this.validateForm()) {
+                    return; 
+                }
+
+            // Obtenemos datos ya validados
             const dateVal = this.querySelector('#avistamiento-form-date').value;
             const timeVal = this.querySelector('#avistamiento-form-time').value;
+            const selectedDateFormat = `${dateVal} ${timeVal}:00`; // Formateamos la fecha
 
-            // Validaciones básicas antes de enviar
-            if (!dateVal || !timeVal) {
-                alert("Por favor, indica la fecha y la hora del avistamiento.");
-                return;
-            }
-
-            if (!this._currentLocationDetails) {
-                alert("Primero busca una dirección en el mapa para obtener los datos de ubicación.");
-                return;
-            }
-
-            //Formateamos fecha_hora para el backend: "YYYY-MM-DD HH:mm:ss"
-            const fecha_hora = `${dateVal} ${timeVal}:00`;
+            // Aseguramos que tomamos los valores numéricos para latitud y longigud
+            const lat = parseFloat(this._currentLocationDetails?.latitud || this.querySelector('#lat-input').value);
+            const lng = parseFloat(this._currentLocationDetails?.longitud || this.querySelector('#lng-input').value);
 
             // Usamos FormData para poder enviar archivos (fotografía). El backend usa multipart
             const formData = new FormData();
@@ -226,36 +262,66 @@ export class AvistamientoCreationForm extends HTMLElement {
             formData.append('telefono', this.querySelector('#avistamiento-form-telefono').value);
             formData.append('correo', this.querySelector('#avistamiento-form-email').value);
             formData.append('descripcion', this.querySelector('#avistamiento-dsc').value);
-            formData.append('fecha_hora', fecha_hora); // La variable que calculamos antes
+            formData.append('fecha_hora', selectedDateFormat);
 
             // Campos de ubicación
-            formData.append('latitud', this._currentLocationDetails.latitud);
-            formData.append('longitud', this._currentLocationDetails.longitud);
-            formData.append('direccion_formateada', this._currentLocationDetails.direccion_formateada);
-            formData.append('municipio', this._currentLocationDetails.municipio);
-            formData.append('provincia', this._currentLocationDetails.provincia);
-            formData.append('codigo_postal', this._currentLocationDetails.codigo_postal);
-            formData.append('pais', this._currentLocationDetails.pais);
-            formData.append('ubicacion_descripcion', "Ubicación confirmada por el usuario");
+            formData.append('latitud', lat);
+            formData.append('longitud', lng);
 
-            // Añadimos foto
-            const fotoFile = this.querySelector('#avistamiento-foto').files[0];
-            if (fotoFile) {
-                formData.append('fotos', fotoFile);
-                console.log("Archivo adjuntado:", fotoFile.name);
+            if (this._currentLocationDetails) {
+                formData.append('direccion_formateada', this._currentLocationDetails.direccion_formateada);
+                formData.append('municipio', this._currentLocationDetails.municipio);
+                formData.append('provincia', this._currentLocationDetails.provincia);
+                formData.append('codigo_postal', this._currentLocationDetails.codigo_postal);
+                formData.append('pais', this._currentLocationDetails.pais);
+                formData.append('ubicacion_descripcion', "Ubicación confirmada por el usuario");
             }
+            
+            // Añadimos fotos
+            const fileInput = this.querySelector('#avistamiento-fotos');
+            const fileInputFiles = fileInput.files;
+            if (fileInput && fileInputFiles.length > 0) {
+                for (let i = 0; i < fileInputFiles.length; i++) {
+                        formData.append('fotos[]', fileInput.files[i]); 
+                    }
+            }
+            
+            // Seleccionamos botón de enviar
+            const submitBtn = this.querySelector('#avistamiento-btn-send');
+// FORZAR ERROR DE PRUEBA
+const email = this.querySelector('#avistamiento-form-email').value;
+if (email === 'test@gato.com') {
+    showHttpError({ 
+        code: 403, 
+        message: "No tienes permisos para editar este perfil.",
+        validationErrors: ["Tu sesión ha caducado", "Reintenta loguearte"]
+    }, this);
+    return; // Detiene el envío real
+}
 
             try {
+
+                // Iniciamos estado de espera (botón)
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Enviando..";
+
                 // Llamamos a la API pasando el FormData directamente
                 await API.crearAvistamiento(this._petId, formData);
-                showSuccess("¡Avistamiento registrado con éxito!");
-                setTimeout(() => this.close(), 2000); // Se cierra automáticamente tras 2s
+                showSuccess("¡Avistamiento registrado con éxito!", this);
+                setTimeout(() => this.close(), 3000); // Se cierra automáticamente tras 3s
                 
             } catch (error) {
-                console.error("Error al enviar el avistamiento:", error);
+                console.error("Error capturado en el componente:", error);
                 showHttpError(error, this);
+
+            } finally {
+                // Restauramos el botón
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Enviar";
             }
         }
+
+
 
     // Método para abrir el formulario
         open(petId) {
@@ -272,11 +338,16 @@ export class AvistamientoCreationForm extends HTMLElement {
             }
         }
 
+
+
     // Método para cerrar el formulario
         close() {
             this.classList.remove('is-visible');
             document.body.style.overflow = 'auto';
             this.querySelector('#avistamiento-form').reset();
+
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
         }
 }
 

@@ -1,4 +1,4 @@
-export const deleteConfirmHTML = `
+export const userDeleteConfirmHTML = `
     <div class="panel-overlay" id="a-panel-overlay"></div>
     <div class="delete-confirm">
         <div id="success-div"></div>
@@ -12,18 +12,18 @@ export const deleteConfirmHTML = `
                 <button class="button-secondary" id="btn-c-cancel">No, volver</button>
                 <button class="button-danger" id="btn-c-delete">Sí, estoy seguro</button>
             </div>
-            
+        
             <http-cat style="display: none;"></http-cat>
         </div>
     </div>
 `;
 
-export const deleteConfirmCSS = `
-    delete-confirm {
+export const userDeleteConfirmCSS = `
+    user-delete-confirm {
         display: none; /* Oculto por defecto hasta que se active */
     }
 
-    delete-confirm.is-visible {
+    user-delete-confirm.is-visible {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -40,7 +40,6 @@ export const deleteConfirmCSS = `
         width: min(500px, 70vw);
         max-height: 90vh;
         z-index: 1000;
-        overflow: hidden;
         padding: 2rem;
 
         display: flex; 

@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/AuthModel.php';
 require_once __DIR__ . '/../Helpers/JwtHelper.php';
+require_once __DIR__ . '/EmailService.php';
 
 class AuthService
 {
     private AuthModel $authModel;
+    private EmailService $emailService;
 
     public function __construct()
     {
         $this->authModel = new AuthModel();
+        $this->emailService = new EmailService();
     }
 
     // Login. Si la contraseña es correcta, genera y guarda un nuevo token.
@@ -93,65 +96,51 @@ class AuthService
         return $this->authModel->updateToken($usuarioId, null);
     }
 
-    public function forgotPassword(string $correo): array
+    // Genera token de recuperación, lo guarda hasheado y envía email real.
+    public function forgotPassword(string $correo): bool
     {
-        // Buscamos usuario
         $usuario = $this->authModel->findByEmail($correo);
 
-        // Si no existe o está inactivo
+        // No revelamos si el correo existe o no.
         if ($usuario === null || (int) $usuario['activo'] !== 1) {
-            return [
-                'reset_url' => null,
-                'token' => null
-            ];
+            return true;
         }
 
-        // Crear token real
         $plainToken = bin2hex(random_bytes(32));
-
-        // Hash para guardar en BD
         $tokenHash = hash('sha256', $plainToken);
-
-        // Caduca en 1 hora
         $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-        // Guardar token en tabla
         $this->authModel->createPasswordReset(
             (int) $usuario['id'],
             $tokenHash,
             $expiresAt
         );
 
-        // Crear URL
         $resetUrl = $this->buildResetUrl($plainToken);
 
-        // TEMPORAL para pruebas:
-        // devolvemos URL y token por JSON, no por correo
-        return [
-            'reset_url' => $resetUrl,
-            'token' => $plainToken
-        ];
+        return $this->emailService->sendPasswordResetEmail(
+            $usuario['correo'],
+            $usuario['nombre'] ?? '',
+            $resetUrl
+        );
     }
 
+    // Cambia la contraseña usando el token recibido desde el enlace del email.
     public function resetPassword(string $plainToken, string $newPassword): bool
     {
-        // Convertimos el token recibido al mismo hash que guardamos en BD
         $tokenHash = hash('sha256', $plainToken);
 
-        // Buscamos si existe, no está usado y no ha caducado
         $reset = $this->authModel->findValidPasswordReset($tokenHash);
 
         if ($reset === null) {
             return false;
         }
 
-        // Cambiamos contraseña
         $this->authModel->updatePasswordAndClearSessionToken(
             (int) $reset['usuario_id'],
             $newPassword
         );
 
-        // Marcamos token como usado
         $this->authModel->markPasswordResetAsUsed((int) $reset['id']);
 
         return true;
@@ -159,28 +148,9 @@ class AuthService
 
     private function buildResetUrl(string $plainToken): string
     {
-        $config = require __DIR__ . '/../Config/app.php';
-
-        $baseUrl = rtrim($config['frontend_url'] ?? 'http://localhost:4200', '/');
+        $baseUrl = getenv('FRONTEND_BASE_URL') ?: 'http://localhost:4200';
+        $baseUrl = rtrim($baseUrl, '/');
 
         return $baseUrl . '/reset-password?token=' . urlencode($plainToken);
-    }
-
-    private function sendPasswordResetEmail(string $correo, string $resetUrl): void
-    {
-        $config = require __DIR__ . '/../Config/app.php';
-
-        $subject = 'Recuperar contraseña';
-
-        $message = "Hola,\n\n"
-            . "Has solicitado recuperar tu contraseña.\n"
-            . "Pulsa este enlace para crear una nueva contraseña:\n"
-            . $resetUrl . "\n\n"
-            . "El enlace caduca en 1 hora.\n";
-
-        $from = $config['mail_from'] ?? 'no-reply@localhost';
-
-        // El @ evita que el proyecto reviente si mail() no está configurado en local
-        @mail($correo, $subject, $message, 'From: ' . $from);
     }
 }

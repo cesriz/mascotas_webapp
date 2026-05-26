@@ -194,6 +194,14 @@ export const API = {
         });
     },
 
+    // Borrar foto de una mascota asociada
+    deleteFotoMascota(id) {
+        return this.call(`/api/mascotas/fotos/${id}`, { 
+            method: 'DELETE', 
+            headers: this.getHeaders() 
+        });
+    },
+
     // Actualizar datos de una mascota existente
     updateMascota(id, data) {
         return this.call(`/api/mascotas/${id}`, {
@@ -229,6 +237,22 @@ export const API = {
         });
     },
 
+    // Eliminar foto de avistamiento
+    deleteFotoAvistamiento(id) {
+        return this.call(`/api/avistamientos/fotos/${id}`, { 
+            method: 'DELETE', 
+            headers: this.getHeaders() 
+        });
+    },
+
+    // Eliminar avistamiento
+    deleteAvistamiento(id) {
+        return this.call(`/api/avistamientos/${id}`, { 
+            method: 'DELETE', 
+            headers: this.getHeaders() 
+        });
+    },
+
     // Enviar un mensaje al usuario que publicó la mascota
     enviarContacto(idMascota, data) {
         return this.call(`/api/mascotas/${idMascota}/contactos`, {
@@ -248,11 +272,11 @@ export const API = {
     },
 
     // Enviar un mensaje de soporte 
-    crearSoporte(idUsuario, data) {
-        return this.call(`/api/mascotas/${idUsuario}/soporte`, {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: JSON.stringify(data)
+    crearSoporte(data) {
+        return this.call(`/api/soporte`, { 
+            method: 'POST', 
+            headers: this.getHeaders(), 
+            body: JSON.stringify(data),
         });
     },
 

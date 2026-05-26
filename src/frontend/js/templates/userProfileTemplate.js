@@ -1,5 +1,7 @@
 export const userProfileHTML = `
     <div id="success-div"></div>
+    <http-cat style="display: none;"></http-cat>
+    <user-delete-confirm id="delete-confirm"></user-delete-confirm>
     
     <form class="profile-section" id="profile-data-form">
         <div class="profile-data-title">
@@ -10,32 +12,37 @@ export const userProfileHTML = `
         <div class="profile-data-inputs personal">
             <div>            
                 <label for="profile-name">Nombre</label>
-                <input type="text" id="profile-name" required>
+                <input type="text" id="profile-name">
+                <span class="error-text" id="error-profile-name"></span>
             </div>
 
             <div>            
                 <label for="profile-surname">Apellidos</label>
                 <input type="text" id="profile-surname">
+                <span class="error-text" id="error-profile-apellidos"></span>
             </div>
 
             <div>            
                 <label for="profile-email">Email</label>
-                <input type="text" id="profile-email" required>
+                <input type="text" id="profile-email">
+                <span class="error-text" id="error-profile-email"></span>
             </div>
 
             <div>
                 <label for="profile-phone">Teléfono</label>
                 <input type="text" id="profile-phone">
+                <span class="error-text" id="error-profile-phone"></span>
             </div>
 
             <div>            
                 <label for="profile-direction">Dirección</label>
                 <input type="text" id="profile-direction">
+                <span class="error-text" id="error-profile-direction"></span>
             </div>
 
             <div>           
                 <label for="profile-register-date">Fecha de registro</label>
-                <input type="date" id="profile-register-date">
+                <input type="date" id="profile-register-date" readonly disabled>
             </div>
         </div>
 
@@ -55,17 +62,20 @@ export const userProfileHTML = `
         <div class="profile-data-inputs">
             <div>            
                 <label for="profile-pass">Contraseña actual</label>
-                <input type="password" id="profile-old-pass" required>
+                <input type="password" id="profile-old-pass">
+                <span class="error-text" id="error-profile-old-pass"></span>
             </div>
 
             <div>            
                 <label for="profile-newpass">Nueva contraseña</label>
                 <input type="password" id="profile-new-pass">
+                <span class="error-text" id="error-profile-new-pass"></span>
             </div>
 
             <div>            
                 <label for="profile-repeat-pass">Repite la contraseña</label>
-                <input type="password" id="profile-confirm-pass" required>
+                <input type="password" id="profile-confirm-pass">
+                <span class="error-text" id="error-profile-confirm-pass"></span>
             </div>
         </div>
 

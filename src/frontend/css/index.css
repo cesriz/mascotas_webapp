@@ -120,17 +120,12 @@
     font-weight: 900;
 }
 
-#happy-ed-tx button {
+#happy-ed-tx a {
     width: 50%;
     margin-top: 20px;
-    transition: transform 0.2s ease;
+    text-decoration: none;
 
 }
-
-#happy-ed-tx button:hover {  
-    transform: translateX(-2px) translateY(-2px);
-}
-
 
 /* -------- Tablet y móvil -------- */
 @media (max-width: 768px) {

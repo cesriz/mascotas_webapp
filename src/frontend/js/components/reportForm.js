@@ -1,6 +1,9 @@
 import { API } from '../api.js';
+import { Auth } from '../auth.js';
+
 import { showHttpError, showSuccess } from '../main.js';
-import { createTemplate } from "../ui-utils.js";
+import { createTemplate, showInputError, clearInputErrors } from "../ui-utils.js";
+
 import { reportFormHTML, reportFormCSS } from "../templates/reportFormTemplate.js";
 
 // Importamos plantilla (HTML y CSS)
@@ -33,14 +36,78 @@ export class ReportForm extends HTMLElement {
         bg.onclick = () => this.close();
 
         // Limpiar campos
-        btnReset.onclick = () => form.reset();
+        btnReset.onclick = () => {
+            form.reset();
+            const httpCat = this.querySelector('http-cat');
+            if (httpCat) httpCat.style.display = 'none';
+        };
 
         // Envío del formulario
         form.onsubmit = async (e) => {
             e.preventDefault();
             await this.sendReport();
         };
+
+        this.loadUserData();
     }
+
+
+
+    // Lógica para cargar los datos del usuario autenticado en el formulario
+    async loadUserData() {
+        const user = Auth.getUserData();
+        console.log(user);
+
+        if (user) {
+            this.querySelector('#report-name').value = `${user.nombre} ${user.apellidos}` || '';
+            this.querySelector('#report-correo').value = user.correo || '';
+            this.querySelector('#report-phone').value = user.telefono || '';
+        }
+    }
+
+    
+
+    // Lógica para validar datos antes de enviar el reporte
+    validateForm() {
+        clearInputErrors(this);
+        let isValid = true;
+
+        const asunto = this.querySelector('#report-subject').value;
+        const mensaje = this.querySelector('#report-msg').value;
+        const nombre = this.querySelector('#report-name').value;
+        const correo = this.querySelector('#report-correo').value;
+        
+        // Asunto
+        if (!asunto.trim()) {
+            showInputError(this, 'report-subject', 'El asunto es obligatorio');
+            isValid = false;
+        }
+
+        // Mensaje
+        if (!mensaje.trim()) {
+            showInputError(this, 'report-msg', 'Debes describir el motivo del reporte');
+            isValid = false;
+        }
+
+        // Nombre
+        if (!nombre.trim()) {
+            showInputError(this, 'report-name', 'El nombre es obligatorio');
+            isValid = false;
+        }
+
+        // Correo
+        if (!correo.trim()) {
+            showInputError(this, 'report-correo', 'El correo es obligatorio');
+            isValid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            showInputError(this, 'report-correo', 'El formato del correo no es válido');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+
 
     // Método para enviar el mensaje de reporte
     async sendReport() {
@@ -49,7 +116,12 @@ export class ReportForm extends HTMLElement {
         if (httpCat) httpCat.style.display = 'none';
 
         if (!this._petId) {
-            alert("Error: No se ha especificado el anuncio.");
+            showHttpError({ code: 400, message: "ID de mascota no válido" }, this);
+            return;
+        }
+
+        // Validamos datos
+        if (!this.validateForm()) {
             return;
         }
 
@@ -61,15 +133,23 @@ export class ReportForm extends HTMLElement {
             telefono: this.querySelector('#report-phone').value
         };
 
+        const submitBtn = this.querySelector('#report-btn-send');
+
         try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Enviando...";
+
             // Llamada a API
             await API.crearReporte(this._petId, data);
-            showSuccess("Reporte enviado correctamente");
-            setTimeout(() => this.close(), 2000); 
+            showSuccess("Reporte enviado correctamente", this);
+            setTimeout(() => this.close(), 3000); 
         
         } catch (error) {
-            console.error("Error al enviar reporte:", error);
             showHttpError(error, this);
+
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Enviar";
         }
     }
 
@@ -85,6 +165,15 @@ export class ReportForm extends HTMLElement {
         this.classList.remove('is-visible');
         document.body.style.overflow = 'auto';
         this.querySelector('#form-report').reset();
+
+        const httpCat = this.querySelector('http-cat');
+        if (httpCat) {
+            httpCat.style.display = 'none';
+            httpCat.removeAttribute('code');
+            httpCat.removeAttribute('message');
+            httpCat.removeAttribute('errors');
+        }
+
     }
 }
 

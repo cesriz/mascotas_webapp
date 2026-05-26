@@ -1,5 +1,5 @@
 import { API } from '../api.js';
-import { createTemplate } from "../ui-utils.js";
+import { createTemplate, initPasswordToggles } from "../ui-utils.js";
 import { resetPasswordHTML, resetPasswordCSS } from "../templates/resetPasswordTemplate.js";
 import { showSuccess, showHttpError } from "../main.js";
 
@@ -41,6 +41,9 @@ export class ResetPassword extends HTMLElement {
             passwordConfirmInput.disabled = true;
             return;
         }
+
+        // Mostrar y ocultar contraseña en el input (ui-utils)
+        initPasswordToggles(this);
 
         resetTokenInput.value = token;
 

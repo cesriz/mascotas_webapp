@@ -6,10 +6,18 @@ export const authResetHTML = `
             <input type="hidden" id="reset-token">
             
             <label for="new-pass">Nueva contraseña</label>
-            <input type="password" id="new-pass" required>
+            <div class="password-container">
+                <input type="password" id="new-pass">
+                <span class="toggle-pass"><img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña"></span>
+            </div>
+            <span class="error-text" id="error-new-pass"></span>            
 
             <label for="confirm-pass">Confirmar contraseña</label>
-            <input type="password" id="confirm-pass" required>
+            <div class="password-container">
+                <input type="password" id="confirm-pass">
+                <span class="toggle-pass"><img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña"></span>
+            </div>
+            <span class="error-text" id="error-password-confirm-pass"></span>
 
             <div class="auth-form-buttons"> 
                 <button class="button-primary auth-btn" type="submit">ACTUALIZAR CONTRASEÑA</button>

@@ -3,6 +3,9 @@ export const petDetailsHTML = `
     <recover-confirm id="recover-confirm"></recover-confirm>
     <qr-code id="qr"></qr-code>
 
+    <http-cat style="display: none;"></http-cat>
+    <div id="success-div"></div>
+
     <div class="pet-details-title"></div>
 
     <div class="pet-det-container">
@@ -31,13 +34,12 @@ export const petDetailsHTML = `
         <div class="pet-det-description" id="pet-det-description"></div>
 
         <div class="social-media">
-            <p>Un solo click puede traerlo de vuelta, ¡Ayúdanos compartiendo este anuncio!</p>
+            <p>Un solo click puede traerlo de vuelta, ¡Ayúdanos compartiendo!</p>
             <div class="social-media-div">
                 <img src="https://img.icons8.com/?size=100&id=118497&format=png&color=000000" alt="Facebook icon" id="facebook">
-                <img src="https://img.icons8.com/?size=100&id=32323&format=png&color=000000" alt="X icon" id="twitter">
-                <img src="https://img.icons8.com/?size=100&id=cMRBi0rI3iwb&format=png&color=000000" alt="Instagram icon" id="instagram">
-                <img src="https://img.icons8.com/?size=100&id=16713&format=png&color=000000" alt="Whatsapp icon" id="whastapp">
-                <img src="https://img.icons8.com/?size=100&id=63306&format=png&color=000000" alt="Telegram icon" id="telegram">        
+                <img src="https://img.icons8.com/?size=100&id=cMRBi0rI3iwb&format=png&color=000000" alt="Instagram icon" id="twitter">
+                <img src="https://img.icons8.com/?size=100&id=16713&format=png&color=000000" alt="Whatsapp icon" id="whatsapp">
+                <img src="https://img.icons8.com/?size=100&id=63306&format=png&color=000000" alt="Telegram icon" id="telegram">
             </div>
         </div>
         

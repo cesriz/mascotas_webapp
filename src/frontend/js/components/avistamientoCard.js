@@ -32,7 +32,6 @@ export class AvistamientoCard extends HTMLElement {
         this.appendChild(template.content.cloneNode(true));
 
         const avistamiento = this._avistamientoData;
-        console.log (avistamiento);
         const card = this.querySelector('.avistamiento-card');
 
         if (!card) {
@@ -57,7 +56,6 @@ export class AvistamientoCard extends HTMLElement {
         // Obtenemos los datos del usuario logueado desde Auth y comprobamos si es el dueño de la mascota
         const currentUser = Auth.getUserData(); 
         const isOwner = currentUser && currentUser.id === avistamiento.usuario_id;
-        console.log(isOwner);
 
         if (isOwner) {
             card.classList.add('is-owner');
@@ -66,15 +64,27 @@ export class AvistamientoCard extends HTMLElement {
             // Botones
             const btnDelete = this.querySelector('#btn-delete');
 
-            // Borrar anuncio de mascota
+            // Borrar avistamiento de mascota
             btnDelete.onclick = async (e) => {
                 e.stopPropagation();
 
                 const confirmPanel = this.querySelector('#delete-confirm');
 
                 if (confirmPanel) {
-                    confirmPanel.open(this._avistamientoData.id, 'avistamiento');                }
+                    confirmPanel.open(this._avistamientoData.id, 'avistamiento', this._avistamientoData.foto_avistamiento_id);                }
             };
+
+            // Borrar imagen de avistamiento de mascota
+            const photoDelete = this.querySelector('#btn-delete-photo');
+            photoDelete.addEventListener('click', async (e) => {
+                e.stopPropagation();
+
+                const confirmPanel = this.querySelector('#delete-confirm');
+                const photoId = this._avistamientoData.foto_avistamiento_id;
+
+                if (confirmPanel) 
+                    confirmPanel.open(null, 'foto', photoId); 
+            });
 
         } else {
             // Si no es el dueño, eliminamos el elemento del DOM por seguridad

@@ -4,10 +4,7 @@ export const avistamientoListHTML = `
     <http-cat style="display: none;"></http-cat>
 
     <div id="avistamientos-grid"></div>
-    
-    <div id="empty-msg" class="empty-state">
-        <p>No se encontraron mascotas en esta categoría.</p>
-    </div>
+    <div id="empty-state"></div>
 `;
 
 export const avistamientoListCSS = `
@@ -16,29 +13,44 @@ export const avistamientoListCSS = `
     }
     
     #avistamientos-grid {
+        width: 100%;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
         gap: 2rem;
         width: 100%;
     }
 
-    .empty-state {
+    #empty-state {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-align: center;
         padding: 3rem;
-        color: #666;
-        display: none;
+        gap: 1rem;
     }
 
-    .loading-text, .no-data-text, .error-text {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 40px;
-        font-size: var(--text-md, 1.1rem);
-        color: var(--text-color-muted, #757575);
+    #list-img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        margin-top: 1rem;
+        object-fit: cover;
+        border-radius: var(--radius-xl);
+        transition: transform 0.4s ease;
     }
 
-    .error-text {
-        color: var(--danger, #dc3545);
+    #list-img:hover {
+        animation: shake 0.6s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%   { transform: rotate(0deg); }
+        25%  { transform: rotate(10deg); }
+        50%  { transform: rotate(-10deg); }
+        75%  { transform: rotate(8deg); }
+        100% { transform: rotate(0deg); }
     }
 
 /* --------Tablets y móviles--------- */

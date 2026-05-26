@@ -34,7 +34,6 @@ export class AppAside extends HTMLElement {
 
         // Comprobamos el rol del usuario (auth.js)
         const isAdminRole = Auth.isAdmin()
-        console.log(isAdminRole);
         const adminPanel = this.querySelector('#admin-links');
         // Si el usuario tiene el rol de admin, mostramos el panel de administrador
         if (isAdminRole) {

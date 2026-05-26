@@ -3,7 +3,7 @@ import { Auth } from '../auth.js';
 
 import { showSuccess, showHttpError } from "../main.js";
 import { userDeleteConfirm } from './userDeleteConfirm.js';
-import { showInputError, clearInputErrors, createTemplate } from "../ui-utils.js";
+import { showInputError, clearInputErrors, createTemplate, initPasswordToggles } from "../ui-utils.js";
 import { userProfileHTML, userProfileCSS } from "../templates/userProfileTemplate.js";
 
 // Creamos la plantilla a partir del HTML y CSS importados
@@ -29,6 +29,8 @@ export class UserProfile extends HTMLElement {
 
     render() {
         this.innerHTML = template.innerHTML;
+        // Mostrar y ocultar contraseña en el input (ui-utils)
+        initPasswordToggles(this);
     }
 
     /**

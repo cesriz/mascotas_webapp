@@ -8,7 +8,7 @@ export const appFooterHTML = `
         <p id="footer-names">César Ruiz | Steeven Ordoñez | Vanesa Sánchez</p>    
             
         <div class="footer-links">
-            <a href="Term.html">Términos de uso</a> - <a href="Privacidad.html">Política de privacidad</a>
+            <a href="terms.html">Términos de uso - Política de privacidad</a>
         </div>
     </footer>
 `;

@@ -45,7 +45,6 @@ export class SupportForm extends HTMLElement {
     // Lógica para cargar los datos del usuario autenticado en el formulario
     async loadUserData() {
         const user = Auth.getUserData();
-        console.log(user);
 
         if (user) {
             this.querySelector('#support-user-id').value = user.id || '';

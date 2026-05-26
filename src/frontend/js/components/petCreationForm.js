@@ -71,7 +71,6 @@ export class PetCreationForm extends HTMLElement {
         // Seleccionamos elementos del DOM
         const checkbox = this.querySelector('#pet-create-estado');
         if (!checkbox) return;
-        console.log('ESTado', estado);
         // Marcamos el switch según el estado que le pasemos
         if (estado === 'encontrada' || estado === 'ENCONTRADA') {
             checkbox.checked = true;
@@ -342,8 +341,6 @@ export class PetCreationForm extends HTMLElement {
                 pais: e.detail.pais
             };
 
-            console.log ('Location-selected:', this._currentLocationDetails);
-
             // Actualizamos los inputs del formulario
             if (latInput) latInput.value = e.detail.lat;
             if (lngInput) lngInput.value = e.detail.lng;
@@ -356,7 +353,6 @@ export class PetCreationForm extends HTMLElement {
 
             if (result) { 
                 this._currentLocationDetails = result;
-                console.log ('Location-direccion:', this._currentLocationDetails);
 
                 // Actualizamos los inputs ocultos
                 if (latInput) latInput.value = result.latitud;
@@ -612,7 +608,6 @@ export class PetCreationForm extends HTMLElement {
             if (this.querySelector('#upload-icon')) this.querySelector('#upload-icon').style.display = 'block';
             
         } catch (error) {
-            console.error("Error al crear mascota:", error);
             showHttpError(error, this);
             httpCat?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -672,9 +667,7 @@ export class PetCreationForm extends HTMLElement {
             return await API.subirFotosMascota(id, formData);
             
         } catch (error) {
-            console.error("Error al subir las fotos:", error);
-            // OPCIONAL: MOSTRAR ERROR AL USUARIO
-            // showHttpError(error, this);
+            showHttpError(error, this);
         }
     }
 
@@ -858,7 +851,6 @@ export class PetCreationForm extends HTMLElement {
             showSuccess("¡Anuncio actualizado con éxito!");
 
         } catch (error) {
-            console.error("Error al actualizar mascota:", error);
             showHttpError(error, this);
             httpCat?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 

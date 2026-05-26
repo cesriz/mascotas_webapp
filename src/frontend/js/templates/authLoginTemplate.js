@@ -1,13 +1,12 @@
 export const authLoginHTML = `
     <div id="success-div"></div>
+    <http-cat style="display: none;"></http-cat>
 
     <div id="login-div">
         <div class="auth-buttons-section">
             <div class="init-btn-div"><button id="init-btn">INICIAR SESIÓN</button></div>
             <div class="register-btn-div"><button id="register-btn">REGISTRARSE</button></div>
         </div>
-
-        <http-cat style="display: none;"></http-cat>
 
         <div class="pet-auth-section" id="init-div">
             <form id="init">
@@ -16,7 +15,12 @@ export const authLoginHTML = `
                 <span class="error-text" id="error-auth-correo"></span>
 
                 <label for="auth-pass">Contraseña</label>
-                <input type="password" id="auth-pass">
+                <div class="password-container">
+                    <input type="password" id="auth-pass">
+                    <span class="toggle-pass">
+                        <img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña">
+                    </span>
+                </div>
                 <span class="error-text" id="error-auth-pass"></span>
 
                 <div class="auth-form-buttons">
@@ -48,8 +52,16 @@ export const authLoginHTML = `
                 <span class="error-text" id="error-register-correo"></span>
 
                 <label for="register-pass">Contraseña</label>
-                <input type="password" id="register-pass">
+                <div class="password-container">
+                    <input type="password" id="register-pass">
+                    <span class="toggle-pass"><img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña"></span>
+                </div>
                 <span class="error-text" id="error-register-pass"></span>
+
+                <label class="privacy-input">
+                <input type="checkbox" id="privacy-check" required>
+                <span>Mediante el envío de mis datos confirmo que he leído y acepto la <a href="terms.html" target="_blank">política de privacidad</a>.</span>
+                </label>
 
                 <div class="auth-form-buttons">
                     <button class="button-primary auth-btn" type="submit">REGISTRARME</button>

@@ -6,10 +6,18 @@ export const resetPasswordHTML = `
         <div class="reset-body-section">
             <form id="reset-pss">
                 <label for="password">Nueva contraseña</label>
-                <input type="password" id="password">
+                <div class="password-container">
+                    <input type="password" id="password">
+                    <span class="toggle-pass"><img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña"></span>
+                </div>
+                <span class="error-text" id="error-password"></span>
 
                 <label for="password-confirm">Repetir contraseña</label>
-                <input type="password" id="password-confirm">
+                <div class="password-container">
+                    <input type="password" id="password-confirm">
+                    <span class="toggle-pass"><img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña"></span>
+                </div>
+                <span class="error-text" id="error-password-confirm"></span>
 
                 <div class="hidden">
                     <input type="hidden" id="reset-token">

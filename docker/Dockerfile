@@ -40,4 +40,4 @@ RUN sed -i 's/\r$//' /usr/local/bin/start-apache \
 EXPOSE 80
 
 # Railway puede inyectar PORT. Si no existe, Apache se queda en el puerto 80.
-CMD ["bash", "-lc", "a2dismod mpm_event mpm_worker || true && a2enmod mpm_prefork && apache2-foreground"]
+CMD ["start-apache"]

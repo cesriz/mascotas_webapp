@@ -81,7 +81,7 @@ Para recuperacion de contrasena y envio de correo, configura tambien las variabl
 3. Anade un servicio MySQL al proyecto.
 4. Anade un servicio web desde el repositorio GitHub.
 5. Selecciona la rama que contiene la configuracion de Railway.
-6. En el servicio web, entra en `Settings/Build/Builder` y selecciona la opcion `Dockerfile`.
+6. En el servicio web, entra en `Settings/Build/Builder`, selecciona la opcion `Dockerfile` y la ruta `/docker/Dockerfile`.
 7. En `Settings/Config-as-code/Railway Config File`, selecciona `/railway.json`.
 8. Configura las variables de entorno del servicio web usando `railway.env.example` como referencia. En este primer paso, puedes dejar `APP_URL`, `FRONTEND_URL` y `CORS_ALLOWED_ORIGIN` con valores temporales o vacíos, ya que el dominio público aún no se ha generado. Asegúrate de configurar `JWT_SECRET`, las variables de Cloudinary y SMTP.
 9. Lanza el primer deploy del servicio web. Este despliegue inicial es necesario para que Railway provisione el servicio y permita la generación del dominio.

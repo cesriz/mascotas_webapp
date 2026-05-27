@@ -8,7 +8,7 @@ use Firebase\JWT\Key;
 class JwtHelper
 {
     // Solo para desarrollo local. En produccion debe venir de JWT_SECRET.
-    private const DEFAULT_SECRET_KEY = 'local-development-jwt-secret-change-me';
+    private const DEFAULT_SECRET_KEY = 'mascotas_webapp_clave_super_secreta_2026_token_jwt_larga_y_segura_123456789';
 
     // Algoritmo usado para firmar.
     private const ALGORITHM = 'HS256';

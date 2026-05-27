@@ -57,6 +57,183 @@ body {
 
 }
 
+a {
+    text-underline-offset: 0.18em;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--secondary500);
+    outline-offset: 3px;
+}
+
+.btn-accesibilidad {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 auto;
+    padding: 0;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background-color: #3089b6;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-accesibilidad img {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+.btn-accesibilidad:hover,
+.btn-accesibilidad:focus-visible {
+    background-color: #004d73;
+    transform: scale(1.08);
+}
+
+body.alto-contraste {
+    --background: #F5F5F5;
+    --inputbackground: #ffffff;
+    --backgroundorange: #fff5db;
+    --backgroundblue: #e9f7ff;
+    --primary: #b84e00;
+    --primary300: #7f3700;
+    --secondary: #99d0ee;
+    --secondary500: #004d73;
+    --danger: #b00020;
+    --warning: #6f5600;
+    --success: #006b45;
+    --disabled: #55585c;
+    --shadow-button: none;
+    --shadow-soft: none;
+    --shadow-default: none;
+    --shadow-sharp: none;
+    color: #111111;
+    line-height: 1.6;
+}
+
+body.alto-contraste a {
+    color: #004d73;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+body.alto-contraste a:hover,
+body.alto-contraste a:focus-visible {
+    color: #7f3700;
+}
+
+body.alto-contraste .navbar a,
+body.alto-contraste .navbar a.active {
+    color: #004d73;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+body.alto-contraste .navbar a:hover,
+body.alto-contraste .navbar a.active:hover {
+    color: #7f3700;
+    border-bottom-color: #7f3700;
+}
+
+body.alto-contraste button,
+body.alto-contraste .button-primary,
+body.alto-contraste .button-secondary,
+body.alto-contraste .button-success,
+body.alto-contraste .button-danger {
+    box-shadow: none;
+    min-height: 44px;
+}
+
+body.alto-contraste .btn-accesibilidad {
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+body.alto-contraste .button-primary {
+    background-color: #b84e00;
+    border-color: #7f3700;
+    color: #ffffff;
+}
+
+body.alto-contraste .button-secondary {
+    background-color: #ffffff;
+    border-color: #7f3700;
+    color: #7f3700;
+}
+
+body.alto-contraste .button-success {
+    border-color: #006b45;
+    color: #006b45;
+}
+
+body.alto-contraste .button-danger {
+    border-color: #b00020;
+    color: #b00020;
+}
+
+body.alto-contraste input,
+body.alto-contraste select,
+body.alto-contraste textarea {
+    border: 2px solid #55585c;
+    color: #111111;
+}
+
+body.alto-contraste input:focus,
+body.alto-contraste select:focus,
+body.alto-contraste textarea:focus {
+    box-shadow: none;
+}
+
+body.alto-contraste .btn-accesibilidad {
+    background-color: #db5d01;
+    border-color: #111111;
+}
+
+body.alto-contraste a,
+body.alto-contraste button,
+body.alto-contraste .button-primary,
+body.alto-contraste .button-secondary,
+body.alto-contraste .button-success,
+body.alto-contraste .button-danger,
+body.alto-contraste .logo-img,
+body.alto-contraste .logo-text,
+body.alto-contraste .text-orange,
+body.alto-contraste #main-content > * {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+body.alto-contraste a:focus-visible,
+body.alto-contraste button:focus-visible,
+body.alto-contraste input:focus-visible,
+body.alto-contraste select:focus-visible,
+body.alto-contraste textarea:focus-visible,
+body.alto-contraste [tabindex]:focus-visible {
+    outline: 4px solid #111111;
+    outline-offset: 4px;
+}
+
 /* Clase para ocultar componentes */
 .hidden {
     display: none !important;
@@ -524,6 +701,29 @@ label + input,select {
 @media (max-width: 480px) {
     body {
         padding: 0 8px;
+    }
+
+    .btn-accesibilidad {
+        right: 14px;
+        bottom: 14px;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        max-width: 44px;
+        min-height: 44px;
+        max-height: 44px;
+    }
+
+    body.alto-contraste .btn-accesibilidad {
+        min-width: 44px;
+        max-width: 44px;
+        min-height: 44px;
+        max-height: 44px;
+    }
+
+    .btn-accesibilidad img {
+        width: 24px;
+        height: 24px;
     }
 
     input, select {

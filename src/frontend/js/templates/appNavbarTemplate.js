@@ -14,8 +14,8 @@ export const navBarHTML = `
             </div>
 
             <!-- Botón hamburguesa -->
-            <button class="hamburger-btn" id="hamburger-btn">
-                <img src="../assets/icons/material-symbols--menu-rounded.svg" alt="Menu burger">
+            <button class="hamburger-btn" id="hamburger-btn" type="button" aria-label="Abrir menu de navegacion" aria-controls="navbar" aria-expanded="false">
+                <img src="../assets/icons/material-symbols--menu-rounded.svg" alt="" aria-hidden="true">
             </button>
         </div>
         <nav class="navbar" id="navbar">
@@ -29,7 +29,11 @@ export const navBarHTML = `
                 <button class="button-primary" id="mobile-btn-publicar"> PUBLICAR ANUNCIO </button>
             </div>
         </nav>
-    </div> 
+    </div>
+
+    <button class="btn-accesibilidad" id="btn-contraste" type="button" aria-pressed="false" aria-label="Activar modo de alto contraste" title="Activar modo de alto contraste">
+        <img src="../assets/icons/Accessibility_logo.svg" alt="" aria-hidden="true">
+    </button>
 `;
 
 export const navBarCSS = `
@@ -48,6 +52,8 @@ export const navBarCSS = `
 
         .row-top {
             display: flex;
+            align-items: center;
+            flex-wrap: wrap;
             justify-content: space-between;
             padding: 0.75rem 2rem;
             border-bottom: 1px solid #f0f0f0;
@@ -58,7 +64,9 @@ export const navBarCSS = `
             display: flex;
             align-items: center;
             text-decoration: none;
-            gap: 2px;
+            gap: 6px;
+            flex: 0 0 auto;
+            min-width: max-content;
         }
 
             .logo-img {
@@ -94,10 +102,24 @@ export const navBarCSS = `
 
         .nav-btn {
             display:flex;
+            align-items: center;
+            justify-content: flex-end;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
-            
+
+        #desktop-btn {
+            flex: 1 1 280px;
+        }
+
+        .nav-btn button {
+            white-space: nowrap;
+        }
+
+        body.alto-contraste .row-top {
+            gap: 1rem 1.25rem;
+        }
+
         .hamburger-btn {
             display: none;
             background: none;
@@ -136,7 +158,7 @@ export const navBarCSS = `
                 color: var(--primary);
                 font-weight: bold;
                 border-bottom: 2px solid var(--primary);
-                transition: all 0.2s ease;
+                transition: all 0.5s ease;
             }
 
             .navbar a.active:hover {
@@ -164,20 +186,34 @@ export const navBarCSS = `
     @media (max-width: 768px) {
         .navbar {
             flex-direction: column;
-            height: 0;
+            height: auto;
+            max-height: 0;
             overflow: hidden;
-            transition: all 0.5s ease;
             gap: 1rem;
+            padding: 0;
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+            transition:
+                max-height 0.35s ease,
+                opacity 0.25s ease,
+                transform 0.25s ease,
+                padding 0.25s ease;
         }
 
         .navbar.active {
-            height: auto;
+            max-height: 420px;
             padding: 1rem 0;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .row-top {
             flex-direction: column;
+            align-items: stretch;
             gap: 1rem;
+            position: relative;
         }
 
         .nav-btn {
@@ -199,11 +235,14 @@ export const navBarCSS = `
         .hamburger-btn {
             display: block;
             position: absolute;
-            transform: translate(0px, 5px);
+            top: 1rem;
+            left: 1rem;
+            transform: none;
         }
 
         .logo {
-            transform: translate(30px, 0px);
+            align-self: center;
+            transform: none;
         }
 
         #mobile-btn {
@@ -224,7 +263,9 @@ export const navBarCSS = `
         .hamburger-btn {
             display: block;
             position: absolute;
-            transform: translate(0px, 5px);
+            top: 1rem;
+            left: 0.75rem;
+            transform: none;
         }
     }      
 `;

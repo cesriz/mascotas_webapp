@@ -6,6 +6,8 @@ import { navBarHTML, navBarCSS } from "../templates/appNavbarTemplate.js";
 
 // Importamos plantilla (HTML y CSS)
 const template = createTemplate(navBarHTML, navBarCSS);
+const ACCESSIBILITY_STORAGE_KEY = 'mp_accessibility_mode';
+const ACCESSIBILITY_CLASS = 'alto-contraste';
 
 export class AppNavbar extends HTMLElement {
     constructor() {
@@ -13,6 +15,7 @@ export class AppNavbar extends HTMLElement {
     }
 
     connectedCallback() {
+        this.restoreAccessibilityMode();
         this.render();
     }
 
@@ -42,16 +45,23 @@ export class AppNavbar extends HTMLElement {
         const mobileBtnAuth = this.querySelector('#mobile-btn-auth');
         this.setupAuthButton(mobileBtnAuth, isLoggedIn); 
 
+        this.querySelectorAll('.btn-accesibilidad').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.setAccessibilityMode(!this.isAccessibilityModeEnabled());
+            });
+        });
+        this.updateAccessibilityButtons();
 
         // Lógica para el botón publicar
-        const publishBtn = this.querySelector('#btn-publish');
-        publishBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Evita cualquier recarga accidental
-            if (isLoggedIn) {
-                window.location.href = 'perfil?panel=publicar';
-            } else {
-                window.location.href = 'login.html';
-            }
+        this.querySelectorAll('#btn-publish, #mobile-btn-publicar').forEach(publishBtn => {
+            publishBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Evita cualquier recarga accidental
+                if (isLoggedIn) {
+                    window.location.href = 'perfil?panel=publicar';
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
         });
 
         // Lógica para el menú de hamburguesa en tablet/móvil
@@ -61,16 +71,22 @@ export class AppNavbar extends HTMLElement {
 
         if (burgerBtn && navbar) {
             burgerBtn.addEventListener("click", () => {
-                navbar.classList.toggle("active");
+                const isOpen = navbar.classList.toggle("active");
+                burgerBtn.setAttribute('aria-expanded', String(isOpen));
+                burgerBtn.setAttribute(
+                    'aria-label',
+                    isOpen ? 'Cerrar menu de navegacion' : 'Abrir menu de navegacion'
+                );
                 navBtns.forEach(btn => {
                     btn.classList.toggle("active");
                 });
             });
+        }
 
         // Declarada abajo
         this.updateActiveLinks();
     }
-}
+
     // Función para cambiar el contenido y la funcionalidad de un botón según autenticación de usuario
     setupAuthButton(btn, isLoggedIn) {
         if (!btn) return;                
@@ -101,6 +117,47 @@ export class AppNavbar extends HTMLElement {
             } else {
                 link.classList.remove('active');
             }
+        });
+    }
+
+    restoreAccessibilityMode() {
+        try {
+            const storedValue = localStorage.getItem(ACCESSIBILITY_STORAGE_KEY);
+            document.body.classList.toggle(ACCESSIBILITY_CLASS, storedValue === 'true');
+        } catch (error) {
+            console.warn('No se pudo recuperar la preferencia de accesibilidad:', error);
+        }
+    }
+
+    isAccessibilityModeEnabled() {
+        return document.body.classList.contains(ACCESSIBILITY_CLASS);
+    }
+
+    setAccessibilityMode(isEnabled) {
+        document.body.classList.toggle(ACCESSIBILITY_CLASS, isEnabled);
+
+        try {
+            localStorage.setItem(ACCESSIBILITY_STORAGE_KEY, String(isEnabled));
+        } catch (error) {
+            console.warn('No se pudo guardar la preferencia de accesibilidad:', error);
+        }
+
+        this.updateAccessibilityButtons();
+    }
+
+    updateAccessibilityButtons() {
+        const isEnabled = this.isAccessibilityModeEnabled();
+
+        this.querySelectorAll('.btn-accesibilidad').forEach(btn => {
+            btn.setAttribute('aria-pressed', String(isEnabled));
+            btn.setAttribute(
+                'aria-label',
+                isEnabled ? 'Desactivar modo de alto contraste' : 'Activar modo de alto contraste'
+            );
+            btn.setAttribute(
+                'title',
+                isEnabled ? 'Desactivar modo de alto contraste' : 'Activar modo de alto contraste'
+            );
         });
     }
 }

@@ -11,6 +11,9 @@ export const reportFormHTML = `
 
         <form id="form-report">
             <div class="report-form-inputs">
+                <div style="display: none">            
+                    <input type="number" id="report-user-id">
+                </div>
                 <div>            
                     <label for="report-subject">Asunto</label>
                     <input type="text" id="report-subject">

@@ -16,7 +16,6 @@ export class QRCodeComponent extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        window.addEventListener('resize', () => this.generate());
     }
 
     render() {
@@ -35,7 +34,7 @@ export class QRCodeComponent extends HTMLElement {
         if (qrImgContainer) {
             qrImgContainer.innerHTML = "";
             // Usamos 'new window.QRCode' para asegurar que llamamos a la librería y no a la clase de este archivo
-            const size = Math.min(window.innerWidth * 0.5, 200); // Establecemos un tamaño responsive para el QR
+            const size = this.getQRSize();
 
             new window.QRCode(qrImgContainer, {
                 text: window.location.href,
@@ -48,16 +47,28 @@ export class QRCodeComponent extends HTMLElement {
         }
     }
     
-    // Método para abrir el modal
+    // Método para abrir el modal y generar el QR
     open() {
         this.classList.add('is-visible');
         document.body.style.overflow = 'hidden';
+        requestAnimationFrame(() => {
+            this.generate();
+        });
     }
 
     // Método para cerrar el modal
     close() {
         this.classList.remove('is-visible');
         document.body.style.overflow = 'auto';
+    }
+
+    // Método para ajustar tamaño según el div que lo contiene
+    getQRSize() {
+        const width = window.innerWidth;
+
+        if (width < 480) return 100;
+        if (width < 768) return 180;
+        if (width > 768) return 200;
     }
 }
 

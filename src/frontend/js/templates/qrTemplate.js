@@ -43,9 +43,13 @@ export const qrCSS = `
     }
 
     #qrcode {
-        width: 80%;
+        width:80%;
         max-width: 300px;
-        padding: 2.5rem;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 300px;
+        padding: 1rem;
         border: 2px dashed var(--primary);
         border-radius: var(--radius-sm);
     }
@@ -58,25 +62,15 @@ export const qrCSS = `
                 width: min(420px, 85vw);
                 padding: 1.5rem;
             }
-
-            #qrcode {
-                width: 75%;
-            }
         }
     
 
     @media (max-width: 480px) {
         #qr-div {
                 width: 92vw;
-                padding: 1.25rem;
+                padding: 1rem;
                 gap: 0.75rem;
-                border-radius: 12px;
             }
-
-        #qrcode {
-            width: 70%;
-            max-width: 240px;
-        }
 
         qr-code.is-visible {
             padding: 0.75rem;

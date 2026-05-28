@@ -15,6 +15,11 @@ export const petMapCSS = `
     }
 
     /* Card del avistamiento */
+
+    .leaflet-popup-content-wrapper {
+        max-width: 300px;
+    }
+
     .map-popup-card {
         position: relative;
         background-color: var(--inputbackground);
@@ -30,8 +35,10 @@ export const petMapCSS = `
         gap: 10px;
         padding: 20px 10px;
         width: 100%;
-        max-width: 300px;
         cursor: pointer;
+
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     /* Imagen del avistamiento */
@@ -41,7 +48,6 @@ export const petMapCSS = `
         max-height: 200px;
         border-radius: var(--radius-sm);
         object-fit: cover;
-        transition: transform 0.3s ease;
     }
 
     /* Datos del avistamiento */
@@ -99,6 +105,7 @@ export const petMapCSS = `
             opacity: 1;
         }
 
+
     /* -------- Tablet y móvil -------- */
     @media (max-width: 768px) {
 
@@ -107,17 +114,24 @@ export const petMapCSS = `
         }
 
         .map-popup-card {
-            max-width: 100%;
             padding: 15px;
         }
 
         .map-popup-card > img:first-child {
-            max-height: 180px; /* 🔧 más compacta */
+            max-height: 180px;
         }
 
         .map-popup-info,
         .map-popup-contact {
             width: 100%;
+        }
+
+        .leaflet-popup-content-wrapper {
+            max-width: 300px;
+        }
+        
+        .leaflet-popup-content {
+            max-width: 300px;
         }
     }
 
@@ -128,7 +142,7 @@ export const petMapCSS = `
         }
 
         .map-popup-card {
-            padding: 12px;
+            padding: 8px;
             gap: 8px;
         }
 
@@ -147,5 +161,16 @@ export const petMapCSS = `
         .map-popup-contact img {
             width: 16px;
             height: 16px;
-        }   
+        }  
+
+        .leaflet-popup-content-wrapper {
+            max-width: 200px;
+            padding: 0;
+        }
+        
+        .leaflet-popup-content {
+            max-width: 150px;
+            padding: 2px;
+            margin: 2px;
+        }
 `;

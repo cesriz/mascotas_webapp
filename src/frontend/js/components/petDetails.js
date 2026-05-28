@@ -135,16 +135,25 @@ export class PetDetail extends HTMLElement {
         const birthDate = this.petData.fecha_nacimiento;
         const age = birthDate ? `${new Date().getFullYear() - new Date(birthDate).getFullYear()} años` : 'Desconocida';
 
+        // Tamaño
+        const size = this.petData.tamano.toLowerCase().charAt(0).toUpperCase() + this.petData.tamano.toLowerCase().slice(1);
+        let formatSize;
+        if (size == 'Pequeno') formatSize = 'Pequeño'
+        else formatSize = size;
+
+        // Sexo (formateo)
+        const sex = this.petData.sexo.toLowerCase().charAt(0).toUpperCase() + this.petData.sexo.toLowerCase().slice(1);
+
         // Resto de datos
         const info = [
             `<strong>Especie:</strong> ${this.petData.especie_nombre || 'Desconocida'}`,
             `<strong>Raza:</strong> ${this.petData.raza_nombre || 'Desconocida'}`,
-            `<strong>Sexo:</strong> ${(this.petData.sexo || '').toLowerCase() || 'Desconocido'}`,
-            `<strong>Edad:</strong> ${age}`,
-            `<strong>Tamaño:</strong> ${(this.petData.tamano || '').toLowerCase() || 'Desconocido'} `,
+            `<strong>Sexo:</strong> ${sex || 'Desconocido'}`,
+            `<strong>Edad:</strong> ${age || 'Desconocido'}`,
+            `<strong>Tamaño:</strong> ${formatSize || 'Desconocido'}`,
             `<strong>Peso:</strong> ${this.petData.peso ? `${this.petData.peso} kg` : 'Desconocido'} `,
             `<strong>Colores:</strong> ${formatColors || 'No especificados'}`,
-            `<strong>Chip:</strong> ${(this.petData.tiene_chip ? 'Sí' : 'No').toLowerCase() || 'Desconocido '}`          
+            `<strong>Chip:</strong> ${this.petData.tiene_chip ? 'Sí' : 'No' || 'Desconocido '}`          
         ];
         
             info.forEach(item => {

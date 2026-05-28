@@ -15,9 +15,10 @@ export const petMapCSS = `
     }
 
     /* Card del avistamiento */
-
-    .leaflet-popup-content-wrapper {
+    .leaflet-popup-content {
         max-width: 300px;
+        min-width: 250px;
+        margin: 1rem;
     }
 
     .map-popup-card {
@@ -126,12 +127,10 @@ export const petMapCSS = `
             width: 100%;
         }
 
-        .leaflet-popup-content-wrapper {
-            max-width: 300px;
-        }
-        
         .leaflet-popup-content {
-            max-width: 300px;
+            max-width: 250px;
+            min-width: 200px;
+            margin: 1rem;
         }
     }
 
@@ -162,15 +161,12 @@ export const petMapCSS = `
             width: 16px;
             height: 16px;
         }  
-
-        .leaflet-popup-content-wrapper {
-            max-width: 200px;
-            padding: 0;
-        }
         
         .leaflet-popup-content {
             max-width: 150px;
-            padding: 2px;
-            margin: 2px;
+            min-width: 100px;
         }
+
+
+            
 `;

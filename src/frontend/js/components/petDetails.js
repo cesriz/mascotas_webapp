@@ -62,11 +62,16 @@ export class PetDetail extends HTMLElement {
         const dotsContainer = this.querySelector('#carrousel-dots');
         const photos = this.petData.fotos || [];
 
+        // Si obtenemos más de una foto, creamos un div, inyectamos atributos y lo añadimos al dom.
         if (photos.length > 0) {
             photos.forEach((photo, index) => {
                 const img = document.createElement('img');
                 img.src = photo.url;
+                img.style.cursor = 'pointer';
                 img.alt = `Foto ${index + 1} de ${this.petData.nombre}`;
+
+                // Al hacer click "llamamos" al componente que nos muestra la img a pantalla completa
+                img.onclick = () => document.querySelector('#global-viewer').open(photo.url);
                 carrousel.appendChild(img);
 
                 // Creamos los puntos indicadores

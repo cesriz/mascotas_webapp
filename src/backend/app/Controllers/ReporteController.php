@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/ReporteModel.php';
 require_once __DIR__ . '/../Models/MascotaModel.php';
+require_once __DIR__ . '/../Services/AuthService.php';
 require_once __DIR__ . '/../Validators/ReporteValidator.php';
 require_once __DIR__ . '/../Core/Request.php';
 require_once __DIR__ . '/../Core/Response.php';
@@ -17,6 +18,7 @@ class ReporteController
 {
     private ReporteModel $reporteModel;
     private MascotaModel $mascotaModel;
+    private AuthService $authService;
 
     /**
      * Inicializa los modelos necesarios.
@@ -25,7 +27,19 @@ class ReporteController
     {
         $this->reporteModel = new ReporteModel();
         $this->mascotaModel = new MascotaModel();
+        $this->authService = new AuthService();
     }
+
+    /**
+     * Intenta obtener el usuario autenticado actual sin obligar a que exista.
+     *
+     * Si no hay token o no es válido, devuelve null.
+     */
+    private function getOptionalUser(): ?array
+    {
+        return $this->authService->validateCurrentToken();
+    }
+
 
     /**
      * Crea un nuevo reporte asociado a una mascota.
@@ -35,8 +49,10 @@ class ReporteController
      * - usuario público
      */
     public function store(int $mascotaId): void
-    {
-        $usuario = Request::user();
+    {$headers = getallheaders();
+    error_log("Headers recibidos: " . print_r($headers, true));
+
+        $usuario = $this->getOptionalUser();
         $mascota = $this->mascotaModel->getById($mascotaId);
 
         if ($mascota === null) {
@@ -50,7 +66,7 @@ class ReporteController
         $input = Request::json();
 
         if ($usuario !== null) {
-            $input['usuario_reportante_id'] = (int) $usuario['id'];
+            $input['usuario_reportante_id'] = $usuario ? (int) $usuario['id'] : null;
 
             if (empty($input['nombre'])) {
                 $input['nombre'] = trim(($usuario['nombre'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));

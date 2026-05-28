@@ -1,4 +1,5 @@
 export const petDetailsHTML = `
+    <image-viewer id="global-viewer"></image-viewer>
     <delete-confirm id="delete-confirm"></delete-confirm>
     <recover-confirm id="recover-confirm"></recover-confirm>
     <qr-code id="qr"></qr-code>

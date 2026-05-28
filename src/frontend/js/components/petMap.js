@@ -164,7 +164,7 @@ export class PetMap extends HTMLElement {
         // Añadimos el contenido de la tarjeta
         // Si el usuario es dueño o el popup es el del anuncio de la mascota, no se muestras el botón "Contactar"
         popupCard.innerHTML = `
-            <img src="${finalUrl}" alt="Foto del avistamiento">
+            <img src="${finalUrl}" alt="Foto del avistamiento" id="popup-card-img">
             <div class="map-popup-info">
                 <p id="map-popup-info-date">${date}</p>
                 <p style="font-weight:600; margin-top:5px;">${isPet ? 'Nombre: ' + data.nombre : 'Descripción: '}</p>
@@ -178,6 +178,15 @@ export class PetMap extends HTMLElement {
                 <p> <img src="../../assets/icons/mingcute--phone-line.svg" alt="Icono teléfono"> ${data.telefono || 'No disponible'}</p>
             </div>
         `;
+
+        const popupCardImg = popupCard.querySelector('#popup-card-img');
+        popupCardImg.style.cursor = 'pointer';
+
+        if (popupCard) { 
+            popupCard.onclick = () => {
+                document.querySelector('#global-viewer').open(finalUrl);
+            };
+        }
 
         // Lógica del botón (Toggle de contacto)
         const popupBtn = popupCard.querySelector('#map-popup-button');

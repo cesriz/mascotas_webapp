@@ -58,7 +58,6 @@ export class ReportForm extends HTMLElement {
         const user = Auth.getUserData();
 
         if (user) {
-            this.querySelector('#report-user-id').value = user.id || '';
             this.querySelector('#report-name').value = `${user.nombre} ${user.apellidos}` || '';
             this.querySelector('#report-correo').value = user.correo || '';
             this.querySelector('#report-phone').value = user.telefono || '';
@@ -134,7 +133,6 @@ export class ReportForm extends HTMLElement {
         }
 
         const data = {
-            usuario_reportante_id: this.querySelector('#report-user-id').value,
             asunto: this.querySelector('#report-subject').value,
             mensaje: this.querySelector('#report-msg').value,
             nombre: this.querySelector('#report-name').value,

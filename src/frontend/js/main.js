@@ -24,6 +24,7 @@ import './components/avistamientoList.js';
 import './components/faq.js';
 import './components/heroSection.js';
 import './components/http-cat.js';
+import './components/imageViewer.js';
 import './components/notificationCenter.js';
 import './components/petCard.js';
 import './components/petContactForm.js';

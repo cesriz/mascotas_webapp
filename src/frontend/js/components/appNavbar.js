@@ -17,6 +17,11 @@ export class AppNavbar extends HTMLElement {
     connectedCallback() {
         this.restoreAccessibilityMode();
         this.render();
+
+        // Evento para actualizar notificaciones cuando se marcan como leídas
+        window.addEventListener('notificationsUpdated', () => {
+            this.showNotifications();
+        });
     }
 
     async handleLogout() {
@@ -83,6 +88,11 @@ export class AppNavbar extends HTMLElement {
             });
         }
 
+        // Botón de notificaciones (usamos función declarada abajo)
+        if (Auth.isLoggedIn()) {
+            this.showNotifications();
+        }
+
         // Declarada abajo
         this.updateActiveLinks();
     }
@@ -120,6 +130,33 @@ export class AppNavbar extends HTMLElement {
         });
     }
 
+    // Lógica para el botón de notificaciones
+    // Obtener número de notificaciones y mostrarlas
+    async showNotifications() {
+        try {
+            const data = await API.getNotificaciones();
+            const count = data?.resumen.total_no_leidas || 0;
+
+            const badge = this.querySelector('#notification-badge');
+            if (count > 0) {
+                badge.textContent = count > 9 ? '9+' : count;
+                badge.style.display = 'inline-block'; // Cambiamos a inline-block para que se vea
+            } else {
+            badge.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Error cargando notificaciones:", error);
+        }
+
+        // Si pulsamos, redirigimos al panel de notificaciones
+        this.querySelectorAll('#btn-notifications, #mobile-btn-notifications').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.location.href = 'perfil?panel=notificaciones'; 
+            });
+        });
+    }
+
+    // Accesibilidad
     restoreAccessibilityMode() {
         try {
             const storedValue = localStorage.getItem(ACCESSIBILITY_STORAGE_KEY);

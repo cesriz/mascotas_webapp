@@ -606,6 +606,9 @@ export class PetCreationForm extends HTMLElement {
             this._currentLocationDetails = null;
             this.querySelector('#preview-container').innerHTML = '';
             if (this.querySelector('#upload-icon')) this.querySelector('#upload-icon').style.display = 'block';
+
+            // Redireccionamos a "mis mascotas"
+            window.location.href = `perfil?panel=mascotas`;
             
         } catch (error) {
             showHttpError(error, this);

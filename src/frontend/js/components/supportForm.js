@@ -60,30 +60,40 @@ export class SupportForm extends HTMLElement {
         let isValid = true;
 
         const asunto = this.querySelector('#support-subject').value;
-        const nombre = this.querySelector('#support-name').value;
-        const correo = this.querySelector('#support-correo').value;
-        const mensaje = this.querySelector('#support-msg').value;
+        const name = this.querySelector('#support-name').value;
+        const email = this.querySelector('#support-correo').value;
+        const message = this.querySelector('#support-msg').value;
+        const phone = this.querySelector('#support-phone').value;
 
         if (!asunto.trim()) {
             showInputError(this, 'support-subject', 'El asunto es obligatorio');
             isValid = false;
         }
 
-        if (!nombre.trim()) {
+        // Nombre
+        if (!name.trim()) {
             showInputError(this, 'support-name', 'El nombre es obligatorio');
             isValid = false;
         }
 
-        if (!correo.trim()) {
+        // Correo
+        if (!email.trim()) {
             showInputError(this, 'support-correo', 'El correo es obligatorio');
             isValid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showInputError(this, 'support-correo', 'El formato del correo no es válido');
             isValid = false;
         }
 
-        if (!mensaje.trim()) {
+        // Mensaje
+        if (!message.trim()) {
             showInputError(this, 'support-msg', 'El mensaje es obligatorio');
+            isValid = false;
+        }
+
+        // Teléfono
+        if (phone && !/^\+?[0-9\s\-]{9,15}$/.test(phone)) {
+            showInputError(this, 'support-phone', 'Formato de teléfono no válido');
             isValid = false;
         }
 

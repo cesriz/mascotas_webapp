@@ -149,9 +149,9 @@ export class PetCard extends HTMLElement {
             
             badge.classList.remove('badge-perdido', 'badge-encontrado', 'badge-recuperado');
 
-            if (est === 'perdida') badge.classList.add('badge-perdido');
-            if (est === 'encontrada') badge.classList.add('badge-encontrado');
-            if (est === 'recuperada') badge.classList.add('badge-recuperado');
+            if (est === 'perdida') badge.classList.add('pet-badge-perdido');
+            if (est === 'encontrada') badge.classList.add('pet-badge-encontrado');
+            if (est === 'recuperada') badge.classList.add('pet-badge-recuperado');
             badgeText.textContent = est.toUpperCase();
         }
 

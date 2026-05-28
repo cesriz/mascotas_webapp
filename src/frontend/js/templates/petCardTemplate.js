@@ -3,10 +3,13 @@ export const petCardHTML = `
     <recover-confirm id="recover-confirm"></recover-confirm>
 
     <div class="pet-card">
-        <img src="" id="card-pet-img" alt="">
-
-        <div class="badge" id="pet-badge">
-            <p id="badge-text"></p>
+        <div id="img-badge-container">
+            <div id="img-wrapper">
+                <img src="" id="card-pet-img" alt="" >
+                <span class="pet-badge" id="pet-badge">
+                    <p id="badge-text"></p>
+                </span>
+            </div>
         </div>
 
         <div class="pet-card-title"></div>
@@ -39,7 +42,6 @@ export const petCardHTML = `
 export const petCardCSS = `
     .pet-card {
         overflow: hidden;
-        position: relative;
 
         width: 100%;
         box-sizing: border-box;
@@ -67,14 +69,52 @@ export const petCardCSS = `
         box-shadow: var(--shadow-sharp)
     }
     
+    /* Contenedor de imagen + badge */
+    #img-badge-container {
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    #img-wrapper {
+        position: relative;
+        width: 95%;
+    }
+
     /* Imagen de la mascota */
     #card-pet-img {
-        width: 95%;
-        max-height: 200px;
+        width: 100%;
+        max-height: 300px;
         border-radius: var(--radius-sm);
         object-fit: cover;
-        transition: transform 0.3s ease;
+        display: block;
     }
+
+    /* Badges */
+    .pet-badge {
+        padding: 5px 20px;
+        border-radius: var(--radius-xs);
+        box-shadow: var(--shadow-button);
+        font-size: var(--text-sm);
+        color: white;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+        font-weight: bold;
+        text-transform: uppercase;
+
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+
+        width: max-content;
+        height: fit-content;
+    }
+
+    .pet-badge-perdido { background-color: var(--danger); }
+    .pet-badge-encontrado { background-color: var(--warning); }
+    .pet-badge-recuperado {background-color: var(--success); }
 
     /* Título de la tarjeta */
     .pet-card h3 {
@@ -136,7 +176,8 @@ export const petCardCSS = `
         .pet-card-info > div p  {
             margin: 0;
             font-size: var(--text-md);
-            white-space: nowrap;
+            white-space: normal;
+            text-align: left;
         }
 
 
@@ -173,25 +214,6 @@ export const petCardCSS = `
     }
 
 
-    /* Badges */
-    .badge {
-        padding: 5px 20px;
-        border-radius: var(--radius-xs);
-        box-shadow: var(--shadow-button);
-        font-size: var(--text-sm);
-        color: white;
-        text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-        font-weight: bold;
-        text-transform: uppercase;
-        position: absolute;
-        top: 200px;
-        z-index: 5;
-    }
-
-    .badge-perdido { background-color: var(--danger); }
-    .badge-encontrado { background-color: var(--warning); }
-    .badge-recuperado {background-color: var(--success); }
-
     /* ------- Tablet y móvil ---------- */
     @media (max-width: 768px) {
 
@@ -208,7 +230,6 @@ export const petCardCSS = `
         .badge {
             font-size: var(--text-xs);
             padding: 5px 14px;
-            top: 180px;
         }
     }
 
@@ -232,7 +253,6 @@ export const petCardCSS = `
         .badge {
             font-size: 0.65rem;
             padding: 4px 10px;
-            top: 150px;
         }
 
         .card-overlay button {

@@ -69,31 +69,34 @@ export class PetContactForm extends HTMLElement {
         clearInputErrors(this);
         let isValid = true;
 
-        const nombre = this.querySelector('#contact-name').value;
-        const correo = this.querySelector('#contact-correo').value;
-        const telefono = this.querySelector('#contact-phone').value;
-        const mensaje = this.querySelector('#contact-msg').value;
+        const name = this.querySelector('#contact-name').value;
+        const email = this.querySelector('#contact-correo').value;
+        const phone = this.querySelector('#contact-phone').value;
+        const message = this.querySelector('#contact-msg').value;
         const privacy = this.querySelector('#privacy-check').checked;
 
-        if (!nombre.trim()) {
+        if (!name.trim()) {
             showInputError(this, 'contact-name', 'El nombre es obligatorio');
             isValid = false;
         }
 
-        if (!correo.trim()) {
+        if (!email.trim()) {
             showInputError(this, 'contact-correo', 'El correo es obligatorio');
             isValid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showInputError(this, 'contact-correo', 'El formato del correo no es válido');
             isValid = false;
         }
 
-        if (!telefono.trim()) {
+        if (!phone.trim()) {
             showInputError(this, 'contact-phone', 'El teléfono es obligatorio');
+            isValid = false;
+        } else if (!/^\+?[0-9\s\-]{9,15}$/.test(phone)) {
+            showInputError(this, 'contact-phone', 'Formato de teléfono no válido');
             isValid = false;
         }
 
-        if (!mensaje.trim()) {
+        if (!message.trim()) {
             showInputError(this, 'contact-msg', 'Debes escribir un mensaje');
             isValid = false;
         }

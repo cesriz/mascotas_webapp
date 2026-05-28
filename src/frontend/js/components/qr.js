@@ -16,6 +16,7 @@ export class QRCodeComponent extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        window.addEventListener('resize', () => this.generate());
     }
 
     render() {
@@ -33,12 +34,13 @@ export class QRCodeComponent extends HTMLElement {
         const qrImgContainer = this.querySelector("#qrcode");
         if (qrImgContainer) {
             qrImgContainer.innerHTML = "";
-            // Usamos 'new window.QRCode' para asegurar que llamamos a la librería 
-            // y no a la clase de este archivo
+            // Usamos 'new window.QRCode' para asegurar que llamamos a la librería y no a la clase de este archivo
+            const size = Math.min(window.innerWidth * 0.5, 200); // Establecemos un tamaño responsive para el QR
+
             new window.QRCode(qrImgContainer, {
                 text: window.location.href,
-                width: 200,
-                height: 200,
+                width: size,
+                height: size,
                 colorDark : "#000000",
                 colorLight : "#ffffff",
                 correctLevel : window.QRCode.CorrectLevel.H

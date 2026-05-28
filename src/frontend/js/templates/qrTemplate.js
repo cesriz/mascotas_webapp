@@ -54,7 +54,7 @@ export const qrCSS = `
     /* --------Tablets y móviles--------- */
 
         @media (max-width: 768px) {
-            .qr-div {
+            #qr-div {
                 width: min(420px, 85vw);
                 padding: 1.5rem;
             }
@@ -66,12 +66,12 @@ export const qrCSS = `
     
 
     @media (max-width: 480px) {
-        .qr-div {
-            width: 92vw;
-            padding: 1.25rem;
-            gap: 0.75rem;
-            border-radius: 12px;
-        }
+        #qr-div {
+                width: 92vw;
+                padding: 1.25rem;
+                gap: 0.75rem;
+                border-radius: 12px;
+            }
 
         #qrcode {
             width: 70%;
@@ -81,6 +81,6 @@ export const qrCSS = `
         qr-code.is-visible {
             padding: 0.75rem;
         }
-    }`
-;
+    }
+`;
   

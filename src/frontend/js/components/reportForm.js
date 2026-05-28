@@ -72,9 +72,10 @@ export class ReportForm extends HTMLElement {
         let isValid = true;
 
         const asunto = this.querySelector('#report-subject').value;
-        const mensaje = this.querySelector('#report-msg').value;
-        const nombre = this.querySelector('#report-name').value;
-        const correo = this.querySelector('#report-correo').value;
+        const message = this.querySelector('#report-msg').value;
+        const name = this.querySelector('#report-name').value;
+        const email = this.querySelector('#report-correo').value;
+        const phone = this.querySelector('#report-phone').value;
         
         // Asunto
         if (!asunto.trim()) {
@@ -83,25 +84,32 @@ export class ReportForm extends HTMLElement {
         }
 
         // Mensaje
-        if (!mensaje.trim()) {
+        if (!message.trim()) {
             showInputError(this, 'report-msg', 'Debes describir el motivo del reporte');
             isValid = false;
         }
 
         // Nombre
-        if (!nombre.trim()) {
+        if (!name.trim()) {
             showInputError(this, 'report-name', 'El nombre es obligatorio');
             isValid = false;
         }
 
         // Correo
-        if (!correo.trim()) {
+        if (!email.trim()) {
             showInputError(this, 'report-correo', 'El correo es obligatorio');
             isValid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showInputError(this, 'report-correo', 'El formato del correo no es válido');
             isValid = false;
         }
+
+        // Teléfono
+        if (phone && !/^\+?[0-9\s\-]{9,15}$/.test(phone)) {
+            showInputError(this, 'report-phone', 'Formato de teléfono no válido');
+            isValid = false;
+        }
+
 
         return isValid;
     }

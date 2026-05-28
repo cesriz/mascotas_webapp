@@ -217,5 +217,9 @@ export const authLoginCSS = `
         button {
             padding: 0.9rem;
         }
+
+        pet-auth-section p {
+            font-size: 0.95rem;
+        }
     }      
 `;

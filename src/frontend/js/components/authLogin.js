@@ -51,19 +51,20 @@ export class AuthLogin extends HTMLElement {
     validateRegister() {
         clearInputErrors(this);
         let isValid = true;
-        const nombre = this.querySelector('#register-name').value.trim();
-        const correo = this.querySelector('#register-correo').value.trim();
+        const name = this.querySelector('#register-name').value.trim();
+        const email = this.querySelector('#register-correo').value.trim();
         const pass = this.querySelector('#register-pass').value;
+        const phone = this.querySelector('#register-phone').value.trim();
 
-        if (!nombre) {
+        if (!name) {
             showInputError(this, 'register-name', 'El nombre es obligatorio');
             isValid = false;
         }
 
-        if (!correo) {
+        if (!email) {
             showInputError(this, 'register-correo', 'El correo es obligatorio');
             isValid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showInputError(this, 'register-correo', 'Formato de correo no válido');
             isValid = false;
         }
@@ -73,6 +74,11 @@ export class AuthLogin extends HTMLElement {
             isValid = false;
         } else if (pass.length < 6) {
             showInputError(this, 'register-pass', 'Mínimo 6 caracteres');
+            isValid = false;
+        }
+
+        if (phone && !/^\+?[0-9\s\-]{9,15}$/.test(phone)) {
+            showInputError(this, 'register-phone', 'Formato de teléfono no válido');
             isValid = false;
         }
 

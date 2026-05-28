@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Throwable;
-
 require_once __DIR__ . '/../Models/ReporteModel.php';
 require_once __DIR__ . '/../Models/MascotaModel.php';
 require_once __DIR__ . '/../Validators/ReporteValidator.php';
@@ -101,7 +99,7 @@ class ReporteController
                     'mascota_id' => $mascotaId
                 ]
             ], 201);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             Response::json([
                 'success' => false,
                 'message' => 'Error al enviar el reporte',

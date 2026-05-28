@@ -188,16 +188,20 @@ export class AvistamientoCreationForm extends HTMLElement {
             let isValid = true;
 
             const email = this.querySelector('#avistamiento-form-email').value;
-            const telefono = this.querySelector('#avistamiento-form-telefono').value;
+            const phone = this.querySelector('#avistamiento-form-telefono').value;
             const dateVal = this.querySelector('#avistamiento-form-date').value;
             const timeVal = this.querySelector('#avistamiento-form-time').value;
             const address = this.querySelector('#avistamiento-form-loc').value;
 
             // Teléfono (Obligatorio)
-            if (!telefono.trim()) {
+            if (!phone.trim()) {
                 showInputError(this, 'avistamiento-form-telefono', 'El teléfono es obligatorio para contactarte');
                 isValid = false;
+            } else if (!/^\+?[0-9\s\-]{9,15}$/.test(phone)) {
+                showInputError(this, 'avistamiento-form-telefono', 'Formato de teléfono no válido');
+                isValid = false;
             }
+
 
             // Email (Opcional, validamos formato)
             if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

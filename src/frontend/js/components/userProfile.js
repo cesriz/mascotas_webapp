@@ -147,21 +147,27 @@ export class UserProfile extends HTMLElement {
             clearInputErrors(this);
             let isValid = true;
 
-            const nombre = this.querySelector('#profile-name').value.trim();
-            const correo = this.querySelector('#profile-email').value.trim();
+            const name = this.querySelector('#profile-name').value.trim();
+            const email = this.querySelector('#profile-email').value.trim();
+            const phone = this.querySelector('#profile-phone');
 
-            if (nombre === '') {
+            if (!name) {
                 showInputError(this, 'profile-name', 'El nombre es obligatorio');
                 isValid = false;
             }
 
-            if (correo === '') {
+            if (!email) {
                 showInputError(this, 'profile-email', 'El correo es obligatorio');
                 isValid = false;
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 showInputError(this, 'profile-email', 'El formato del correo no es válido');
                 isValid = false;
             }
+
+            if (phone && !/^\+?[0-9\s\-]{9,15}$/.test(phone)) {
+                showInputError(this, 'profile-phone', 'Formato de teléfono no válido');
+                isValid = false;
+            }   
 
             const updatedData = {
                 nombre: nombre,

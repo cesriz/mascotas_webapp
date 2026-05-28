@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Throwable;
 
 require_once __DIR__ . '/../Models/ContactoModel.php';
 require_once __DIR__ . '/../Models/MascotaModel.php';
@@ -110,7 +109,7 @@ class ContactoController
                     'usuario_remitente_id' => $data['usuario_remitente_id']
                 ]
             ], 201);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             Response::json([
                 'success' => false,
                 'message' => 'Error al enviar el mensaje de contacto',

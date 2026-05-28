@@ -33,6 +33,9 @@ RUN composer dump-autoload --optimize
 COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY docker/start-apache.sh /usr/local/bin/start-apache
 
+# Configuracion personalizada PHP uploads para el tamaño de las fotos
+COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
 RUN sed -i 's/\r$//' /usr/local/bin/start-apache \
     && chmod +x /usr/local/bin/start-apache \
     && chown -R www-data:www-data /var/www/project/backend

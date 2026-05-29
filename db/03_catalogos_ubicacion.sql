@@ -27,7 +27,7 @@ INSERT INTO provincias (codigo_ine, nombre) VALUES
 ('12', 'Castellón'),
 ('13', 'Ciudad Real'),
 ('14', 'Córdoba'),
-('15', 'A Coruña'),
+('15', 'La Coruña'),
 ('16', 'Cuenca'),
 ('17', 'Girona'),
 ('18', 'Granada'),

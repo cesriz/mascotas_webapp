@@ -31,14 +31,33 @@ class EmailService
             $fromAddress = getenv('MAIL_FROM_ADDRESS') ?: '';
             $fromName = getenv('MAIL_FROM_NAME') ?: 'Mascotas WebApp';
 
+            error_log('[EMAIL] Preparando envío de correo de recuperación');
+            error_log('[EMAIL] Destinatario: ' . $to);
+            error_log('[EMAIL] Host SMTP: ' . $host);
+            error_log('[EMAIL] Puerto SMTP: ' . $port);
+            error_log('[EMAIL] MAIL_USERNAME configurado: ' . ($username !== '' ? 'SI' : 'NO'));
+            error_log('[EMAIL] MAIL_PASSWORD configurado: ' . ($password !== '' ? 'SI' : 'NO'));
+            error_log('[EMAIL] MAIL_FROM_ADDRESS configurado: ' . ($fromAddress !== '' ? 'SI' : 'NO'));
+
             if ($username === '' || $password === '' || $fromAddress === '') {
-                error_log('Configuración SMTP incompleta.');
+                error_log('[EMAIL ERROR] Configuración SMTP incompleta.');
                 return false;
             }
 
             $mail->CharSet = 'UTF-8';
 
             $mail->isSMTP();
+
+            // Para que no se quede 2 minutos esperando si Brevo falla
+            $mail->Timeout = 10;
+            $mail->SMTPKeepAlive = false;
+
+            // Logs detallados de PHPMailer/Brevo en Railway
+            $mail->SMTPDebug = 2;
+            $mail->Debugoutput = function ($str, $level) {
+                error_log("[SMTP DEBUG nivel {$level}] {$str}");
+            };
+
             $mail->Host = $host;
             $mail->SMTPAuth = true;
             $mail->Username = $username;
@@ -54,9 +73,19 @@ class EmailService
             $mail->Body = $htmlBody;
             $mail->AltBody = $plainBody;
 
-            return $mail->send();
+            error_log('[EMAIL] Intentando enviar correo...');
+
+            $result = $mail->send();
+
+            error_log('[EMAIL] Resultado envío: ' . ($result ? 'OK' : 'ERROR'));
+
+            return $result;
         } catch (Exception $e) {
-            error_log('Error enviando email: ' . $mail->ErrorInfo);
+            error_log('[EMAIL ERROR] Excepción PHPMailer: ' . $e->getMessage());
+            error_log('[EMAIL ERROR] ErrorInfo PHPMailer: ' . $mail->ErrorInfo);
+            return false;
+        } catch (\Throwable $e) {
+            error_log('[EMAIL ERROR] Excepción general: ' . $e->getMessage());
             return false;
         }
     }

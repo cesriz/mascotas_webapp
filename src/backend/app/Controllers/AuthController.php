@@ -56,18 +56,18 @@ class AuthController
             $data['password']
         );
 
-        if ($authResult === null) {
+        if (!($authResult['success'] ?? false)) {
             Response::json([
                 'success' => false,
-                'message' => 'Credenciales no válidas'
-            ], 401);
+                'message' => $authResult['message'] ?? 'Credenciales no válidas'
+            ], (int) ($authResult['status'] ?? 401));
             return;
         }
 
         Response::json([
             'success' => true,
             'message' => 'Login correcto',
-            'data' => $authResult
+            'data' => $authResult['data']
         ]);
     }
 

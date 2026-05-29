@@ -18,20 +18,32 @@ class AuthService
     }
 
     // Login. Si la contraseña es correcta, genera y guarda un nuevo token.
-    public function login(string $correo, string $password): ?array
+    public function login(string $correo, string $password): array
     {
         $usuario = $this->authModel->findByEmail($correo);
 
         if ($usuario === null) {
-            return null;
-        }
-
-        if ((int) $usuario['activo'] !== 1) {
-            return null;
+            return [
+                'success' => false,
+                'status' => 401,
+                'message' => 'Credenciales no válidas'
+            ];
         }
 
         if (!password_verify($password, $usuario['password_hash'])) {
-            return null;
+            return [
+                'success' => false,
+                'status' => 401,
+                'message' => 'Credenciales no válidas'
+            ];
+        }
+
+        if ((int) $usuario['activo'] !== 1) {
+            return [
+                'success' => false,
+                'status' => 403,
+                'message' => 'Tu cuenta ha sido bloqueada. Contacta con un administrador si crees que es un error.'
+            ];
         }
 
         $token = JwtHelper::generateToken($usuario);
@@ -39,16 +51,19 @@ class AuthService
         $this->authModel->updateToken((int) $usuario['id'], $token);
 
         return [
-            'usuario' => [
-                'id' => (int) $usuario['id'],
-                'nombre' => $usuario['nombre'],
-                'apellidos' => $usuario['apellidos'],
-                'correo' => $usuario['correo'],
-                'telefono' => $usuario['telefono'],
-                'direccion' => $usuario['direccion'],
-                'rol' => $usuario['rol']
-            ],
-            'token' => $token
+            'success' => true,
+            'data' => [
+                'usuario' => [
+                    'id' => (int) $usuario['id'],
+                    'nombre' => $usuario['nombre'],
+                    'apellidos' => $usuario['apellidos'],
+                    'correo' => $usuario['correo'],
+                    'telefono' => $usuario['telefono'],
+                    'direccion' => $usuario['direccion'],
+                    'rol' => $usuario['rol']
+                ],
+                'token' => $token
+            ]
         ];
     }
 
@@ -148,7 +163,11 @@ class AuthService
 
     private function buildResetUrl(string $plainToken): string
     {
-        $baseUrl = getenv('FRONTEND_BASE_URL') ?: 'http://localhost:4200';
+        $baseUrl = getenv('FRONTEND_BASE_URL')
+            ?: getenv('FRONTEND_URL')
+            ?: getenv('APP_URL')
+            ?: 'http://localhost:4200';
+
         $baseUrl = rtrim($baseUrl, '/');
 
         return $baseUrl . '/reset-password?token=' . urlencode($plainToken);

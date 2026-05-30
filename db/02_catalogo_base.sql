@@ -1,16 +1,38 @@
+-- =====================================
+-- 02_catalogo_base.sql
+-- Proyecto mascotas_webapp
+-- Catálogos base de especies, razas y colores
+-- =====================================
+
+USE mascotas_webapp;
+
+SET NAMES utf8mb4 COLLATE utf8mb4_general_ci;
+
 -- 1. Insertar Especies (si no existen)
 INSERT IGNORE INTO especies (nombre) VALUES 
 ('Perro'), ('Gato'), ('Conejo'), ('Ave'), ('Roedor'), ('Reptil');
 
--- 2. Insertar "Raza Indefinida" para todas las especies existentes
--- Esto asegura que, aunque añadas nuevas especies en el futuro, siempre tengan su opción genérica
-INSERT IGNORE INTO razas (especies_id, nombre)
-SELECT id, 'Raza Indefinida' FROM especies;
+-- 2. Insertar colores base (si no existen)
+INSERT IGNORE INTO colores (nombre) VALUES
+('Negro'),
+('Blanco'),
+('Marrón'),
+('Gris'),
+('Naranja'),
+('Beige'),
+('Tricolor'),
+('Atigrado'),
+('Canela');
 
--- 3. Insertar el resto de razas (omitiendo las que ya existan por nombre)
+-- 3. Insertar "Desconocido {especie}" para todas las especies existentes
+INSERT IGNORE INTO razas (especies_id, nombre)
+SELECT id, CONCAT('Desconocido ', nombre) FROM especies;
+
+-- 4. Insertar el resto de razas (omitiendo las que ya existan por nombre)
 -- PERROS
 INSERT IGNORE INTO razas (especies_id, nombre) VALUES 
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Labrador Retriever'),
+((SELECT id FROM especies WHERE nombre = 'Perro'), 'Mestizo'),
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Golden Retriever'),
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Pastor Alemán'),
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Bulldog Francés'),

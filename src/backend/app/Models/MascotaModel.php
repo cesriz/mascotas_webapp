@@ -128,13 +128,23 @@ class MascotaModel extends BaseModel
         }
 
         if (!empty($filters['municipio'])) {
-            $where .= " AND u.municipio COLLATE utf8mb4_0900_ai_ci LIKE :municipio";
-            $params['municipio'] = '%' . $filters['municipio'] . '%';
+            $this->addLocationVariantFilter(
+                $where,
+                $params,
+                'u.municipio',
+                'municipio',
+                (string) $filters['municipio']
+            );
         }
 
         if (!empty($filters['provincia'])) {
-            $where .= " AND u.provincia COLLATE utf8mb4_0900_ai_ci LIKE :provincia";
-            $params['provincia'] = '%' . $filters['provincia'] . '%';
+            $this->addLocationVariantFilter(
+                $where,
+                $params,
+                'u.provincia',
+                'provincia',
+                (string) $filters['provincia']
+            );
         }
 
         if (!empty($filters['q_ubicacion'])) {
@@ -231,6 +241,38 @@ class MascotaModel extends BaseModel
             'order_by' => $orderBy,
             'params' => $params
         ];
+    }
+
+    // Añade filtros tolerantes con nombres bilingües tipo "Alacant/Alicante".
+    private function addLocationVariantFilter(
+        string &$where,
+        array &$params,
+        string $column,
+        string $paramPrefix,
+        string $value
+    ): void {
+        $terms = $this->getLocationSearchTerms($value);
+        $conditions = [];
+
+        foreach ($terms as $index => $term) {
+            $key = "{$paramPrefix}_{$index}";
+            $conditions[] = "{$column} COLLATE utf8mb4_general_ci LIKE :{$key}";
+            $params[$key] = '%' . $term . '%';
+        }
+
+        if (!empty($conditions)) {
+            $where .= " AND (" . implode(' OR ', $conditions) . ")";
+        }
+    }
+
+    // Convierte "Alicante/Alacant" en ["Alicante", "Alacant"].
+    private function getLocationSearchTerms(string $value): array
+    {
+        $terms = preg_split('/\s*\/\s*/', trim($value)) ?: [];
+        $terms = array_map('trim', $terms);
+        $terms = array_filter($terms, static fn(string $term): bool => $term !== '');
+
+        return array_values(array_unique($terms));
     }
 
     // Devuelve el ORDER BY según el valor recibido.

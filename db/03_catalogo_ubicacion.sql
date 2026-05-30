@@ -1,5 +1,5 @@
 -- =========================================
--- 03_catalogos_ubicacion.sql
+-- 03_catalogo_ubicacion.sql
 -- Catálogo de provincias y municipios de España
 -- Fuente: INE - Relación de municipios y códigos por provincias
 -- Generado automáticamente por scripts/generar_catalogos_ubicacion.py
@@ -7,7 +7,7 @@
 
 USE mascotas_webapp;
 
-SET NAMES utf8mb4;
+SET NAMES utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- =========================================
 -- PROVINCIAS

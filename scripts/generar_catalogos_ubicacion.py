@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 INE_XLSX_URL = "https://www.ine.es/daco/daco42/codmun/diccionario26.xlsx"
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-OUTPUT_SQL = PROJECT_ROOT / "db" / "03_catalogos_ubicacion.sql"
+OUTPUT_SQL = PROJECT_ROOT / "db" / "03_catalogo_ubicacion.sql"
 TEMP_XLSX = PROJECT_ROOT / "scripts" / "diccionario26.xlsx"
 
 PROVINCIAS = {
@@ -107,14 +107,14 @@ def main() -> None:
 
     with OUTPUT_SQL.open("w", encoding="utf-8") as file:
         file.write("-- =========================================\n")
-        file.write("-- 03_catalogos_ubicacion.sql\n")
+        file.write("-- 03_catalogo_ubicacion.sql\n")
         file.write("-- Catálogo de provincias y municipios de España\n")
         file.write("-- Fuente: INE - Relación de municipios y códigos por provincias\n")
         file.write("-- Generado automáticamente por scripts/generar_catalogos_ubicacion.py\n")
         file.write("-- =========================================\n\n")
 
         file.write("USE mascotas_webapp;\n\n")
-        file.write("SET NAMES utf8mb4;\n\n")
+        file.write("SET NAMES utf8mb4 COLLATE utf8mb4_general_ci;\n\n")
 
         file.write("-- =========================================\n")
         file.write("-- PROVINCIAS\n")

@@ -267,6 +267,8 @@ export const faqCSS = `
 
         #faq-not-found-box {
             padding: 1rem 0.75rem;
+            width: 100%;
+            text-align: center;
         }
 
         #faq-not-found-box h3 {
@@ -286,6 +288,7 @@ export const faqCSS = `
         #faq-not-found-info {
             font-size: 0.95rem;
             gap: 0.8rem;
+            width: 100%;
         }
 
         #faq-not-found-info h4 {

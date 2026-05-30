@@ -1,63 +1,27 @@
 -- =====================================
--- 02_datos_prueba.sql
+-- 04_datos_prueba.sql
 -- Proyecto mascotas_webapp
--- Datos de prueba unificados
+-- Datos de prueba
 -- =====================================
 
 USE mascotas_webapp;
 
--- =========================================
--- ESPECIES
--- =========================================
-INSERT INTO especies (nombre) VALUES
-('Perro'),
-('Gato');
-
-SET @especie_perro = (SELECT id FROM especies WHERE nombre = 'Perro' LIMIT 1);
-SET @especie_gato = (SELECT id FROM especies WHERE nombre = 'Gato' LIMIT 1);
+SET NAMES utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- =========================================
--- RAZAS
+-- IDS DE CATÁLOGO
 -- =========================================
-INSERT INTO razas (especies_id, nombre) VALUES
-(@especie_perro, 'Desconocido Perro'),
-(@especie_perro, 'Mestizo'),
-(@especie_perro, 'Labrador'),
-(@especie_perro, 'Pastor Aleman'),
-(@especie_perro, 'Caniche'),
-(@especie_perro, 'Bulldog Frances'),
-(@especie_gato, 'Desconocido Gato'),
-(@especie_gato, 'Comun'),
-(@especie_gato, 'Siames'),
-(@especie_gato, 'Sphynx'),
-(@especie_gato, 'Persa'),
-(@especie_gato, 'Maine Coon');
-
 SET @raza_mestizo_perro = (SELECT id FROM razas WHERE nombre = 'Mestizo' LIMIT 1);
-SET @raza_labrador = (SELECT id FROM razas WHERE nombre = 'Labrador' LIMIT 1);
+SET @raza_labrador = (SELECT id FROM razas WHERE nombre = 'Labrador Retriever' LIMIT 1);
 SET @raza_caniche = (SELECT id FROM razas WHERE nombre = 'Caniche' LIMIT 1);
-SET @raza_bulldog = (SELECT id FROM razas WHERE nombre = 'Bulldog Frances' LIMIT 1);
-SET @raza_gato_comun = (SELECT id FROM razas WHERE nombre = 'Comun' LIMIT 1);
-SET @raza_siames = (SELECT id FROM razas WHERE nombre = 'Siames' LIMIT 1);
+SET @raza_bulldog = (SELECT id FROM razas WHERE nombre = 'Bulldog Francés' LIMIT 1);
+SET @raza_gato_comun = (SELECT id FROM razas WHERE nombre = 'Común Europeo' LIMIT 1);
+SET @raza_siames = (SELECT id FROM razas WHERE nombre = 'Siamés' LIMIT 1);
 SET @raza_persa = (SELECT id FROM razas WHERE nombre = 'Persa' LIMIT 1);
-
--- =========================================
--- COLORES
--- =========================================
-INSERT INTO colores (nombre) VALUES
-('Negro'),
-('Blanco'),
-('Marron'),
-('Gris'),
-('Naranja'),
-('Beige'),
-('Tricolor'),
-('Atigrado'),
-('Canela');
 
 SET @color_negro = (SELECT id FROM colores WHERE nombre = 'Negro' LIMIT 1);
 SET @color_blanco = (SELECT id FROM colores WHERE nombre = 'Blanco' LIMIT 1);
-SET @color_marron = (SELECT id FROM colores WHERE nombre = 'Marron' LIMIT 1);
+SET @color_marron = (SELECT id FROM colores WHERE nombre = 'Marrón' LIMIT 1);
 SET @color_gris = (SELECT id FROM colores WHERE nombre = 'Gris' LIMIT 1);
 SET @color_naranja = (SELECT id FROM colores WHERE nombre = 'Naranja' LIMIT 1);
 SET @color_beige = (SELECT id FROM colores WHERE nombre = 'Beige' LIMIT 1);

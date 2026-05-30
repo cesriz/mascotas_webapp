@@ -29,6 +29,15 @@ class Database
         self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
+        $charset = $config['charset'] ?? 'utf8mb4';
+        $collation = $config['collation'] ?? 'utf8mb4_general_ci';
+
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $charset) || !preg_match('/^[a-zA-Z0-9_]+$/', $collation)) {
+            throw new RuntimeException('Configuración de charset/collation no válida');
+        }
+
+        self::$pdo->exec("SET NAMES {$charset} COLLATE {$collation}");
+
         $appConfig = require __DIR__ . '/../Config/app.php';
         $timezone = $appConfig['timezone'] ?? 'Europe/Madrid';
 

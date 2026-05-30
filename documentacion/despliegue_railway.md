@@ -97,14 +97,16 @@ Para recuperacion de contrasena y envio de correo, configura tambien las variabl
 Los scripts SQL estan en `db/`:
 
 - `01_estructura.sql`: estructura de tablas.
-- `03_catalogos_ubicacion.sql`: catalogos de provincias y municipios.
-- `02_datos_prueba.sql`: datos de prueba.
+- `02_catalogo_base.sql`: catalogos base de especies, razas y colores.
+- `03_catalogo_ubicacion.sql`: catalogos de provincias y municipios.
+- `04_datos_prueba.sql`: datos de prueba.
 
 Orden recomendado:
 
 1. `01_estructura.sql`
-2. `03_catalogos_ubicacion.sql`
-3. `02_datos_prueba.sql`
+2. `02_catalogo_base.sql`
+3. `03_catalogo_ubicacion.sql`
+4. `04_datos_prueba.sql`
 
 Puedes importarlos desde un cliente MySQL conectado a Railway o desde las herramientas de datos disponibles en Railway.
 

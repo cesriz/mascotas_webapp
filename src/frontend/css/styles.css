@@ -635,15 +635,6 @@ label + input,select {
 
 
 
-
-
-
-
-
-
-
-
-
 /* -------- Tablet y móvil -------- */
 @media (max-width: 768px) {
     :root {
@@ -695,6 +686,12 @@ label + input,select {
     .dashboard-wrapper-aside {
         flex-direction: column;
     }
+
+    #av-title {
+        font-size: 2rem;
+        padding: 2rem;
+        text-align: center;
+    }
 }
 
 
@@ -728,5 +725,16 @@ label + input,select {
 
     input, select {
         padding: 12px;
+    }
+
+    
+    .dashboard-wrapper {
+        padding: 1rem;
+
+    }
+
+    #av-title {
+        font-size: 2rem;
+        padding: 2rem;
     }
 }

@@ -1,20 +1,11 @@
 -- 1. Insertar Especies (si no existen)
 INSERT IGNORE INTO especies (nombre) VALUES 
-('Perro'), ('Gato'), ('Conejo'), ('Ave'), ('Roedor'), ('Reptil');
-
--- 2. Insertar "Raza Indefinida" para todas las especies existentes
--- Esto asegura que, aunque añadas nuevas especies en el futuro, siempre tengan su opción genérica
-INSERT IGNORE INTO razas (especies_id, nombre)
-SELECT id, 'Raza Indefinida' FROM especies;
+('Conejo'), ('Ave'), ('Roedor'), ('Reptil');
 
 -- 3. Insertar el resto de razas (omitiendo las que ya existan por nombre)
 -- PERROS
 INSERT IGNORE INTO razas (especies_id, nombre) VALUES 
-((SELECT id FROM especies WHERE nombre = 'Perro'), 'Labrador Retriever'),
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Golden Retriever'),
-((SELECT id FROM especies WHERE nombre = 'Perro'), 'Pastor Alemán'),
-((SELECT id FROM especies WHERE nombre = 'Perro'), 'Bulldog Francés'),
-((SELECT id FROM especies WHERE nombre = 'Perro'), 'Caniche'),
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Beagle'),
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Yorkshire Terrier'),
 ((SELECT id FROM especies WHERE nombre = 'Perro'), 'Boxer'),
@@ -35,13 +26,8 @@ INSERT IGNORE INTO razas (especies_id, nombre) VALUES
 
 -- GATOS
 INSERT IGNORE INTO razas (especies_id, nombre) VALUES 
-((SELECT id FROM especies WHERE nombre = 'Gato'), 'Común Europeo'),
-((SELECT id FROM especies WHERE nombre = 'Gato'), 'Persa'),
-((SELECT id FROM especies WHERE nombre = 'Gato'), 'Maine Coon'),
-((SELECT id FROM especies WHERE nombre = 'Gato'), 'Siamés'),
 ((SELECT id FROM especies WHERE nombre = 'Gato'), 'Ragdoll'),
 ((SELECT id FROM especies WHERE nombre = 'Gato'), 'Bengala'),
-((SELECT id FROM especies WHERE nombre = 'Gato'), 'Sphynx'),
 ((SELECT id FROM especies WHERE nombre = 'Gato'), 'British Shorthair'),
 ((SELECT id FROM especies WHERE nombre = 'Gato'), 'Azul Ruso'),
 ((SELECT id FROM especies WHERE nombre = 'Gato'), 'Angora Turco'),
@@ -56,6 +42,7 @@ INSERT IGNORE INTO razas (especies_id, nombre) VALUES
 ((SELECT id FROM especies WHERE nombre = 'Conejo'), 'Cabeza de León'),
 ((SELECT id FROM especies WHERE nombre = 'Conejo'), 'Enano Holandés'),
 ((SELECT id FROM especies WHERE nombre = 'Conejo'), 'Rex');
+((SELECT id FROM especies WHERE nombre = 'Conejo'), 'Desconocido Conejo');
 
 -- AVES
 INSERT IGNORE INTO razas (especies_id, nombre) VALUES 
@@ -68,6 +55,8 @@ INSERT IGNORE INTO razas (especies_id, nombre) VALUES
 ((SELECT id FROM especies WHERE nombre = 'Ave'), 'Diamante de Gould'),
 ((SELECT id FROM especies WHERE nombre = 'Ave'), 'Yaco (Loro Gris)'),
 ((SELECT id FROM especies WHERE nombre = 'Ave'), 'Guacamayo');
+((SELECT id FROM especies WHERE nombre = 'Ave'), 'Desconocido Ave');
+
 
 -- ROEDORES
 INSERT IGNORE INTO razas (especies_id, nombre) VALUES 
@@ -79,6 +68,7 @@ INSERT IGNORE INTO razas (especies_id, nombre) VALUES
 ((SELECT id FROM especies WHERE nombre = 'Roedor'), 'Chinchilla'),
 ((SELECT id FROM especies WHERE nombre = 'Roedor'), 'Jerbo'),
 ((SELECT id FROM especies WHERE nombre = 'Roedor'), 'Degú');
+((SELECT id FROM especies WHERE nombre = 'Roedor'), 'Desconocido Roedor');
 
 -- REPTILES
 INSERT IGNORE INTO razas (especies_id, nombre) VALUES 
@@ -90,3 +80,4 @@ INSERT IGNORE INTO razas (especies_id, nombre) VALUES
 ((SELECT id FROM especies WHERE nombre = 'Reptil'), 'Serpiente del Maíz (Corn Snake)'),
 ((SELECT id FROM especies WHERE nombre = 'Reptil'), 'Piton Bola'),
 ((SELECT id FROM especies WHERE nombre = 'Reptil'), 'Camaleón del Yemen');
+((SELECT id FROM especies WHERE nombre = 'Reptil'), 'Desconocido Reptil');

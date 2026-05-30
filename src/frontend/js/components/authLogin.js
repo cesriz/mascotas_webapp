@@ -107,7 +107,7 @@ export class AuthLogin extends HTMLElement {
         // Contenedores principales
         const loginDiv = this.querySelector('#login-div');
         const forgotDiv = this.querySelector('#forgot-pss-div');
-        
+
         // Secciones de formulario
         const initDiv = this.querySelector('#init-div');
         const registerDiv = this.querySelector('#register-div');
@@ -165,15 +165,15 @@ export class AuthLogin extends HTMLElement {
         // Click en "¿Has olvidado tu contraseña?"
         changerBtn.addEventListener('click', () => {
             changerBtn.style.display = 'none';
-            forgotDiv.style.display = 'block'; 
+            forgotDiv.style.display = 'block';
         });
-    
+
         // --- Lógica de Peticiones API ---
         // Inicio de sesión
         const loginForm = this.querySelector('#init');
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             // Validamos datos
             if (!this.validateLogin()) return;
 
@@ -184,13 +184,13 @@ export class AuthLogin extends HTMLElement {
 
             try {
                 const data = await API.login(credentials);
-                
+
                 // Se guarda el token en localStorage
                 Auth.setSession(data.token, data.usuario);
                 loginForm.reset();
- 
+
                 showSuccess("¡Bienvenido!");
-                
+
                 // Redirigimos al login
                 setTimeout(() => window.location.href = 'index.html', 1500);
             } catch (error) {
@@ -227,25 +227,36 @@ export class AuthLogin extends HTMLElement {
             }
         });
 
-    // Recuperar contraseña
+        // Recuperar contraseña
         const forgotForm = this.querySelector('#forgot-pss');
+        const forgotSubmitBtn = forgotForm.querySelector('button[type="submit"]');
+
         forgotForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Validamos datos
+
             if (!this.validateForgot()) return;
 
             const email = this.querySelector('#forgot-correo').value;
+
             try {
-                const data = await API.forgotPassword(email);
-                showSuccess("Se ha procesado la solicitud. Revisa tu correo electrónico.")
+                forgotSubmitBtn.disabled = true;
+                forgotSubmitBtn.textContent = 'ENVIANDO...';
+
+                await API.forgotPassword(email);
+
+                showSuccess("Se ha procesado la solicitud. Revisa tu correo electrónico.");
+                forgotForm.reset();
 
             } catch (error) {
                 showHttpError(error, this);
+            } finally {
+                forgotSubmitBtn.disabled = false;
+                forgotSubmitBtn.textContent = 'ENVIAR CONTRASEÑA NUEVA';
             }
         });
     }
 }
-       
+
 
 
 customElements.define('auth-login', AuthLogin);

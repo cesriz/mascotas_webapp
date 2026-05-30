@@ -97,9 +97,12 @@ export class Notification extends HTMLElement {
                         else notificacionInterna.leido_propietario = 1;
                     }
 
+                    // Actualizamos el contador de appNavbar
+                    window.dispatchEvent(new Event('notificationsUpdated'));
+
                     this.render();
-                } catch (err) {
-                    console.error("Detalle del error al marcar como leída:", err);
+                } catch (error) {
+                    console.error("Detalle del error al marcar como leída:", error);
                     alert("No se pudo marcar como leída");
                 }
             }

@@ -8,6 +8,11 @@ export const navBarHTML = `
                 </div>
             </a>
 
+            <button id="btn-notifications" aria-label="Ver notificaciones">
+                <img src="../assets/icons/mi--notification.svg" alt="Campana">
+                <span id="notification-badge" class="badge" style="display: none;">0</span>
+            </button>
+
             <div class="nav-btn" id="desktop-btn">
                 <button class="button-secondary" id="btn-auth"></button>
                 <button class="button-primary" id="btn-publish"> PUBLICAR ANUNCIO </button>
@@ -18,6 +23,7 @@ export const navBarHTML = `
                 <img src="../assets/icons/material-symbols--menu-rounded.svg" alt="" aria-hidden="true">
             </button>
         </div>
+
         <nav class="navbar" id="navbar">
             <a href="index.html">Inicio</a>
             <a href="tablon">Tablón de anuncios</a>
@@ -67,6 +73,7 @@ export const navBarCSS = `
             gap: 6px;
             flex: 0 0 auto;
             min-width: max-content;
+            order: 1;
         }
 
             .logo-img {
@@ -100,7 +107,36 @@ export const navBarCSS = `
                 color: var(--secondary);
             }
 
+        #btn-notifications {
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: auto;
+            margin-top: 0.5rem;
+            order: 2;
+        }
+
+        #btn-notifications img {
+            width: 35px;
+            height: 35px;
+        }
+
+        #notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--danger);
+            color: white;
+            border-radius: var(--radius-xl);
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
         .nav-btn {
+            width: max-content;
             display:flex;
             align-items: center;
             justify-content: flex-end;
@@ -109,7 +145,8 @@ export const navBarCSS = `
         }
 
         #desktop-btn {
-            flex: 1 1 280px;
+            order: 3;
+            flex: 0 1 auto;
         }
 
         .nav-btn button {
@@ -125,6 +162,7 @@ export const navBarCSS = `
             background: none;
             border: none;
             cursor: pointer;
+            order: 4;
         }
 
         .hamburger-btn img {
@@ -172,15 +210,6 @@ export const navBarCSS = `
             }
 
 
-        .badge {
-            background: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.7rem;
-            position: absolute;
-            top: 0;
-        }
 
     /* -------- Tablet y móvil -------- */
     @media (max-width: 768px) {
@@ -240,6 +269,11 @@ export const navBarCSS = `
             transform: none;
         }
 
+        #btn-notifications img {
+            width: 28px;
+            height: 28px;
+        }
+
         .logo {
             align-self: center;
             transform: none;
@@ -247,6 +281,13 @@ export const navBarCSS = `
 
         #mobile-btn {
             display: flex;
+        }
+
+        #btn-notifications {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 900;
         }
     }
 

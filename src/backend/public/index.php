@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+$appConfig = require __DIR__ . '/../app/Config/app.php';
+date_default_timezone_set($appConfig['timezone'] ?? 'Europe/Madrid');
+
 // Maneja el CORS para que el front se pueda conectar al back
 require_once __DIR__ . '/../app/Config/cors.php';
 

@@ -340,10 +340,6 @@ export const petDetailsCSS = `
             padding: 1rem;
         }
 
-        .carrousel img {
-            width: 100%;
-        }
-
         .pet-det-data,
         .pet-det-description,
         .social-media {

@@ -104,6 +104,15 @@ export class AvistamientoCreationForm extends HTMLElement {
                 console.log("Dirección seleccionada:", data.address);
             });
 
+
+
+
+
+
+
+
+
+
         // Lógica para registrar fotografías y previsualizarlas
             const fotoDiv = this.querySelector('.foto-div');
             const fotoInput = this.querySelector('#avistamiento-fotos');
@@ -111,8 +120,23 @@ export class AvistamientoCreationForm extends HTMLElement {
             const fileNameLabel = this.querySelector('#file-name-label');
             const icon = this.querySelector('#upload-icon');
 
+            
+            // ACCESIBILIDAD
+            fotoDiv.setAttribute('tabindex', '0'); // Permite que el teclado lo "vea"
+            fotoDiv.setAttribute('role', 'button'); // Le dice al lector de voz que es un botón
+
+            // Evento para el ratón
             fotoDiv.addEventListener('click', () => {
                 fotoInput.click();
+            });
+
+            // Evento para el teclado
+            fotoDiv.addEventListener('keydown', (e) => {
+                // Si el usuario pulsa "Enter" o la barra espaciadora
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fotoInput.click(); 
+                }
             });
 
             if (fotoInput) {

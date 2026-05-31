@@ -156,6 +156,24 @@ export const avistamientoCardCSS = `
             pointer-events: auto;
         }
 
+        /* SOPORTE PARA TECLADO (Focus) igual que el Hover */
+        .avistamiento-card.is-owner:focus-within .avistamiento-card-info { 
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+        }
+
+        .avistamiento-card.is-owner:focus-within .avistamiento-card-actions {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .avistamiento-card:focus-visible {
+            box-shadow: 0 0 0 3px var(--secondary500);
+            transform: translateY(-5px);
+        }
+
     /* Badges */
     .badge {
         padding: 5px 20px;

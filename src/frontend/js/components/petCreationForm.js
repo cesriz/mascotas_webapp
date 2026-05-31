@@ -285,8 +285,22 @@ export class PetCreationForm extends HTMLElement {
         const fileNameLabel = this.querySelector('#file-name-label');
         const icon = this.querySelector('#upload-icon');
 
+        // ACCESIBILIDAD
+        fotoDiv.setAttribute('tabindex', '0');
+        fotoDiv.setAttribute('role', 'button');
+        fotoDiv.setAttribute('aria-label', 'Seleccionar fotos de la mascota');
+
+        // Click normal
         fotoDiv.addEventListener('click', () => {
             fotoInput.click();
+        });
+
+        // Soporte teclado
+        fotoDiv.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fotoInput.click();
+            }
         });
 
         if (fotoInput) {

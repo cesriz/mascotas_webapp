@@ -7,24 +7,24 @@ export const appAsideHTML = `
                 <div class="aside-title">
                     <h3>ÁREA PERSONAL</h3>
                 </div>
-                <a class="aside-a" data-panel="mascotas"><img src="../assets/icons/streamline-plump--pet-paw-black.svg"> Mis mascotas</a>
-                <a class="aside-a" data-panel="avistamientos"><img src="../assets/icons/iconamoon--eye-black.svg"> Mis avistamientos</a>
-                <a class="aside-a" data-panel="notificaciones"><img src="../assets/icons/mi--notification-black.svg"> Notificaciones</a>
-                <a class="aside-a" data-panel="miperfil"><img src="../assets/icons/mdi--user-outline-black.svg"> Mi perfil</a>
-                <a class="aside-a" data-panel="publicar" id="aside-publish"></a>
+                <a class="aside-a" href="#" role="button" data-panel="mascotas"><img src="../assets/icons/streamline-plump--pet-paw-black.svg"> Mis mascotas</a>
+                <a class="aside-a" href="#" role="button" data-panel="avistamientos"><img src="../assets/icons/iconamoon--eye-black.svg"> Mis avistamientos</a>
+                <a class="aside-a" href="#" role="button" data-panel="notificaciones"><img src="../assets/icons/mi--notification-black.svg"> Notificaciones</a>
+                <a class="aside-a" href="#" role="button" data-panel="miperfil"><img src="../assets/icons/mdi--user-outline-black.svg"> Mi perfil</a>
+                <a class="aside-a" href="#" role="button" data-panel="publicar" id="aside-publish"></a>
             </div>
 
             <div class="aside-links" id="admin-links">
                 <div class="aside-title">
                     <h3>PANEL DE CONTROL</h3>
                 </div>
-                <a class="aside-a" data-panel="admin-anuncios"><img src="../assets/icons/iconoir--post-black.svg" alt="Icono anuncios"> Moderación de anuncios</a>
-                <a class="aside-a" data-panel="admin-usuarios"><img src="../assets/icons/cuida--users-outline-black.svg" alt="Icono usuarios"> Gestión de usuarios</a>
-                <a class="aside-a" data-panel="admin-reportes"><img src="../assets/icons/mingcute--alert-line-black.svg" alt="Icono reportes"> Reportes</a>
-                <a class="aside-a" data-panel="admin-soporte"><img src="../assets/icons/material-symbols--help-outline-black.svg" alt="Icono soporte"> Soporte</a>
+                <a class="aside-a" href="#" role="button" data-panel="admin-anuncios"><img src="../assets/icons/iconoir--post-black.svg" alt="Icono anuncios"> Moderación de anuncios</a>
+                <a class="aside-a" href="#" role="button" data-panel="admin-usuarios"><img src="../assets/icons/cuida--users-outline-black.svg" alt="Icono usuarios"> Gestión de usuarios</a>
+                <a class="aside-a" href="#" role="button" data-panel="admin-reportes"><img src="../assets/icons/mingcute--alert-line-black.svg" alt="Icono reportes"> Reportes</a>
+                <a class="aside-a" href="#" role="button" data-panel="admin-soporte"><img src="../assets/icons/material-symbols--help-outline-black.svg" alt="Icono soporte"> Soporte</a>
             </div>
 
-            <a class="aside-a" data-panel="logout" id="a-logout"><img src="../assets/icons/humbleicons--logout.svg" alt="Icono anuncios">CERRAR SESIÓN</a>
+            <a class="aside-a" href="#" role="button" data-panel="logout" id="a-logout"><img src="../assets/icons/humbleicons--logout.svg" alt="Icono anuncios">CERRAR SESIÓN</a>
     </aside>
 `;
 
@@ -102,6 +102,8 @@ export const appAsideCSS = `
     }
 
     .aside-a {
+        text-decoration: none;
+        color: inherit;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -115,6 +117,10 @@ export const appAsideCSS = `
         cursor:pointer;
         transition: all 0.2s ease;
     }
+
+.aside-a:visited {
+    color: inherit;        /* Evita que se pongan morados al hacer clic */
+}
 
     .aside-a:hover {
         cursor: pointer;

@@ -101,6 +101,18 @@ export class AvistamientoCard extends HTMLElement {
             }
         });
 
+        // ACCESIBILIDAD: hacer la tarjeta enfocable y permitir activación por teclado
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button'); 
+        card.setAttribute('aria-label', `Ver detalles del avistamiento de ${avistamiento.mascota_nombre}`);
+
+        card.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                const id = this._avistamientoData.mascota_id;
+                if (id) window.location.href = `detalles?id=${id}`;
+            }
+        };
+
         // Badge de estado de la mascota en el momento del avistamiento
         this.applyBadge(avistamiento.estado_mascota);
         // Fotografía

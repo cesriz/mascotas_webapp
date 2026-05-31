@@ -115,6 +115,19 @@ export class PetCard extends HTMLElement {
             }
         });
 
+        // ACCESIBILIDAD 
+        // Hacemos que la tarjeta sea alcanzable con el tabulador
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'article'); // Mejora semántica para lectores de pantalla
+
+        // Permitimos que se pueda "clickear" con el teclado (Enter)
+        card.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                const id = this._petData.id;
+                if (id) window.location.href = `detalles?id=${id}`;
+            }
+        };
+
         // Aplicamos funciones para mostrar la foto, el badge y el titulo
         this.applyPhoto();
         this.applyBadge(pet.estado);

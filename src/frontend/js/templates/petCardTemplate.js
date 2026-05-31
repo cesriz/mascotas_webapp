@@ -213,6 +213,21 @@ export const petCardCSS = `
         pointer-events: auto;
     }
 
+    /* EFECTO CON FOCO (si el usuario logeado es el dueño) - Accesibilidad */
+    .pet-card.is-owner:hover .pet-card-info,
+    .pet-card.is-owner:focus-within .pet-card-info { 
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+    }
+
+    .pet-card.is-owner:hover .pet-card-actions,
+    .pet-card.is-owner:focus-within .pet-card-actions {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
 
     /* ------- Tablet y móvil ---------- */
     @media (max-width: 768px) {

@@ -155,9 +155,9 @@ Ejecutar los scripts SQL en el siguiente orden:
 
 | Servicio    | URL                   |
 | ----------- | --------------------- |
-| Backend API | http://localhost:3000 |
-| phpMyAdmin  | http://localhost:8081 |
-| MySQL       | localhost:3306        |
+| Backend API | http://localhost:puerto a definir |
+| phpMyAdmin  | http://localhost:puerto a definir |
+| MySQL       | localhost:puerto a definir        |
 
 ---
 

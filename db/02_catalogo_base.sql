@@ -91,6 +91,7 @@ INSERT IGNORE INTO razas (especies_id, nombre) VALUES
 ((SELECT id FROM especies WHERE nombre = 'Ave'), 'Yaco (Loro Gris)'),
 ((SELECT id FROM especies WHERE nombre = 'Ave'), 'Guacamayo');
 
+
 -- ROEDORES
 INSERT IGNORE INTO razas (especies_id, nombre) VALUES 
 ((SELECT id FROM especies WHERE nombre = 'Roedor'), 'Hámster Sirio'),

@@ -18,6 +18,11 @@ export const petFiltersHTML = `
                     <label for="especie-select">Especie</label>
                     <select id="especie-select"></select>
                 </div>
+                
+                <div>            
+                    <label for="raza-select">Raza</label>
+                    <select id="raza-select"></select>
+                </div>
 
                 <div>
                     <label for="prov-select">Provincia</label>
@@ -60,11 +65,6 @@ export const petFiltersHTML = `
             </div>
 
             <div class="more-filter-group">
-                <div>            
-                    <label for="raza-select">Raza</label>
-                    <select id="raza-select"></select>
-                </div>
-
                 <div>
                     <label for="sexo-select">Sexo</label>
                     <select id="sexo-select"></select>

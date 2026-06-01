@@ -289,12 +289,18 @@ export const petDetailsCSS = `
             gap: 20px;
         }
 
+        .pet-details-title {
+            font-size: 2rem;
+            padding: 2rem
+        }
+
         .pet-det-data {
             grid-column: 1;
             grid-row: auto;
         }
 
         .pet-det-images {
+            width: 100%;
             grid-column: 1;
             grid-row: auto;
         }
@@ -321,8 +327,17 @@ export const petDetailsCSS = `
 
     @media (max-width: 480px) {
         .pet-det-container {
-            padding: 2rem;
-            gap: 15px;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .pet-det-images {
+            width: 100%;
+        }
+
+        .pet-details-title {
+            font-size: 2rem;
+            padding: 1rem;
         }
 
         .pet-det-data,

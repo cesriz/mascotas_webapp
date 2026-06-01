@@ -1,0 +1,225 @@
+export const authLoginHTML = `
+    <div id="success-div"></div>
+    <http-cat style="display: none;"></http-cat>
+
+    <div id="login-div">
+        <div class="auth-buttons-section">
+            <div class="init-btn-div"><button id="init-btn">INICIAR SESIÓN</button></div>
+            <div class="register-btn-div"><button id="register-btn">REGISTRARSE</button></div>
+        </div>
+
+        <div class="pet-auth-section" id="init-div">
+            <form id="init">
+                <label for="auth-correo">Email</label>
+                <input type="text" id="auth-correo">
+                <span class="error-text" id="error-auth-correo"></span>
+
+                <label for="auth-pass">Contraseña</label>
+                <div class="password-container">
+                    <input type="password" id="auth-pass">
+                    <span class="toggle-pass">
+                        <img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña">
+                    </span>
+                </div>
+                <span class="error-text" id="error-auth-pass"></span>
+
+                <div class="auth-form-buttons">
+                    <button class="button-primary auth-btn" type="submit">ENTRAR</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="pet-auth-section" id="register-div">
+            <form id="register">
+                <label for="register-name">Nombre</label>
+                <input type="text" id="register-name">
+                <span class="error-text" id="error-register-name"></span>
+
+                <label for="register-surname">Apellidos</label>
+                <input type="text" id="register-surname">
+                <span class="error-text" id="error-register-surname"></span>
+
+                <label for="register-direction">Dirección</label>
+                <input type="text" id="register-direction">
+                <span class="error-text" id="error-register-direction"></span>
+
+                <label for="register-phone">Teléfono</label>
+                <input type="text" id="register-phone">
+                <span class="error-text" id="error-register-phone"></span>
+
+                <label for="register-correo">Email</label>
+                <input type="text" id="register-correo">
+                <span class="error-text" id="error-register-correo"></span>
+
+                <label for="register-pass">Contraseña</label>
+                <div class="password-container">
+                    <input type="password" id="register-pass">
+                    <span class="toggle-pass"><img src="../assets/icons/mdi--eye-outline.svg" alt="Icono mostrar contraseña"></span>
+                </div>
+                <span class="error-text" id="error-register-pass"></span>
+
+                <label class="privacy-input">
+                <input type="checkbox" id="privacy-check" required>
+                <span>Mediante el envío de mis datos confirmo que he leído y acepto la <a href="terms.html" target="_blank">política de privacidad</a>.</span>
+                </label>
+
+                <div class="auth-form-buttons">
+                    <button class="button-primary auth-btn" type="submit">REGISTRARME</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class = "changer-div"> <button id="changer">¿Has olvidado tu contraseña?</button> </div>
+
+    <div id="forgot-pss-div">
+        <div class="auth-buttons-section">
+            <h3>¿Has olvidado tu contraseña?</h3>
+        </div>
+        <div class="pet-auth-section">
+            <p>Introduce tu email y te enviarmos una nueva</p>
+            <form id="forgot-pss">
+                <label for="forgot-correo">Email</label>
+                <input type="text" id="forgot-correo">
+                <span class="error-text" id="error-forgot-correo"></span>
+
+                <div class="auth-form-buttons"> 
+                    <button class="button-primary auth-btn" type="submit">ENVIAR CONTRASEÑA NUEVA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+`;
+
+export const authLoginCSS = `
+    /* Contenedores */
+    .pet-auth-section {
+        width: min(500px, 90vw); 
+        margin: 0 auto;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+
+        background-color: var(--backgroundblue);
+        border-top: 1px solid var(--secondary);
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        
+        padding: 2rem;
+    }
+
+    #forgot-pss-div {
+        margin-top: 30px;
+    }
+
+    /* Inputs */
+    .pet-auth-section form {
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px; 
+    }
+
+    /* Botones */
+
+    .auth-buttons-section {
+        width: min(500px, 90vw);
+        height: auto;
+        margin: 0 auto;
+        display: flex;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        background-color: var(--backgroundblue);
+    }
+
+    .auth-buttons-section button {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: none;
+        padding: 1.5rem;
+        background-color: inherit;
+        font-size: var(--text-md);
+        font-weight: 550;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .init-btn-div {
+        width: 50%;
+        height: 100%;
+        border-radius: var(--radius-md) 0 0 0;
+    }
+
+    .register-btn-div {
+        width: 50%;
+        height: 100%;
+        border-radius: 0 var(--radius-md) 0 0;
+    }
+
+
+    .auth-form-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+    }
+
+    .auth-button {
+        width: 100%;
+        max-width: 250px;
+        font-size: var(--text-sm);
+    }
+
+    .changer-div {
+        width: 100%;
+        height: fit-content;
+        display:flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    #changer {
+        border: none;
+        width: fit-content;
+        font-size: var(--text-md);
+    }
+
+    #changer:hover {
+        color: var(--primary);
+        font-weight: bold;
+
+    }
+
+    /* Otros */
+
+    h3 {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        font-size: var(--text-2md);
+    }
+
+
+    /* --------Tablets y móviles--------- */
+    @media (max-width: 768px) {
+        button {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        h3 {
+            font-size: 0.95rem;
+        }
+
+        button {
+            padding: 0.9rem;
+        }
+
+        pet-auth-section p {
+            font-size: 0.95rem;
+        }
+    }      
+`;

@@ -11,26 +11,31 @@ Thumbs.db
 #################################
 .env
 .env.*
-config/db.php
+
+# Como ya no contiene secretos rales y es necesario para el despliegue en Railway, se ha eliminado de la lista de ignorados
+# src/backend/app/Config/database.php
 
 #################################
 # PHP / Composer
 #################################
-/vendor/
-composer.lock
+vendor/
+
 
 #################################
-# Docker
+# Node / Frontend
 #################################
-docker/db_data/
+node_modules/
+
+#################################
+# Docker / Base de datos
+#################################
+mysql_data/
 *.pid
 
 #################################
 # Subidas de usuarios
 #################################
-uploads/
-public/uploads/
-src/public/uploads/
+src/backend/public/uploads/
 
 #################################
 # Logs / temporales
@@ -38,4 +43,3 @@ src/public/uploads/
 *.log
 /tmp/
 cache/
-

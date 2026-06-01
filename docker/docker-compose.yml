@@ -1,0 +1,80 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mascotas_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mascotas_webapp
+    ports:
+      - "3306:3306"
+    volumes:
+      # Persistencia de datos de MySQL
+      - ../mysql_data:/var/lib/mysql
+
+      # Scripts SQL iniciales
+      # Todo .sql que haya en db/ se ejecutará la primera vez
+      # que se cree la base de datos
+      - ../db:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.1-apache
+    container_name: mascotas_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+
+  backend-app:
+    build:
+      # Usamos la raíz del proyecto como contexto
+      context: ..
+
+      # El Dockerfile está dentro de la carpeta docker
+      dockerfile: docker/Dockerfile
+    container_name: mascotas_backend_app
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - ../.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Montamos todo src para que el proyecto completo esté accesible
+      - ../src:/var/www/project
+
+      # Configuración de Apache para servir backend/public
+      - ./000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+
+      # Configuración opcional de Xdebug
+      # Déjalo solo si existe docker/xdebug.ini
+      - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    ports:
+      - "3000:80"
+
+  # Descomentar cuando implemente frontend
+  frontend-app:
+    image: node:20
+    container_name: mascotas_frontend_app
+    restart: unless-stopped
+    working_dir: /app
+    depends_on:
+      - backend-app
+    volumes:
+      - ../src/frontend:/app
+    ports:
+      - "4200:4200"
+    command: npx serve -l 4200
+  # Ejecuta al iniciar el contenedor:
+  # 1. Instala dependencias del proyecto (npm install)
+  # 2. Arranca el servidor de desarrollo del frontend
+  # 3. Usa --host 0.0.0.0 para que sea accesible desde el navegador fuera del contenedor
+  # 4. Ejecuta "npm run dev -- --host 0.0.0.0" para que el servidor se actualice automáticamente al modificar los archivos

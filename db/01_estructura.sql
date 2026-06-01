@@ -110,8 +110,7 @@ CREATE TABLE IF NOT EXISTS municipios (
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
 
-    UNIQUE KEY uk_municipio_provincia_nombre (provincia_id, nombre),
-    INDEX idx_municipios_provincia_nombre (provincia_id, nombre)
+    UNIQUE KEY uk_municipio_provincia_nombre (provincia_id, nombre)
 ) ENGINE=InnoDB;
 
 -- =========================================
@@ -193,8 +192,7 @@ CREATE TABLE IF NOT EXISTS anuncio_mascotas (
         )
 ) ENGINE=InnoDB;
 
-CREATE INDEX idx_anuncio_mascotas_fecha_eliminacion
-ON anuncio_mascotas(fecha_eliminacion);
+
 
 -- =========================================
 -- TABLA: MASCOTAS_COLORES
@@ -430,9 +428,6 @@ CREATE INDEX idx_razas_especies_id
 ON razas(especies_id);
 
 -- TABLA: ANUNCIO_MASCOTAS
-CREATE INDEX idx_anuncio_usuario_id
-ON anuncio_mascotas(usuario_id);
-
 CREATE INDEX idx_anuncio_raza_id
 ON anuncio_mascotas(raza_id);
 
@@ -448,6 +443,9 @@ ON anuncio_mascotas(estado_publicacion, estado, fecha_registro);
 CREATE INDEX idx_anuncio_usuario_fecha
 ON anuncio_mascotas(usuario_id, fecha_registro);
 
+CREATE INDEX idx_anuncio_mascotas_fecha_eliminacion
+ON anuncio_mascotas(fecha_eliminacion);
+
 -- TABLA: MASCOTAS_COLORES
 CREATE INDEX idx_mascotas_colores_color_id
 ON mascotas_colores(color_id);
@@ -458,9 +456,6 @@ ON avistamientos(mascota_id);
 
 CREATE INDEX idx_avistamientos_ubicacion_id
 ON avistamientos(ubicaciones_avistamientos_id);
-
-CREATE INDEX idx_avistamientos_usuario_id
-ON avistamientos(usuario_id);
 
 CREATE INDEX idx_avistamientos_fecha_hora
 ON avistamientos(fecha_hora);
@@ -498,9 +493,6 @@ ON ubicaciones(provincia);
 -- TABLA: MENSAJES_CONTACTO
 CREATE INDEX idx_mensajes_contacto_mascota
 ON mensajes_contacto(mascota_id);
-
-CREATE INDEX idx_mensajes_contacto_usuario_destinatario
-ON mensajes_contacto(usuario_destinatario_id);
 
 CREATE INDEX idx_mensajes_contacto_usuario_remitente
 ON mensajes_contacto(usuario_remitente_id);

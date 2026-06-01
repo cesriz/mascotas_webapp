@@ -99,14 +99,14 @@ Los scripts SQL estan en `db/`:
 - `01_estructura.sql`: estructura de tablas.
 - `02_catalogo_base.sql`: catalogos base de especies, razas y colores.
 - `03_catalogo_ubicacion.sql`: catalogos de provincias y municipios.
-- `04_datos_prueba.sql`: datos de prueba.
+- `04_datos_demo.sql`: datos demo.
 
 Orden recomendado:
 
 1. `01_estructura.sql`
 2. `02_catalogo_base.sql`
 3. `03_catalogo_ubicacion.sql`
-4. `04_datos_prueba.sql`
+4. `04_datos_demo.sql`
 
 Puedes importarlos desde un cliente MySQL conectado a Railway o desde las herramientas de datos disponibles en Railway.
 

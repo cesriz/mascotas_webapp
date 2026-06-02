@@ -38,11 +38,16 @@ class SoporteValidator
             ];
         }
 
+        $usuarioId = null;
+        if (isset($data['usuario_id']) && is_numeric($data['usuario_id']) && (int) $data['usuario_id'] > 0) {
+            $usuarioId = (int) $data['usuario_id'];
+        }
+
         // Devuelve datos ya limpios y con valores por defecto.
         return [
             'errors' => [],
             'data' => [
-                'usuario_id' => $data['usuario_id'] ?? null,
+                'usuario_id' => $usuarioId,
                 'asunto' => trim((string) $data['asunto']),
 
                 // Si no se indica categoría, se asigna GENERAL.

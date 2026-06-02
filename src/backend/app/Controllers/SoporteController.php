@@ -51,7 +51,7 @@ class SoporteController
                 $input['telefono'] = $usuario['telefono'];
             }
         } else {
-            $input['usuario_id'] = isset($input['usuario_id']) ? (int) $input['usuario_id'] : null;
+            $input['usuario_id'] = null;
         }
 
         $result = SoporteValidator::validateStore($input);

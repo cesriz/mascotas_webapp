@@ -48,17 +48,17 @@ INSERT INTO usuarios (
     email_verificado,
     activo
 ) VALUES
-('Admin', 'Sistema', 'admin@proyectoanimales.com', '111222333', 'Murcia', 'ADMIN', '$2y$10$Q4dk6tGqsDTnZ619LREUweC6nMzO0SFfeMTCrHnx0pjUIZn7YCGK6', TRUE, TRUE), -- Contraseña: "123456"
-('Laura', 'Martinez Lopez', 'laura@example.com', '600222333', 'Murcia', 'USUARIO', '$2y$12$PNsXbjGCi2mID1at7EbedO0hAXaAjBL59na.ili33u.F1nNkyCQKS', TRUE, TRUE),
-('Carlos', 'Perez Sanchez', 'carlos@example.com', '600333444', 'Molina de Segura', 'USUARIO', '$2y$12$.Cy134CMtz/0FAljE47nuOwywC5O27KkC1KNE07yQlLMxVH2VSTo2', FALSE, TRUE),
-('Marta', 'Ruiz Garcia', 'marta@example.com', '600444777', 'Alcantarilla', 'USUARIO', '$2y$12$PNsXbjGCi2mID1at7EbedO0hAXaAjBL59na.ili33u.F1nNkyCQKS', TRUE, TRUE),
-('Diego', 'Navarro Torres', 'diego@example.com', '600555888', 'Murcia', 'USUARIO', '$2y$12$.Cy134CMtz/0FAljE47nuOwywC5O27KkC1KNE07yQlLMxVH2VSTo2', FALSE, TRUE);
+('Admin', 'Sistema', 'proyecto.mascotasapp+admin@gmail.com', '111222333', 'Murcia', 'ADMIN', '$2y$10$Q4dk6tGqsDTnZ619LREUweC6nMzO0SFfeMTCrHnx0pjUIZn7YCGK6', TRUE, TRUE), -- Contraseña: "123456"
+('Laura', 'Martinez Lopez', 'proyecto.mascotasapp+laura@gmail.com', '600222333', 'Murcia', 'USUARIO', '$2y$10$Q4dk6tGqsDTnZ619LREUweC6nMzO0SFfeMTCrHnx0pjUIZn7YCGK6', TRUE, TRUE), -- Contraseña: "123456"
+('Carlos', 'Perez Sanchez', 'proyecto.mascotasapp+carlos@gmail.com', '600333444', 'Molina de Segura', 'USUARIO', '$2y$10$Q4dk6tGqsDTnZ619LREUweC6nMzO0SFfeMTCrHnx0pjUIZn7YCGK6', FALSE, TRUE), -- Contraseña: "123456"
+('Marta', 'Ruiz Garcia', 'proyecto.mascotasapp+marta@gmail.com', '600444777', 'Alcantarilla', 'USUARIO', '$2y$10$Q4dk6tGqsDTnZ619LREUweC6nMzO0SFfeMTCrHnx0pjUIZn7YCGK6', TRUE, TRUE), -- Contraseña: "123456"
+('Diego', 'Navarro Torres', 'proyecto.mascotasapp+diego@gmail.com', '600555888', 'Murcia', 'USUARIO', '$2y$10$Q4dk6tGqsDTnZ619LREUweC6nMzO0SFfeMTCrHnx0pjUIZn7YCGK6', FALSE, TRUE); -- Contraseña: "123456"
 
-SET @usuario_admin = (SELECT id FROM usuarios WHERE correo = 'admin@proyectoanimales.com' LIMIT 1);
-SET @usuario_laura = (SELECT id FROM usuarios WHERE correo = 'laura@example.com' LIMIT 1);
-SET @usuario_carlos = (SELECT id FROM usuarios WHERE correo = 'carlos@example.com' LIMIT 1);
-SET @usuario_marta = (SELECT id FROM usuarios WHERE correo = 'marta@example.com' LIMIT 1);
-SET @usuario_diego = (SELECT id FROM usuarios WHERE correo = 'diego@example.com' LIMIT 1);
+SET @usuario_admin = (SELECT id FROM usuarios WHERE correo = 'proyecto.mascotasapp+admin@gmail.com' LIMIT 1);
+SET @usuario_laura = (SELECT id FROM usuarios WHERE correo = 'proyecto.mascotasapp+laura@gmail.com' LIMIT 1);
+SET @usuario_carlos = (SELECT id FROM usuarios WHERE correo = 'proyecto.mascotasapp+carlos@gmail.com' LIMIT 1);
+SET @usuario_marta = (SELECT id FROM usuarios WHERE correo = 'proyecto.mascotasapp+marta@gmail.com' LIMIT 1);
+SET @usuario_diego = (SELECT id FROM usuarios WHERE correo = 'proyecto.mascotasapp+diego@gmail.com' LIMIT 1);
 
 -- =========================================
 -- UBICACIONES
@@ -213,7 +213,7 @@ INSERT INTO avistamientos (
     leido_propietario
 ) VALUES
 (@mascota_toby, '2026-03-19 19:30:00', @ubic_parque_seda, 'Vi un perro parecido corriendo cerca del parque. Parecía desorientado.', '600444555', 'testigo1@example.com', NULL, FALSE),
-(@mascota_toby, '2026-03-20 09:15:00', @ubic_juan_carlos, 'Creo que era Toby, estaba cerca de una cafetería pidiendo comida.', '600333444', 'carlos@example.com', @usuario_carlos, FALSE),
+(@mascota_toby, '2026-03-20 09:15:00', @ubic_juan_carlos, 'Creo que era Toby, estaba cerca de una cafetería pidiendo comida.', '600333444', 'proyecto.mascotasapp+carlos@gmail.com', @usuario_carlos, FALSE),
 (@mascota_misu, '2026-03-21 22:10:00', @ubic_molina_centro, 'Gata negra atigrada vista junto a unos contenedores.', '600555666', 'testigo2@example.com', NULL, FALSE),
 (@mascota_luna, '2026-04-03 21:15:00', @ubic_alfonso_x, 'Vi una gata gris y blanca cerca de las terrazas.', '600888111', 'aviso.luna@example.com', NULL, FALSE),
 (@mascota_kira, '2026-04-09 18:30:00', @ubic_el_valle, 'Una perra parecida pasó corriendo junto al área recreativa.', '600888222', 'senderista@example.com', @usuario_carlos, FALSE),
@@ -311,12 +311,12 @@ INSERT INTO mensajes_contacto (
     fecha_creacion,
     fecha_leido
 ) VALUES
-(@mascota_toby, @usuario_laura, @usuario_carlos, 'Carlos Perez Sanchez', 'carlos@example.com', '600333444', 'Creo haber visto a Toby cerca de una cafetería. Puedo enviar más detalles.', FALSE, '2026-03-20 10:05:00', NULL),
+(@mascota_toby, @usuario_laura, @usuario_carlos, 'Carlos Perez Sanchez', 'proyecto.mascotasapp+carlos@gmail.com', '600333444', 'Creo haber visto a Toby cerca de una cafetería. Puedo enviar más detalles.', FALSE, '2026-03-20 10:05:00', NULL),
 (@mascota_misu, @usuario_carlos, NULL, 'Vecina de Molina', 'vecina@example.com', '600777888', 'He visto una gata parecida a Misu por la zona del centro.', TRUE, '2026-03-22 18:40:00', '2026-03-22 19:10:00'),
 (@mascota_luna, @usuario_laura, NULL, 'Ana Ruiz', 'ana.ruiz@example.com', '600111222', 'He visto una gata muy parecida entrando en un portal cerca de Alfonso X.', FALSE, '2026-04-04 09:25:00', NULL),
-(@mascota_coco, @usuario_carlos, @usuario_laura, 'Laura Martinez Lopez', 'laura@example.com', '600222333', 'Creo que Coco podría ser de una familia de mi barrio. Te paso información.', FALSE, '2026-04-14 18:05:00', NULL),
-(@mascota_nube, @usuario_laura, @usuario_carlos, 'Carlos Perez Sanchez', 'carlos@example.com', '600333444', 'He visto el aviso de Nube y estaré atento por la zona.', TRUE, '2026-04-21 12:30:00', '2026-04-21 13:00:00'),
-(@mascota_pelusa, @usuario_marta, @usuario_diego, 'Diego Navarro Torres', 'diego@example.com', '600555888', 'Creo haber visto a Pelusa cerca de Plaza Circular. Puedo revisar si vuelve a aparecer por la zona.', FALSE, '2026-04-25 09:15:00', NULL),
+(@mascota_coco, @usuario_carlos, @usuario_laura, 'Laura Martinez Lopez', 'proyecto.mascotasapp+laura@gmail.com', '600222333', 'Creo que Coco podría ser de una familia de mi barrio. Te paso información.', FALSE, '2026-04-14 18:05:00', NULL),
+(@mascota_nube, @usuario_laura, @usuario_carlos, 'Carlos Perez Sanchez', 'proyecto.mascotasapp+carlos@gmail.com', '600333444', 'He visto el aviso de Nube y estaré atento por la zona.', TRUE, '2026-04-21 12:30:00', '2026-04-21 13:00:00'),
+(@mascota_pelusa, @usuario_marta, @usuario_diego, 'Diego Navarro Torres', 'proyecto.mascotasapp+diego@gmail.com', '600555888', 'Creo haber visto a Pelusa cerca de Plaza Circular. Puedo revisar si vuelve a aparecer por la zona.', FALSE, '2026-04-25 09:15:00', NULL),
 (@mascota_kiwi, @usuario_diego, NULL, 'Vecina de Plaza Circular', 'vecina.circular@example.com', '600222999', 'El periquito sigue en una terraza cercana. Puede que alguien lo esté buscando.', FALSE, '2026-04-25 17:20:00', NULL);
 
 -- =========================================
@@ -337,9 +337,9 @@ INSERT INTO reportes_anuncios (
     revisado_por,
     notas_admin
 ) VALUES
-(@mascota_toby, @usuario_carlos, @usuario_laura, 'Información incorrecta en el anuncio', 'La zona indicada podría no coincidir con el último avistamiento.', 'Carlos Perez Sanchez', 'carlos@example.com', '600333444', 'PENDIENTE', '2026-03-21 12:00:00', NULL, NULL, NULL),
+(@mascota_toby, @usuario_carlos, @usuario_laura, 'Información incorrecta en el anuncio', 'La zona indicada podría no coincidir con el último avistamiento.', 'Carlos Perez Sanchez', 'proyecto.mascotasapp+carlos@gmail.com', '600333444', 'PENDIENTE', '2026-03-21 12:00:00', NULL, NULL, NULL),
 (@mascota_misu, NULL, @usuario_carlos, 'Imagen poco clara', 'La foto no permite identificar bien a la mascota.', 'Usuario anónimo', 'anonimo@example.com', NULL, 'REVISADO', '2026-03-23 09:30:00', '2026-03-23 11:00:00', @usuario_admin, 'Revisado por admin. No requiere acción.'),
-(@mascota_rocky, @usuario_laura, @usuario_carlos, 'Posible duplicado', 'Este anuncio podría estar duplicado con otro perro encontrado en Alcantarilla.', 'Laura Martinez Lopez', 'laura@example.com', '600222333', 'PENDIENTE', '2026-04-06 14:35:00', NULL, NULL, NULL),
+(@mascota_rocky, @usuario_laura, @usuario_carlos, 'Posible duplicado', 'Este anuncio podría estar duplicado con otro perro encontrado en Alcantarilla.', 'Laura Martinez Lopez', 'proyecto.mascotasapp+laura@gmail.com', '600222333', 'PENDIENTE', '2026-04-06 14:35:00', NULL, NULL, NULL),
 (@mascota_chispa, NULL, @usuario_carlos, 'Datos de contacto incompletos', 'El anuncio podría necesitar una descripción más concreta de la zona.', 'Visitante', 'visitante.reporte@example.com', NULL, 'DESCARTADO', '2026-04-23 10:00:00', '2026-04-23 10:45:00', @usuario_admin, 'Descartado tras revisar el contenido del anuncio.');
 
 -- =========================================
@@ -359,7 +359,7 @@ INSERT INTO mensajes_soporte (
     cerrado_por,
     notas_admin
 ) VALUES
-(@usuario_laura, 'No puedo editar mi anuncio', 'ANUNCIOS', 'Al intentar guardar cambios en mi anuncio aparece un error.', 'Laura Martinez Lopez', 'laura@example.com', '600222333', 'ABIERTO', '2026-03-24 16:20:00', NULL, NULL, NULL),
+(@usuario_laura, 'No puedo editar mi anuncio', 'ANUNCIOS', 'Al intentar guardar cambios en mi anuncio aparece un error.', 'Laura Martinez Lopez', 'proyecto.mascotasapp+laura@gmail.com', '600222333', 'ABIERTO', '2026-03-24 16:20:00', NULL, NULL, NULL),
 (NULL, 'Duda sobre registro', 'CUENTA', 'Quiero saber si puedo publicar un avistamiento sin crear una cuenta.', 'Visitante', 'visitante@example.com', NULL, 'CERRADO', '2026-03-18 08:45:00', '2026-03-18 10:15:00', @usuario_admin, 'Respondido: los avistamientos públicos están permitidos.'),
-(@usuario_carlos, 'No veo mis notificaciones', 'NOTIFICACIONES', 'Tengo avistamientos enviados pero no encuentro el contador de notificaciones.', 'Carlos Perez Sanchez', 'carlos@example.com', '600333444', 'ABIERTO', '2026-04-15 12:10:00', NULL, NULL, NULL),
-(@usuario_laura, 'Consulta sobre fotos', 'ANUNCIOS', 'Quiero saber si puedo subir más de una foto en el anuncio.', 'Laura Martinez Lopez', 'laura@example.com', '600222333', 'CERRADO', '2026-04-19 17:25:00', '2026-04-19 18:00:00', @usuario_admin, 'Se indica que el formulario permite seleccionar varias imágenes.');
+(@usuario_carlos, 'No veo mis notificaciones', 'NOTIFICACIONES', 'Tengo avistamientos enviados pero no encuentro el contador de notificaciones.', 'Carlos Perez Sanchez', 'proyecto.mascotasapp+carlos@gmail.com', '600333444', 'ABIERTO', '2026-04-15 12:10:00', NULL, NULL, NULL),
+(@usuario_laura, 'Consulta sobre fotos', 'ANUNCIOS', 'Quiero saber si puedo subir más de una foto en el anuncio.', 'Laura Martinez Lopez', 'proyecto.mascotasapp+laura@gmail.com', '600222333', 'CERRADO', '2026-04-19 17:25:00', '2026-04-19 18:00:00', @usuario_admin, 'Se indica que el formulario permite seleccionar varias imágenes.');

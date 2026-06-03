@@ -170,6 +170,6 @@ class AuthService
 
         $baseUrl = rtrim($baseUrl, '/');
 
-        return $baseUrl . '/reset-password?token=' . urlencode($plainToken);
+        return $baseUrl . '/reset-password.html?token=' . urlencode($plainToken);
     }
 }
